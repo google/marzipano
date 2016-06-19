@@ -30,7 +30,6 @@ make-swf $DIST/marzipano.swf
 
 browserify \
   --noparse=node_modules/**/*.js \
-  -t glslify \
   -s Marzipano \
   -o $DIST/marzipano.js \
   $SRC/index.js

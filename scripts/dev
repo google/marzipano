@@ -28,7 +28,6 @@ make-swf $BUILD/marzipano.swf
 
 watchify -v -d \
   --noparse=node_modules/**/*.js \
-  -t glslify \
   -s Marzipano \
   -o $BUILD/marzipano.js \
   $SRC/index.js &

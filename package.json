@@ -28,6 +28,11 @@
     "hammerjs": "git://github.com/digisfera/hammer.js.git",
     "minimal-event-emitter": "^0.1.0"
   },
+  "browserify": {
+    "transform": [
+      "glslify"
+    ]
+  },
   "devDependencies": {
     "async": "^1.5.2",
     "browserify": "^13.0.0",
