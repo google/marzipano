@@ -37,6 +37,8 @@ package {
   import flash.system.LoaderContext;
   import flash.system.Security;
   import flash.utils.Dictionary;
+  import mx.graphics.codec.JPEGEncoder;
+  import mx.utils.Base64Encoder;
 
   public class FlashCommon extends Sprite {
 
@@ -62,6 +64,7 @@ package {
       ExternalInterface.addCallback('destroyTexture', destroyTexture);
       ExternalInterface.addCallback('drawCubeTiles', drawCubeTiles);
       ExternalInterface.addCallback('drawFlatTiles', drawFlatTiles);
+      ExternalInterface.addCallback('takeSnapshot', takeSnapshot);
 
       var callbacksObjName:String = loaderInfo.parameters.callbacksObjName as String;
       imageLoadedCallback = callbacksObjName + '.imageLoaded';
@@ -470,6 +473,28 @@ package {
         texture.parent.removeChild(texture);
       }
       delete textureMap[id];
+    }
+    
+    public function takeSnapshot(quality:uint):String {
+      // Make an empty snap of stage size
+      var snap:BitmapData = new BitmapData (
+        stage.width,
+        stage.height,
+        false
+      );
+      
+      // Draw each layer onto it
+      for each (var layer:Sprite in layerMap) snap.draw(layer);
+      
+      // Make Base64Encoder and JPEGEncoder for exporting
+      var buffer:Base64Encoder = new Base64Encoder();
+      var jpeg:JPEGEncoder = new JPEGEncoder(quality);
+      
+      // Base40 encode jpeg data
+      buffer.encodeBytes(jpeg.encode(snap));
+      
+      // Return proper base64 DataURI
+      return 'data:image/jpeg;charset=utf-8;base64,' + buffer.toString();
     }
   }
 }

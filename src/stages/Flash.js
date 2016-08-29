@@ -211,8 +211,9 @@ FlashStage.prototype._callListeners = function(callbackName) {
 
 
 FlashStage.prototype._checkReady = function() {
-  var isReady = this._flashElement.isReady;
-  if (!isReady || !isReady()) {
+  if (!this._flashElement
+  ||  !this._flashElement.isReady
+  ||  !this._flashElement.isReady()) {
     // Not ready yet.
     return false;
   }
@@ -288,6 +289,26 @@ FlashStage.prototype.startFrame = function() {};
 
 
 FlashStage.prototype.endFrame = function() {};
+
+
+FlashStage.prototype.takeSnapshot = function (options) {
+  
+  // Validate passed argument
+  if (typeof options !== 'object' || options == null) options = {};
+  
+  var quality = options.quality;
+  
+  // Set default quality if it is not passed
+  if (typeof quality == 'undefined') quality = 75;
+  
+  // Throw if quality is of invlid type or out of bounds
+  if (typeof quality !== 'number' || quality < 0 || quality > 100)
+  throw new Error('FlashStage: Snapshot quality needs to be a number between 0 and 100');
+  
+  // Return the snapshot by executing a flash-exported method
+  return this._flashElement.takeSnapshot(quality);
+  
+}
 
 
 FlashStage.type = FlashStage.prototype.type = 'flash';
