@@ -21,7 +21,6 @@ var WorkQueue = require('../collections/WorkQueue');
 var inherits = require('../util/inherits');
 var defer = require('../util/defer');
 var setAbsolute = require('../util/dom').setAbsolute;
-var setPixelSize = require('../util/dom').setPixelSize;
 var setFullSize = require('../util/dom').setFullSize;
 var setBlocking = require('../util/dom').setBlocking;
 var loadImageFlash = require('./loadImageFlash');
@@ -158,14 +157,7 @@ FlashStage.supported = function() {
 };
 
 
-FlashStage.prototype._updateSize = function() {
-  var element = this._domElement;
-  var width = this._width;
-  var height = this._height;
-
-  // Update DOM element size.
-  setPixelSize(element, width, height);
-};
+FlashStage.prototype._setSize = function() {};
 
 
 FlashStage.prototype.loadImage = function(tile, rect, done) {

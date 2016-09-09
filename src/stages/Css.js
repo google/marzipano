@@ -21,7 +21,6 @@ var browser = require('bowser');
 var inherits = require('../util/inherits');
 var loadImageHtml = require('./loadImageHtml');
 var setAbsolute = require('../util/dom').setAbsolute;
-var setPixelSize = require('../util/dom').setPixelSize;
 var setFullSize = require('../util/dom').setFullSize;
 var setNullTransformOrigin = require('../util/dom').setNullTransformOrigin;
 
@@ -85,14 +84,7 @@ CssStage.supported = function() {
 };
 
 
-CssStage.prototype._updateSize = function() {
-  var element = this._domElement;
-  var width = this._width;
-  var height = this._height;
-
-  // Update DOM element size.
-  setPixelSize(element, width, height);
-};
+CssStage.prototype._setSize = function() {};
 
 
 CssStage.prototype.loadImage = loadImageHtml;

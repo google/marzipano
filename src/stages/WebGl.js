@@ -125,7 +125,7 @@ WebGlStage.prototype.destroy = function() {
 
   this.constructor.super_.prototype.destroy.call(this);
 
-  this._domElement.removeEventListener('webglcontextlost', this._handleContextLoss);
+  this.removeEventListener('webglcontextlost', this._handleContextLoss);
   this._domElement = null;
   this._rendererInstances = null;
   this._gl = null;
@@ -145,20 +145,13 @@ WebGlStage.prototype.webGlContext = function() {
 };
 
 
-WebGlStage.prototype._updateSize = function() {
-  var element = this._domElement;
-  var width = this._width;
-  var height = this._height;
+WebGlStage.prototype._setSize = function() {
+  // Update the size of the canvas coordinate space. The size is obtained by
+  // taking the stage dimensions, which are set in CSS pixels, and multiplying
+  // them by the device pixel ratio.
   var ratio = pixelRatio();
-
-  // Update canvas size, scaling by the device pixel ratio.
-  this._domElement.width = ratio * width;
-  this._domElement.height = ratio * height;
-
-  // Update DOM element size.
-  // This must be done asynchronously on iOS 8 for the canvas to be scaled
-  // correctly.
-  defer(setPixelSize.bind(null, element, width, height));
+  this._domElement.width = ratio * this._width;
+  this._domElement.height = ratio * this._height;
 };
 
 

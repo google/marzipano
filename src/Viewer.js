@@ -151,7 +151,8 @@ function Viewer(domElement, opts) {
   this._controlContainer.appendChild(controlCapture);
   domElement.appendChild(this._controlContainer);
 
-  // Respond to size changes.
+  // Respond to window size changes.
+  this._size = {};
   this.updateSize();
   this._updateSizeListener = this.updateSize.bind(this);
   window.addEventListener('resize', this._updateSizeListener);
@@ -221,6 +222,7 @@ Viewer.prototype.destroy = function() {
 
   window.removeEventListener('resize', this._updateSizeListener);
   this._updateSizeListener = null;
+  this._size = null;
 
   if (this._scene) {
     this._scene.view().removeEventListener('change', this._viewChangeHandler);
@@ -265,9 +267,15 @@ Viewer.prototype.destroy = function() {
 
 /**
  * Update the stage size to fill the containing element.
+ *
+ * This method is automatically called when the browser window is resized.
+ * Most clients won't need to explicitly call it to keep the size up to date.
  */
 Viewer.prototype.updateSize = function() {
-  this._stage.updateSize();
+  var size = this._size;
+  size.width = this._domElement.clientWidth;
+  size.height = this._domElement.clientHeight;
+  this._stage.setSize(size);
 };
 
 

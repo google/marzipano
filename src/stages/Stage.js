@@ -150,17 +150,21 @@ Stage.prototype.size = function(obj) {
 
 
 /**
- * Update the size by querying the DOM. This will usually be called from a
- * window.onresize event handler.
+ * Set the stage dimensions.
  *
  * This contains the size update logic common to all stage types. Subclasses
- * define the _updateSize() method to perform their own logic, if required.
+ * define the _setSize() method to perform their own logic, if required.
+ *
+ * @param {Object} obj
+ * @param {number} obj.width
+ * @param {number} obj.height
+ *
  */
-Stage.prototype.updateSize = function() {
-  this._width = this._domElement.parentElement.clientWidth;
-  this._height = this._domElement.parentElement.clientHeight;
+Stage.prototype.setSize = function(size) {
+  this._width = size.width;
+  this._height = size.height;
 
-  this._updateSize(); // defined by subclasses
+  this._setSize(); // must be defined by subclasses.
 
   this.emit('resize');
   this.emitRenderInvalid();
