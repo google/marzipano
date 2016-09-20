@@ -484,7 +484,9 @@ package {
       );
       
       // Draw each layer onto it
-      for each (var layer:Sprite in layerMap) snap.draw(layer);
+      for each (var layer:Sprite in layerMap) {
+        snap.draw(layer);
+      }
       
       // Make Base64Encoder and JPEGEncoder for exporting
       var buffer:Base64Encoder = new Base64Encoder();
