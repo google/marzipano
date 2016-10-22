@@ -71,9 +71,9 @@ eventEmitter(KeyControlMethod);
   Destroy the instance
 */
 KeyControlMethod.prototype.destroy = function() {
-  this._element.addEventListener('keydown', this._keydownHandler);
-  this._element.addEventListener('keyup', this._keyupHandler);
-  window.addEventListener('blur', this._blurHandler);
+  this._element.removeEventListener('keydown', this._keydownHandler);
+  this._element.removeEventListener('keyup', this._keyupHandler);
+  window.removeEventListener('blur', this._blurHandler);
 };
 
 KeyControlMethod.prototype._handlePress = function(e) {
