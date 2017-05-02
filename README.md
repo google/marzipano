@@ -21,8 +21,8 @@ You can include Marzipano in your project in two different ways:
 ### Developer guide
 
 This is an `npm`-based project.
-A [Node.js](http://www.nodejs.org) installation is required for development. (Set 32-bit Java path in your PATH, as MXMLC does not support 64-bit Java)
-You also need a Java compiler to build the SWF file containing the Flash renderers. 
+A [Node.js](http://www.nodejs.org) installation is required for development. 
+You also need a Java compiler to build the SWF file containing the Flash renderers. (Set 32-bit Java path in your PATH, as MXMLC does not support 64-bit Java) 
 
 Run `npm install` to install the dependencies. If you haven't in a while,
 bring them up to date with `npm update`.
