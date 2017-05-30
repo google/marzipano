@@ -45,6 +45,8 @@ var DragCursor = require('./controls/DragCursor');
 
 var HammerGestures = require('./controls/HammerGestures');
 
+var browser = require('bowser');
+
 var stageMap = {
   webgl: WebGlStage,
   css: CssStage,
@@ -136,9 +138,14 @@ function Viewer(domElement, opts) {
   setFullSize(this._controlContainer);
 
   // Prevent bounce scroll effect on iOS.
-  this._controlContainer.addEventListener('touchstart', function(event) {
-    event.preventDefault();
-  });
+  // Applied only for iOS, as Android's events must have the default action to allow interaction with hotspots.
+  var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+  if (browser.ios) {
+    this._controlContainer.addEventListener('touchstart', function(event) {
+      event.preventDefault();
+    });
+  }
+
 
   // Old IE does not detect mouse events on elements without background
   // Add a child element to the controls with full width, a background color
