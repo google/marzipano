@@ -45,6 +45,8 @@ var DragCursor = require('./controls/DragCursor');
 
 var HammerGestures = require('./controls/HammerGestures');
 
+var browser = require('bowser');
+
 var stageMap = {
   webgl: WebGlStage,
   css: CssStage,
@@ -136,9 +138,9 @@ function Viewer(domElement, opts) {
   setFullSize(this._controlContainer);
 
   // Prevent bounce scroll effect on iOS.
-  // Applied only for iPhone, as Android's events must have the default action to allow a proper hotspots' usage
+  // Applied only for iOS, as Android's events must have the default action to allow interaction with hotspots.
   var userAgent = navigator.userAgent || navigator.vendor || window.opera;
-  if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+  if (browser.ios) {
     this._controlContainer.addEventListener('touchstart', function(event) {
       event.preventDefault();
     });
