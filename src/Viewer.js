@@ -136,9 +136,14 @@ function Viewer(domElement, opts) {
   setFullSize(this._controlContainer);
 
   // Prevent bounce scroll effect on iOS.
-  this._controlContainer.addEventListener('touchstart', function(event) {
-    event.preventDefault();
-  });
+  // Applied only for iPhone, as Android's events must have the default action to allow a proper hotspots' usage
+  var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+  if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+    this._controlContainer.addEventListener('touchstart', function(event) {
+      event.preventDefault();
+    });
+  }
+
 
   // Old IE does not detect mouse events on elements without background
   // Add a child element to the controls with full width, a background color
