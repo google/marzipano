@@ -72,9 +72,10 @@
 
   // Create scenes.
   var scenes = data.scenes.map(function(data) {
+    var urlPrefix = "//www.marzipano.net/media";
     var source = Marzipano.ImageUrlSource.fromString(
-      "tiles/" + data.id + "/{z}/{f}/{y}/{x}.jpg",
-      { cubeMapPreviewUrl: "tiles/" + data.id + "/preview.jpg" });
+      urlPrefix + "/" + data.id + "/{z}/{f}/{y}/{x}.jpg",
+      { cubeMapPreviewUrl: urlPrefix + "/" + data.id + "/preview.jpg" });
     var geometry = new Marzipano.CubeGeometry(data.levels);
 
     var limiter = Marzipano.RectilinearView.limit.traditional(data.faceSize, 100*Math.PI/180, 120*Math.PI/180);
