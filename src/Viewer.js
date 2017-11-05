@@ -335,44 +335,67 @@ Viewer.prototype.domElement = function() {
  *        constructor.
  * @return {Scene}
  */
-Viewer.prototype.createScene = function(opts) {
+Viewer.prototype.createScene = function(MLopts) {
   // TODO: set textureStore size to 0 for video scenes somehow?
 
-  opts = opts || {};
+  MLopts = MLopts || {};
 
   var stage = this._stage;
+  var layers = [];
 
-  var source = opts.source;
-  var geometry = opts.geometry;
-  var view = opts.view;
-  var textureStore = new TextureStore(geometry, source, stage, opts.textureStore);
+  // Multilayer options now passed as Array of opts, wrapping in Array in case for single layer argument for backward compatibility
+  if( Object.prototype.toString.call( MLopts ) !== '[object Array]' ) MLopts = Array(MLopts);
 
-  var layer = new Layer(stage, source, geometry, view, textureStore, opts.layerOpts);
+  MLopts.forEach(function(opts) {
+    
+    var source = opts.source;
+    var geometry = opts.geometry;
+    var view = opts.view;
+    var textureStore = new TextureStore(geometry, source, stage, opts.textureStore);
+    
+    var layer = new Layer(stage, source, geometry, view, textureStore, opts.layerOpts);
+  
+    layers.push(layer);
+  
+    if (opts.pinFirstLevel) {
+      layer.pinFirstLevel();
+    }
+    // Added option to pin specified level, keeping pinFirstLevel for backwards compatibility
+    if (opts.pinLevel) {
+      layer.pinLevel(opts.pinLevel);
+    }
+  }); 
 
-  if (opts.pinFirstLevel) {
-    layer.pinFirstLevel();
-  }
-
-  var scene = new Scene(this, layer);
+  var scene = new Scene(this, layers);
   this._scenes.push(scene);
 
   return scene;
 };
 
 
-Viewer.prototype._addLayer = function(layer) {
-  // Pin the first level to serve as a last-resort fallback.
-  layer.pinFirstLevel();
-  this._stage.addLayer(layer);
+Viewer.prototype._addLayers = function(layers) {
+  var ref = this;
+  layers.forEach(function(layer, index) {
+    if(index === 0) {
+      // Pin the first level to serve as a last-resort fallback.
+      layer.pinFirstLevel();
+    } 
+    ref._stage.addLayer(layer);
+  }); 
 };
 
 
-Viewer.prototype._removeLayer = function(layer) {
-  if (this._stage.hasLayer(layer)) {
-    layer.unpinFirstLevel();
-    this._stage.removeLayer(layer);
-  }
-  layer.textureStore().clearNotPinned();
+Viewer.prototype._removeLayers = function(layers) {
+  var ref = this;
+  layers.forEach(function(layer, index) {
+    if (ref._stage.hasLayer(layer)) {
+      if(index === 0) {
+        layer.unpinFirstLevel();
+      }
+      ref._stage.removeLayer(layer);
+    }
+    layer.textureStore().clearNotPinned();
+  }); 
 };
 
 
@@ -386,7 +409,7 @@ Viewer.prototype.destroyScene = function(scene) {
     throw new Error('No such scene in viewer');
   }
 
-  this._removeLayer(scene._layer);
+  this._removeLayers(scene._layers);
 
   if (this._scene === scene) {
     this._scene = null;
@@ -397,12 +420,16 @@ Viewer.prototype.destroyScene = function(scene) {
   }
   this._scenes.splice(i, 1);
 
-  var layer = scene._layer;
-  var textureStore = layer.textureStore();
+  var layers = scene._layers;
+
+  layers.forEach(function(layer) {
+    var textureStore = layer.textureStore();
+    layer.destroy();
+    textureStore.destroy();    
+  }); 
 
   scene._destroy();
-  layer.destroy();
-  textureStore.destroy();
+
 };
 
 
@@ -453,7 +480,8 @@ Viewer.prototype.scene = function() {
 Viewer.prototype.view = function() {
   var scene = this._scene;
   if (scene) {
-    return scene.layer().view();
+    // assuming all the layers share the same view, refering to the view of the first layer
+    return scene.layers()[0].view();
   }
   return null;
 };
@@ -548,7 +576,11 @@ Viewer.prototype._leaveIdle = function() {
 var defaultSwitchDuration = 1000;
 
 function defaultTransitionUpdate(val, newScene, oldScene) {
-  newScene.layer().mergeEffects({ opacity: val });
+  var layers = newScene.layers();
+  layers.forEach(function(layer) {
+    layer.mergeEffects({ opacity: val }); 
+  }); 
+
   newScene._hotspotContainer.domElement().style.opacity = val;
 }
 
@@ -584,9 +616,9 @@ Viewer.prototype.switchScene = function(newScene, opts, done) {
     throw new Error('No such scene in viewer');
   }
 
-  // Consistency check.
+  // Consistency check -- updated for multiple layers
   var layerList = stage.listLayers();
-  if (oldScene && oldScene.layer() !== layerList[layerList.length - 1]) {
+  if (oldScene && oldScene.layers()[oldScene.layers().length - 1] !== layerList[layerList.length - 1]) {
     throw new Error('Stage not in sync with viewer');
   }
 
@@ -603,8 +635,8 @@ Viewer.prototype.switchScene = function(newScene, opts, done) {
 
   var self = this;
 
-  // Start by adding the new layer
-  self._addLayer(newScene.layer());
+  // Start by adding the new layers
+  self._addLayers(newScene.layers());
 
   // Call provided update function
   function tweenUpdate(val) {
@@ -614,7 +646,7 @@ Viewer.prototype.switchScene = function(newScene, opts, done) {
   // Remove old layer when tween is complete
   function tweenDone() {
     if(oldScene) {
-      self._removeLayer(oldScene.layer());
+      self._removeLayers(oldScene.layers());
     }
     //Remove tween to ensure objects referenced on callbacks are garbage collected
     self._cancelCurrentTween = null;
