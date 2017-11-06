@@ -226,7 +226,7 @@ eventEmitter(TextureStoreItem);
 
 /**
  * Signals that a texture has been unloaded.
- * @event TextureStore#textureLoad
+ * @event TextureStore#textureUnload
  * @param {Tile} tile The tile for which the texture was unloaded.
  */
 
