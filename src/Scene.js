@@ -36,12 +36,12 @@ var defaults = require('./util/defaults');
  *            Client code should call {@link Viewer#createScene} instead of
  *            invoking the constructor directly.
  * @param {Viewer} viewer
- * @param {Layer} layer
+ * @param {Array<Layer>} layers
  */
 function Scene(viewer, layers) {
   this._viewer = viewer;
   this._layers = layers;
-  this._view = layers[0].view(); // assuming single view shared among all layers, referencing the first one
+  this._view = layers[0].view(); // TODO: Enforce that all layers in a scene share the same view.
 
   // Hotspot container -- for first layer only
   this._hotspotContainer = new HotspotContainer(viewer._controlContainer, viewer._stage, this._view, viewer._renderLoop, { rect: layers[0].effects().rect });
@@ -104,12 +104,19 @@ Scene.prototype.hotspotContainer = function() {
   return this._hotspotContainer;
 };
 
-
 /**
  * Get the scene's underlying @link{Layer layer}.
  * @return {Layer}
  */
-Scene.prototype.layers = function() {
+Scene.prototype.layer = function() {
+  return this._layers[0];
+};
+
+/**
+ * Get the scene's underlying @link{Layer layer}.
+ * @return {Array<Layer>} layers
+ */
+Scene.prototype.listLayers = function() {
   return [].concat(this._layers);
 };
 
