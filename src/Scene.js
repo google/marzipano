@@ -36,15 +36,15 @@ var defaults = require('./util/defaults');
  *            Client code should call {@link Viewer#createScene} instead of
  *            invoking the constructor directly.
  * @param {Viewer} viewer
- * @param {Layer} layer
+ * @param {Array<Layer>} layers
  */
-function Scene(viewer, layer) {
+function Scene(viewer, layers) {
   this._viewer = viewer;
-  this._layer = layer;
-  this._view = layer.view();
+  this._layers = layers;
+  this._view = layers[0].view(); // TODO: Enforce that all layers in a scene share the same view.
 
-  // Hotspot container
-  this._hotspotContainer = new HotspotContainer(viewer._controlContainer, viewer._stage, this._view, viewer._renderLoop, { rect: layer.effects().rect });
+  // Hotspot container -- for first layer only
+  this._hotspotContainer = new HotspotContainer(viewer._controlContainer, viewer._stage, this._view, viewer._renderLoop, { rect: layers[0].effects().rect });
 
   // The current movement.
   this._movement = null;
@@ -60,7 +60,7 @@ function Scene(viewer, layer) {
   // Show or hide hotspots when scene changes.
   this._updateHotspotContainerHandler = this._updateHotspotContainer.bind(this);
   this._viewer.addEventListener('sceneChange', this._updateHotspotContainerHandler);
-  this._layer.addEventListener('effectsChange', this._updateHotspotContainerHandler);
+  this._layers[0].addEventListener('effectsChange', this._updateHotspotContainerHandler);
 
   // Emit event when view changes.
   this._viewChangeHandler = this.emit.bind(this, 'viewChange');
@@ -79,7 +79,7 @@ eventEmitter(Scene);
 Scene.prototype._destroy = function() {
   this._view.removeEventListener('change', this._viewChangeHandler);
   this._viewer.removeEventListener('sceneChange', this._updateHotspotContainerHandler);
-  this._layer.removeEventListener('effectsChange', this._updateHotspotContainerHandler);
+  this._layers[0].removeEventListener('effectsChange', this._updateHotspotContainerHandler);
 
   if (this._movement) {
     this.stopMovement();
@@ -89,7 +89,7 @@ Scene.prototype._destroy = function() {
 
   this._movement = null;
   this._viewer = null;
-  this._layer = null;
+  this._layers = null;
   this._view = null;
   this._hotspotContainer = null;
 };
@@ -104,13 +104,20 @@ Scene.prototype.hotspotContainer = function() {
   return this._hotspotContainer;
 };
 
-
 /**
  * Get the scene's underlying @link{Layer layer}.
  * @return {Layer}
  */
 Scene.prototype.layer = function() {
-  return this._layer;
+  return this._layers[0];
+};
+
+/**
+ * Get the scene's underlying @link{Layer layer}.
+ * @return {Array<Layer>} layers
+ */
+Scene.prototype.listLayers = function() {
+  return [].concat(this._layers);
 };
 
 
@@ -318,7 +325,7 @@ Scene.prototype._updateMovement = function() {
 
 
 Scene.prototype._updateHotspotContainer = function() {
-  this._hotspotContainer.setRect(this._layer.effects().rect);
+  this._hotspotContainer.setRect(this._layers[0].effects().rect);
 
   if(this.visible()) {
     this._hotspotContainer.show();
