@@ -175,6 +175,11 @@
 
   function switchScene(scene) {
     stopAutorotate();
+    var currentSceneElement = document.querySelector('#sceneList .scene.current') || document.querySelector('#sceneList .scene:first-child');
+    var currentScene = findSceneById(currentSceneElement.getAttribute('data-id'));
+    var viewParameters = JSON.parse(JSON.stringify(scene.data.initialViewParameters)); // clone the original
+    viewParameters.yaw = (scene.data.initialViewParameters.yaw || 0) + (currentScene.view._params.yaw - (currentScene.data.initialViewParameters.yaw || 0));
+    scene.view.setParameters(viewParameters);
     scene.view.setParameters(scene.data.initialViewParameters);
     scene.scene.switchTo();
     startAutorotate();
