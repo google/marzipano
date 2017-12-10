@@ -22,6 +22,12 @@ var inherits = require('../util/inherits');
 var radToDeg = require('../util/radToDeg');
 
 
+/**
+ * @class
+ * @classdesc A renderer for {@link CubeGeometry} and {@link RectilinearView},
+ *     appropriate for a {@link FlashStage}.
+ * @implements Renderer
+ */
 function FlashCubeRenderer(flashElement, layerId, quirks) {
   this.constructor.super_.call(this, flashElement, layerId, quirks, CubeTile);
   this._flashTileList = [];

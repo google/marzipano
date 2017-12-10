@@ -16,10 +16,13 @@
 'use strict';
 
 // Dynamic asset containing a video element.
-// IE does not support video textures. We work around it by painting the video
-// into a canvas and using the canvas as a texture. Note that the workaround
-// won't work on videos loaded from a different domain:
-// https://connect.microsoft.com/IE/feedback/details/789809/ie10-cors-headers-not-being-honoured-with-canvas-drawimage-and-getimagedata
+//
+// The wrappedVideo argument should be an object exposing two methods:
+//   - videoElement() returning the actual HTML video element;
+//   - drawElement() returning the HTML element to be used as a WebGL texture.
+//
+// The two available implementations are NullVideoElementWrapper and
+// CanvasHackVideoElementWrapper. See the respective files for an explanation.
 function VideoAsset(wrappedVideo) {
   this._wrappedVideo = null;
   this._destroyed = false;

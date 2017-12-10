@@ -13,12 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/* Extra stuff to be used by JSDoc. This code is never executed */
+
+// This file contains no executable code, only documentation.
+
+/**
+ * @interface Rect
+ * @classdesc Represents a rectangular region.
+ * @property {number} x The horizontal offset.
+ * @property {number} y The vertical offset.
+ * @property {number} width The width.
+ * @property {number} width The height.
+ */
 
 /**
  * @interface View
- * @classdesc Represents a projection and camera direction used to render the
- * media.
+ * @classdesc Defines the camera direction, aperture and projection used to
+ * render media.
+ *
+ * This is an abstract interface; the concrete implementations are
+ * {@link RectilinearView} and {@link FlatView}.
+ */
+
+/**
+ * Returns the view type, used by the {@link Stage} to determine the appropriate
+ * renderer for a given geometry and view.
+ *
+ * See also {@link Stage#registerRenderer}.
+ *
+ * @function
+ * @name View#type
+ * @returns {string}
  */
 
 /**
@@ -132,6 +156,17 @@
  */
 
 /**
+ * Returns the geometry type, used by the {@link Stage} to determine the
+ * appropriate renderer for a given geometry and view.
+ *
+ * See also {@link Stage#registerRenderer}.
+ *
+ * @function
+ * @name Geometry#type
+ * @returns {string}
+ */
+
+/**
  * Return the set of visible tiles for the given view and level. If a result
  * array is supplied, it is filled in with the result and returned. Otherwise,
  * a fresh array is returned.
@@ -176,6 +211,53 @@
  * @param {Tile} tile1
  * @param {Tile} tile2
  * @returns {number}
+ */
+
+/**
+ * @interface Renderer
+ *
+ * @classdesc
+ * A Renderer is responsible for rendering tiles of a given {@link Geometry},
+ * according to a given {@link View}, onto a {@link Stage}.
+ *
+ * This is an abstract interface.
+ */
+
+/**
+ * Signals the start of a frame for a layer.
+ *
+ * Must be matched by a later call to {@link Renderer#endFrame} with the same
+ * arguments. Calls to {@link Renderer#renderTile} must occur in between.
+ *
+ * @function
+ * @name Renderer#startLayer
+ * @param {Layer} layer The layer onto which to render.
+ * @param {Rect} rect The rectangular region of the viewport onto which to
+ *     render, in normalized coordinates.
+ */
+
+/**
+ * Renders a tile into a layer within the current frame.
+ *
+ * @function
+ * @name Renderer#renderTile
+ * @param {Tile} tile The tile to be rendered.
+ * @param {Texture} texture The texture to be rendered.
+ * @param {Layer} layer The layer onto which to render.
+ * @param {number} layerZ The z-index of the tile within the layer.
+ */
+
+/**
+ * Signals the end of a frame for a layer.
+ *
+ * Must be matched by an earlier call to {@link Renderer#startFrame} with the
+ * same arguments. Calls to {@link Renderer#renderTile} must occur in between.
+ *
+ * @function
+ * @name Renderer#endLayer
+ * @param {Layer} layer The layer onto which to render.
+ * @param {Rect} rect The rectangular region of the viewport onto which to
+ *     render, in normalized coordinates.
  */
 
 /**

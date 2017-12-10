@@ -201,7 +201,7 @@ HotspotContainer.prototype.destroyHotspot = function(hotspot) {
   }
   this._hotspots.splice(i, 1);
 
-  hotspot._destroy();
+  hotspot.destroy();
   this.emit('hotspotsChange');
 };
 

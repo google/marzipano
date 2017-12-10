@@ -21,6 +21,13 @@ function loadVideoInSync(url, syncElement, cb) {
   var element = document.createElement('video');
   element.crossOrigin = 'anonymous';
 
+  element.autoplay = true;
+  element.loop = true;
+
+  // Prevent the video from going full screen on iOS.
+  element.playsInline = true;
+  element.webkitPlaysInline = true;
+
   element.onerror = function(e) {
     cb(e.target.error);
   };
@@ -33,8 +40,6 @@ function loadVideoInSync(url, syncElement, cb) {
 
   // Checking readyState on an interval seems to be more reliable than using events
   waitForReadyState(element, element.HAVE_CURRENT_DATA, 0.2, function() {
-
-
     if(syncElement) {
       if(syncElement.paused) {
         // If the video is not playing, we can load the new one to the correct time
@@ -48,7 +53,6 @@ function loadVideoInSync(url, syncElement, cb) {
     }
 
     waitForReadyState(element, element.HAVE_ENOUGH_DATA, 0.2, function() {
-
       if(!syncElement) {
         // If there is no element to sync with we are done
         cb(null, element);

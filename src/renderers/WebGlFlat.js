@@ -16,5 +16,18 @@
 'use strict';
 
 var WebGlBaseRenderer = require('./WebGlBase');
+var inherits = require('../util/inherits');
 
-module.exports = WebGlBaseRenderer;
+/**
+ * @class
+ * @classdesc A renderer for {@link FlatGeometry} and {@link FlatView},
+ *     appropriate for a {@link WebGlStage}.
+ * @implements Renderer
+ */
+function WebGlFlatRenderer() {
+  this.constructor.super_.apply(this, arguments);
+}
+
+inherits(WebGlFlatRenderer, WebGlBaseRenderer);
+
+module.exports = WebGlFlatRenderer;

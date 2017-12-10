@@ -33,48 +33,83 @@ eventEmitter(MockStage);
 
 suite('RenderLoop', function() {
 
-  test('initial state', function(done) {
+  // Replace requestAnimationFrame() and cancelAnimationFrame() with fakes so
+  // that the tests still pass when the browser window has no focus. As a side
+  // effect, it also makes the tests less flaky since no timeouts are involved.
+  //
+  // Note that the fakes don't observe the spec fully: no timestamp argument is
+  // passed to the registered callback (because we have no need for it).
+
+  var realRequestAnimationFrame = window.requestAnimationFrame;
+  var realCancelAnimationFrame = window.cancelAnimationFrame;
+
+  var runMap = {};
+  var nextId = 0;
+
+  var fakeRequestAnimationFrame = function(fn) {
+    var id = nextId++;
+    runMap[id] = fn;
+    return id;
+  };
+
+  var fakeCancelAnimationFrame = function(id) {
+    if (runMap.hasOwnProperty(id)) {
+      delete runMap[id];
+    }
+  };
+
+  var fakeTickFrame = function() {
+    for (var id in runMap) {
+      var fn = runMap[id];
+      fn();
+    }
+    runMap = {};
+  };
+
+  setup(function() {
+    window.requestAnimationFrame = fakeRequestAnimationFrame;
+    window.cancelAnimationFrame = fakeCancelAnimationFrame;
+  });
+
+  teardown(function() {
+    window.requestAnimationFrame = realRequestAnimationFrame;
+    window.cancelAnimationFrame = realCancelAnimationFrame;
+  });
+
+  test('initial state', function() {
     var stage = new MockStage();
     var loop = new RenderLoop(stage);
     stage.emit('renderInvalid');
-    setTimeout(function() {
-      assert(stage.render.notCalled);
-      done();
-    }, 20);
+    fakeTickFrame();
+    assert(stage.render.notCalled);
   });
 
-  test('start', function(done) {
+  test('start', function() {
     var stage = new MockStage();
     var loop = new RenderLoop(stage);
     loop.start();
     stage.emit('renderInvalid');
-    setTimeout(function() {
-      assert(stage.render.called);
-      done();
-    }, 20);
+    fakeTickFrame();
+    assert(stage.render.called);
   });
 
-  test('stop', function(done) {
+  test('stop', function() {
     var stage = new MockStage();
     var loop = new RenderLoop(stage);
     loop.start();
     loop.stop();
     stage.emit('renderInvalid');
-    setTimeout(function() {
-      assert(stage.render.notCalled);
-      done();
-    }, 20);
+    fakeTickFrame();
+    assert(stage.render.notCalled);
   });
 
-  test('renderOnNextFrame', function(done) {
+  test('renderOnNextFrame', function() {
     var stage = new MockStage();
     var loop = new RenderLoop(stage);
     loop.start();
     loop.renderOnNextFrame();
-    setTimeout(function() {
-      assert(stage.render.called);
-      done();
-    }, 20);
+    fakeTickFrame();
+    assert(stage.render.called);
   });
 
 });

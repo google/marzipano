@@ -43,11 +43,11 @@ function reverseTileCmp(t1, t2) {
 /**
  * @interface
  * @classdesc A Stage is a container with the ability to render a stack of
- * {@Layer layers}.
+ * {@link Layer layers}.
  *
  * This is a superclass containing logic that is common to all implementations;
  * it should never be instantiated directly. Instead, use one of the
- * subclasses: {@link WebGlStage}, {@link CssStage}, {@link FlashStage}.
+ * subclasses: {@link WebGlStage}, {@link CssStage} or {@link FlashStage}.
  */
 function Stage(opts) {
 
@@ -106,6 +106,19 @@ Stage.prototype.destroy = function() {
 };
 
 
+/**
+ * Registers a {@link Renderer} for the given {@link Geometry} and {@link View}
+ * type.
+ *
+ * The {@link registerDefaultRenderers} utility function may be used to
+ * register all known renderers for a stage type into that stage. Most users
+ * will not need to register renderers, as {@link Viewer} does it for them.
+ *
+ * @param {string} geometryType The geometry type, as given by
+ *     {@link Geometry#type}.
+ * @param {string} viewType The view type, as given by {@link View#type}.
+ * @param {*} Renderer The renderer class.
+ */
 Stage.prototype.registerRenderer = function(geometryType, viewType, Renderer) {
   return this._rendererRegistry.set(geometryType, viewType, Renderer);
 };
@@ -182,19 +195,51 @@ Stage.prototype.emitRenderInvalid = function() {
 
 
 /**
- * Add a {@link Layer} into the stage.
- * @param {Layer} layer
- * @throws Throws an error if the layer already belongs to the stage.
+ * Returns a list of all {@link Layer layers} belonging to the stage. The
+ * returned list is in display order, background to foreground.
+ * @return {Layer[]}
  */
-Stage.prototype.addLayer = function(layer) {
+Stage.prototype.listLayers = function() {
+  // Return a copy to prevent unintended mutation by the caller.
+  return [].concat(this._layers);
+};
+
+
+/**
+ * Return whether a {@link Layer layer} belongs to the stage.
+ * @param {Layer} layer
+ * @return {boolean}
+ */
+Stage.prototype.hasLayer = function(layer) {
+  return this._layers.indexOf(layer) >= 0;
+};
+
+
+/**
+ * Adds a {@link Layer layer} into the stage.
+ * @param {Layer} layer The layer to add.
+ * @param {number|undefined} i The optional position, where 0 ≤ i ≤ n and n is
+ *     the current number of layers. The default is n, which inserts at the
+ *     top of the display stack.
+ * @throws An error if the layer already belongs to the stage or if the position
+ *     is invalid.
+ */
+Stage.prototype.addLayer = function(layer, i) {
   if (this._layers.indexOf(layer) >= 0) {
     throw new Error('Layer already in stage');
   }
 
+  if (i == null) {
+    i = this._layers.length;
+  }
+  if (i < 0 || i > this._layers.length) {
+    throw new Error('Invalid layer position');
+  }
+
   this._validateLayer(layer);
 
-  this._layers.push(layer);
-  this._renderers.push(null);
+  this._layers.splice(i, 0, layer);
+  this._renderers.splice(i, 0, null);
 
   // Listeners for render invalid.
   layer.addEventListener('viewChange', this.emitRenderInvalid);
@@ -207,9 +252,37 @@ Stage.prototype.addLayer = function(layer) {
 
 
 /**
- * Remove a {@link Layer} from the stage.
- * @param {Layer} layer
- * @throws Throws an error if the layer does not belong to the stage.
+ * Moves a {@link Layer layer} into a different position in the display stack.
+ * @param {Layer} layer The layer to move.
+ * @param {number} i The position, where 0 ≤ i ≤ n-1 and n is the current number
+ *     of layers.
+ * @throws An error if the layer does not belong to the stage or if the position
+ *     is invalid.
+ */
+Stage.prototype.moveLayer = function(layer, i) {
+  var index = this._layers.indexOf(layer);
+  if (index < 0) {
+    throw new Error('No such layer in stage');
+  }
+
+  if (i < 0 || i >= this._layers.length) {
+    throw new Error('Invalid layer position');
+  }
+
+  layer = this._layers.splice(index, 1)[0];
+  var renderer = this._renderers.splice(index, 1)[0];
+
+  this._layers.splice(i, 0, layer);
+  this._renderers.splice(i, 0, renderer);
+
+  this.emitRenderInvalid();
+};
+
+
+/**
+ * Removes a {@link Layer} from the stage.
+ * @param {Layer} layer The layer to remove.
+ * @throws An error if the layer does not belong to the stage.
  */
 Stage.prototype.removeLayer = function(layer) {
   var index = this._layers.indexOf(layer);
@@ -235,59 +308,12 @@ Stage.prototype.removeLayer = function(layer) {
 
 
 /**
- * Remove all {@link Layer layers} from the stage.
+ * Removes all {@link Layer layers} from the stage.
  */
 Stage.prototype.removeAllLayers = function() {
   while (this._layers.length > 0) {
     this.removeLayer(this._layers[0]);
   }
-};
-
-
-/**
- * Return a list of all {@link Layer layers} contained in the stage.
- * @return {Layer[]}
- */
-Stage.prototype.listLayers = function() {
-  // Return a copy to prevent unintended mutation by the caller.
-  return [].concat(this._layers);
-};
-
-
-/**
- * Return whether the stage contains a {@link Layer}.
- * @param {Layer} layer
- * @return {boolean}
- */
-Stage.prototype.hasLayer = function(layer) {
-  return this._layers.indexOf(layer) >= 0;
-};
-
-
-/**
- * Move a {@link Layer} to the given position in the stack.
- * @param {Layer} layer
- * @param {Number} i
- * @throws Throws an error if the layer does not belong to the stage or the
- *         new position is invalid.
- */
-Stage.prototype.moveLayer = function(layer, i) {
-  if (i < 0 || i >= this._layers.length) {
-    throw new Error('Cannot move layer out of bounds');
-  }
-
-  var index = this._layers.indexOf(layer);
-  if (index < 0) {
-    throw new Error('No such layer in stage');
-  }
-
-  layer = this._layers.splice(index, 1)[0];
-  var renderer = this._renderers.splice(index, 1)[0];
-
-  this._layers.splice(i, 0, layer);
-  this._renderers.splice(i, 0, renderer);
-
-  this.emitRenderInvalid();
 };
 
 
@@ -533,5 +559,15 @@ Stage.prototype.createTexture = function(tile, asset, done) {
 
 };
 
+/**
+ * Returns the stage type, used to determine the appropriate renderer for a
+ * given geometry and view.
+ *
+ * See also {@link Stage#registerRenderer}.
+ *
+ * @function
+ * @name Stage#type
+ * @returns {string}
+ */
 
 module.exports = Stage;

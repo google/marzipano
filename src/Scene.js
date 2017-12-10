@@ -15,10 +15,10 @@
  */
 'use strict';
 
-var eventEmitter = require('minimal-event-emitter');
-
+var Layer = require('./Layer');
+var TextureStore = require('./TextureStore');
 var HotspotContainer = require('./HotspotContainer');
-
+var eventEmitter = require('minimal-event-emitter');
 var clock = require('./util/clock');
 var noop = require('./util/noop');
 var type = require('./util/type');
@@ -30,21 +30,34 @@ var defaults = require('./util/defaults');
  */
 
 /**
- * @class
- * @classdesc A @link{Scene} is a {@link Layer} with associated {@link View}
- *            and {@link Effects} that may be rendered inside a {@link Viewer}.
- *            Client code should call {@link Viewer#createScene} instead of
- *            invoking the constructor directly.
- * @param {Viewer} viewer
- * @param {Array<Layer>} layers
+ * Signals that the scene's layers have changed.
+ * @event Scene#layerChange
  */
-function Scene(viewer, layers) {
-  this._viewer = viewer;
-  this._layers = layers;
-  this._view = layers[0].view(); // TODO: Enforce that all layers in a scene share the same view.
 
-  // Hotspot container -- for first layer only
-  this._hotspotContainer = new HotspotContainer(viewer._controlContainer, viewer._stage, this._view, viewer._renderLoop, { rect: layers[0].effects().rect });
+/**
+ * @class
+ * @classdesc
+ * A {@link Scene} is a stack of {@link Layer layers} sharing the same
+ * {@link View view} and {@link HotspotContainer hotspot container}. It belongs
+ * to the {@link Viewer viewer} inside which it is displayed.
+ *
+ * Clients should call {@link Viewer#createScene} instead of invoking the
+ * constructor directly.
+ *
+ * @param {Viewer} viewer The viewer this scene belongs to.
+ * @param {View} view The scene's underlying view.
+ */
+function Scene(viewer, view) {
+  this._viewer = viewer;
+  this._view = view;
+  this._layers = [];
+
+  // Hotspot container. Assume it occupies a full rect.
+  this._hotspotContainer = new HotspotContainer(
+    viewer._controlContainer,
+    viewer.stage(),
+    this._view,
+    viewer.renderLoop());
 
   // The current movement.
   this._movement = null;
@@ -60,7 +73,6 @@ function Scene(viewer, layers) {
   // Show or hide hotspots when scene changes.
   this._updateHotspotContainerHandler = this._updateHotspotContainer.bind(this);
   this._viewer.addEventListener('sceneChange', this._updateHotspotContainerHandler);
-  this._layers[0].addEventListener('effectsChange', this._updateHotspotContainerHandler);
 
   // Emit event when view changes.
   this._viewChangeHandler = this.emit.bind(this, 'viewChange');
@@ -74,18 +86,19 @@ eventEmitter(Scene);
 
 
 /**
- * Destructor. Client code should call {@link Viewer#destroyScene} instead.
+ * Destructor. Clients should call {@link Viewer#destroyScene} instead.
  */
-Scene.prototype._destroy = function() {
+Scene.prototype.destroy = function() {
   this._view.removeEventListener('change', this._viewChangeHandler);
   this._viewer.removeEventListener('sceneChange', this._updateHotspotContainerHandler);
-  this._layers[0].removeEventListener('effectsChange', this._updateHotspotContainerHandler);
 
   if (this._movement) {
     this.stopMovement();
   }
 
   this._hotspotContainer.destroy();
+
+  this.destroyAllLayers();
 
   this._movement = null;
   this._viewer = null;
@@ -97,7 +110,7 @@ Scene.prototype._destroy = function() {
 
 
 /**
- * Get the scene's @link{HotspotContainer hotspot container}.
+ * Returns the {@link HotspotContainer hotspot container} for the scene.
  * @return {Layer}
  */
 Scene.prototype.hotspotContainer = function() {
@@ -105,7 +118,12 @@ Scene.prototype.hotspotContainer = function() {
 };
 
 /**
- * Get the scene's underlying @link{Layer layer}.
+ * Returns the first of the {@link Layer layers} belonging to the scene, or
+ * null if the scene has no layers.
+ *
+ * This method is equivalent to `Scene#listLayers[0]`. It may be removed in the
+ * future.
+ *
  * @return {Layer}
  */
 Scene.prototype.layer = function() {
@@ -113,8 +131,9 @@ Scene.prototype.layer = function() {
 };
 
 /**
- * Get the scene's underlying @link{Layer layer}.
- * @return {Array<Layer>} layers
+* Returns a list of all {@link Layer layers} belonging to the scene. The
+* returned list is in display order, background to foreground.
+* @return {Layer[]}
  */
 Scene.prototype.listLayers = function() {
   return [].concat(this._layers);
@@ -122,7 +141,7 @@ Scene.prototype.listLayers = function() {
 
 
 /**
- * Get the scene's underlying @link{View view}.
+ * Returns the scene's underlying {@link View view}.
  * @return {View}
  */
 Scene.prototype.view = function() {
@@ -131,7 +150,7 @@ Scene.prototype.view = function() {
 
 
 /**
- * Get the @link{Viewer viewer} the scene belongs to.
+ * Returns the {@link Viewer viewer} the scene belongs to.
  * @return {Viewer}
  */
 Scene.prototype.viewer = function() {
@@ -140,7 +159,7 @@ Scene.prototype.viewer = function() {
 
 
 /**
- * Whether the scene is currently visible.
+ * Returns whether the scene is currently visible.
  * @return {boolean}
  */
 Scene.prototype.visible = function() {
@@ -149,9 +168,84 @@ Scene.prototype.visible = function() {
 
 
 /**
- * Switch to the scene, as would be obtained by calling {@link Viewer#switchScene}.
+ * Creates a new {@link Layer layer} and adds it into the scene in the
+ * foreground position.
+ *
+ * @param {Object} opts Layer creation options.
+ * @param {Source} opts.source The layer's underlying {@link Source}.
+ * @param {Source} opts.geometry The layer's underlying {@link Geometry}.
+ * @param {boolean} [opts.pinFirstLevel=false] Whether to pin the first level to
+ *     provide a fallback of last resort, at the cost of memory consumption.
+ * @param {Object} [opts.textureStoreOpts={}] Options to pass to the
+ *     {@link TextureStore} constructor.
+ * @param {Object} [opts.layerOpts={}] Options to pass to the {@link Layer}
+ *     constructor.
+ * @return {Layer}
+ */
+Scene.prototype.createLayer = function(opts) {
+  opts = opts || {};
+
+  var textureStoreOpts = opts.textureStoreOpts || {};
+  var layerOpts = opts.layerOpts || {};
+
+  var source = opts.source;
+  var geometry = opts.geometry;
+  var view = this._view;
+  var stage = this._viewer.stage();
+  var textureStore = new TextureStore(geometry, source, stage, textureStoreOpts);
+  var layer = new Layer(stage, source, geometry, view, textureStore, layerOpts);
+
+  this._layers.push(layer);
+
+  if (opts.pinFirstLevel) {
+    layer.pinFirstLevel();
+  }
+
+  // Signal that the layers have changed.
+  this.emit('layerChange');
+
+  return layer;
+};
+
+
+/**
+ * Destroys a {@link Layer layer} and removes it from the scene.
+ * @param {Layer} layer
+ * @throws An error if the layer does not belong to the scene.
+ */
+Scene.prototype.destroyLayer = function(layer) {
+  var i = this._layers.indexOf(layer);
+  if (i < 0) {
+    throw new Error('No such layer in scene');
+  }
+
+  this._layers.splice(i, 1);
+
+  // Signal that the layers have changed.
+  this.emit('layerChange');
+
+  layer.textureStore().destroy();
+  layer.destroy();
+};
+
+
+/**
+ * Destroys all {@link Layer layers} and removes them from the scene.
+ */
+Scene.prototype.destroyAllLayers = function() {
+  while (this._layers.length > 0) {
+    this.destroyLayer(this._layers[0]);
+  }
+};
+
+
+/**
+ * Switches to the scene.
+ *
+ * This is equivalent to calling {@link Viewer#switchScene} on this scene.
+ *
  * @param {Object} opts Options to pass into {@link Viewer#switchScene}.
- * @param {Object} done Called when the scene switch is complete.
+ * @param {function} done Function to call when the switch is complete.
  */
 Scene.prototype.switchTo = function(opts, done) {
   return this._viewer.switchScene(this, opts, done);
@@ -159,13 +253,18 @@ Scene.prototype.switchTo = function(opts, done) {
 
 
 /**
- * Tween the scene's underlying @link{View view}.
+ * Tweens the scene's underlying {@link View view}.
+ *
  * @param {Object} params Target view parameters.
- * @param {Object} opts
- * @param {Number} [opts.transitionDuration=1000] Tween duration in milliseconds.
- * @param {Number} [opts.closest=true] Whether to take the shortest path when
- * tweening; requires {@link View#normalizeToClosest} to be implemented.
- * @param {Function} done Called when the tween finishes or is interrupted.
+ * @param {Object} opts Transition options.
+ * @param {number} [opts.transitionDuration=1000] Tween duration, in
+ *     milliseconds.
+ * @param {number} [opts.closest=true] Whether to tween through the shortest
+ *    path between the initial and final view parameters. This requires
+ *    {@link View#normalizeToClosest} to be implemented, and does nothing
+ *    otherwise.
+ * @param {function} done Function to call when the tween finishes or is
+ *    interrupted.
  */
 Scene.prototype.lookTo = function(params, opts, done) {
   // TODO: allow controls to interrupt an ongoing tween.
@@ -241,9 +340,11 @@ Scene.prototype.lookTo = function(params, opts, done) {
 
 
 /**
- * Start a movement.
- * @param {Function} fn Movement function.
- * @param {Function} done Called when the movement finishes.
+ * Starts a movement.
+ *
+ * @param {function} fn The movement function.
+ * @param {function} done Function to be called when the movement finishes or is
+ *     interrupted.
  */
 Scene.prototype.startMovement = function(fn, done) {
 
@@ -270,7 +371,7 @@ Scene.prototype.startMovement = function(fn, done) {
 
 
 /**
- * Stop the current movement.
+ * Stops the current movement.
  */
 Scene.prototype.stopMovement = function() {
 
@@ -291,8 +392,8 @@ Scene.prototype.stopMovement = function() {
 
 
 /**
- * Return the current movement.
- * @return {Function}
+ * Returns the current movement.
+ * @return {function}
  */
 Scene.prototype.movement = function() {
   return this._movement;
@@ -325,12 +426,9 @@ Scene.prototype._updateMovement = function() {
 
 
 Scene.prototype._updateHotspotContainer = function() {
-  this._hotspotContainer.setRect(this._layers[0].effects().rect);
-
-  if(this.visible()) {
+  if (this.visible()) {
     this._hotspotContainer.show();
-  }
-  else {
+  } else {
     this._hotspotContainer.hide();
   }
 };

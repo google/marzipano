@@ -21,6 +21,12 @@ var decimal = require('../util/decimal');
 var inherits = require('../util/inherits');
 
 
+/**
+ * @class
+ * @classdesc A renderer for {@link FlatGeometry} and {@link FlatView},
+ *     appropriate for a {@link CssStage}.
+ * @implements Renderer
+ */
 function CssFlatRenderer(root, quirks) {
   this.constructor.super_.call(this, root, quirks, FlatTile);
 }

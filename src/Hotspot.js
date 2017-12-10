@@ -89,9 +89,11 @@ function Hotspot(domElement, parentDomElement, view, params, opts) {
 
 eventEmitter(Hotspot);
 
-
-// Call hotspotContainer.destroyHotspot() instead of this.
-Hotspot.prototype._destroy = function() {
+/**
+ * Destructor. Clients should call {@link HotspotContainer#destroyHotspot}
+ * instead.
+ */
+Hotspot.prototype.destroy = function() {
   this._parentDomElement.removeChild(this._domElement);
 
   this._domElement = null;
@@ -111,12 +113,14 @@ Hotspot.prototype.domElement = function() {
   return this._domElement;
 };
 
+
 /**
  * @return {Object} Position params
  */
 Hotspot.prototype.position = function() {
   return this._params;
 };
+
 
 /**
  *  @param {Object} params Position params
@@ -130,12 +134,14 @@ Hotspot.prototype.setPosition = function(params) {
   // HotspotContainer. What's the best way to do so?
 };
 
+
 /**
  * @return {Object} Perspective
  */
 Hotspot.prototype.perspective = function() {
   return this._perspective;
 };
+
 
 /**
  *  @param {Object} params Perspective params

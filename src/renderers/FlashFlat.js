@@ -20,6 +20,12 @@ var FlatTile = require('../geometries/Flat').TileClass;
 var inherits = require('../util/inherits');
 
 
+/**
+ * @class
+ * @classdesc A renderer for {@link FlatGeometry} and {@link FlatView},
+ *     appropriate for a {@link FlashStage}.
+ * @implements Renderer
+ */
 function FlashFlatRenderer(flashElement, layerId, quirks) {
   this.constructor.super_.call(this, flashElement, layerId, quirks, FlatTile);
   this._flashTileList = [];

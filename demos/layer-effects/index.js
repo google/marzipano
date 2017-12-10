@@ -24,6 +24,9 @@ var viewer = new Marzipano.Viewer(document.getElementById('pano'), viewerOpts);
 var limiter = Marzipano.RectilinearView.limit.traditional(2048, 120*Math.PI/180);
 var view = new Marzipano.RectilinearView(null, limiter);
 
+// Create an empty scene into which layers will be added.
+var scene = viewer.createEmptyScene({ view: view });
+
 // Query the stage for the maximum supported texture size.
 var maxSize = viewer.stage().maxTextureSize();
 var maxDimensions = maxSize + 'x' + maxSize;
@@ -31,10 +34,7 @@ var maxDimensions = maxSize + 'x' + maxSize;
 // Create a knockout.js observable array to hold the layers.
 var layers = ko.observableArray([]);
 
-
-
 // Set up the user interface for importing layers.
-
 var selectFilesInput = document.getElementById('selectFilesInput');
 selectFilesInput.addEventListener('change', function() {
   if (this.files && this.files.length > 0) {
@@ -44,7 +44,6 @@ selectFilesInput.addEventListener('change', function() {
   }
   this.value = null;
 });
-
 var selectFilesButton = document.getElementById('selectFilesButton');
 selectFilesButton.addEventListener('click', function() {
   selectFilesInput.click();
@@ -85,11 +84,10 @@ function importLayer(file) {
     var asset = new Marzipano.DynamicCanvasAsset(canvas);
     var source = new Marzipano.SingleAssetSource(asset);
     var geometry = new Marzipano.EquirectGeometry([{ width: canvas.width }]);
-    var textureStore = new Marzipano.TextureStore(geometry, source, stage);
-    var layer = new Marzipano.Layer(stage, source, geometry, view, textureStore);
-
-    // Add layer to stage.
-    stage.addLayer(layer);
+    var layer = scene.createLayer({
+      source: source,
+      geometry: geometry
+    });
 
     // Create a new effects object for the layer.
     var effects = layerEffects(layer);
@@ -102,7 +100,14 @@ function importLayer(file) {
       canvas: canvas
     });
   });
+}
 
+// Discard an existing layer.
+function discardLayer(item) {
+  if (confirm('Remove this layer?')) {
+    scene.destroyLayer(item.layer);
+    layers.remove(item);
+  }
 }
 
 // Create an observable object with the layer effects.
@@ -222,8 +227,12 @@ function layerEffects(layer) {
 
 }
 
+// Display the initially empty scene.
+scene.switchTo({ transitionDuration: 0 });
+
 var viewModel = {
   layers: layers,
+  discardLayer: discardLayer,
   maxDimensions: maxDimensions
 };
 

@@ -46,29 +46,41 @@ var scene = viewer.createScene({
 // Display scene.
 scene.switchTo();
 
-// Whether playback has started.
-var started = false;
-
 // Start playback on click.
 // Playback cannot start automatically because most browsers require the play()
 // method on the video element to be called in the context of a user action.
-document.body.addEventListener('click', function() {
+document.body.addEventListener('click', tryStart);
+document.body.addEventListener('touchstart', tryStart);
+
+// Whether playback has started.
+var started = false;
+
+// Try to start playback.
+function tryStart() {
   if (started) {
     return;
   }
   started = true;
+
   var video = document.createElement('video');
   video.src = '//www.marzipano.net/media/video/mercedes-f1-1280x640.mp4';
-  video.autoplay = true;
   video.crossOrigin = 'anonymous';
+
+  video.autoplay = true;
   video.loop = true;
+
+  // Prevent the video from going full screen on iOS.
+  video.playsInline = true;
+  video.webkitPlaysInline = true;
+
   video.play();
+
   waitForReadyState(video, video.HAVE_METADATA, 100, function() {
     waitForReadyState(video, video.HAVE_ENOUGH_DATA, 100, function() {
-      asset.setVideo(new NullVideoElementWrapper(video));
+      asset.setVideo(video);
     });
   });
-});
+}
 
 // Wait for an element to reach the given readyState by polling.
 // The HTML5 video element exposes a `readystatechange` event that could be
@@ -81,22 +93,3 @@ function waitForReadyState(element, readyState, interval, done) {
     }
   }, interval);
 }
-
-// A wrapper for an HTML5 video element to be passed into a SingleAssetSource.
-function NullVideoElementWrapper(videoElement) {
-  this._videoElement = videoElement;
-}
-
-NullVideoElementWrapper.prototype.videoElement = function() {
-  return this._videoElement;
-};
-
-NullVideoElementWrapper.prototype.drawElement = function() {
-  return this._videoElement;
-};
-
-NullVideoElementWrapper.prototype.destroy = function() {
-  this._videoElement.pause();
-  this._videoElement.volume = 0;
-  this._videoElement.removeAttribute('src');
-};

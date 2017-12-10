@@ -44,6 +44,12 @@ var uniformList = [
 var mat4 = require('gl-matrix/src/gl-matrix/mat4');
 
 
+/**
+ * @class
+ * @classdesc A renderer for {@link EquirectGeometry} and
+ *     {@link RectilinearView}, appropriate for {@link WebGlStage}.
+ * @implements Renderer
+ */
 function WebGlEquirectRenderer(gl) {
   this.gl = gl;
 

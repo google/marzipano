@@ -35,7 +35,10 @@
 </div>
 
 <script type="text/plain" id="layerControls">
-  <div class="name" data-bind="text: name"></div>
+  <div class="title">
+    <div class="name" data-bind="text: name"></div>
+    <div class="remove" data-bind="click: $root.discardLayer"></div>
+  </div>
   <div class="thumbnail" data-bind="element: canvas"></div>
   <div class="label"><label>
     <p>Opacity:</p>

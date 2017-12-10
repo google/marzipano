@@ -22,9 +22,11 @@ var extend = require('./util/extend');
 
 /**
  * @class
- * @classdesc A Layer is a combination of {@link Source}, {@link Geometry},
- *            {@link View} and {@link TextureStore} that can be added into a
- *            {@link Stage} and rendered with effects.
+ * @classdesc
+ * A Layer is a combination of {@link Source}, {@link Geometry}, {@link View}
+ * and {@link TextureStore} that may be added into a {@link Stage} and rendered
+ * with {@link Effects}.
+ *
  * @param {Stage} stage
  * @param {Source} source
  * @param {Geometry} geometry
@@ -34,7 +36,6 @@ var extend = require('./util/extend');
  * @param {Effects} opts.effects
 */
 function Layer(stage, source, geometry, view, textureStore, opts) {
-
   opts = opts || {};
 
   var self = this;
@@ -65,7 +66,6 @@ function Layer(stage, source, geometry, view, textureStore, opts) {
     this._textureStoreChangeHandler);
   this._textureStore.addEventListener('textureInvalid',
     this._textureStoreChangeHandler);
-
 }
 
 eventEmitter(Layer);
@@ -82,7 +82,6 @@ Layer.prototype.destroy = function() {
     this._textureStoreChangeHandler);
   this._textureStore.removeEventListener('textureInvalid',
     this._textureStoreChangeHandler);
-  this._stage.removeEventListener('resize', this._handleStageResize);
   this._stage = null;
   this._source = null;
   this._geometry = null;
@@ -96,7 +95,16 @@ Layer.prototype.destroy = function() {
 
 
 /**
- * Get the underlying source.
+ * Returns the underlying {@link Stage stage}.
+ * @return {Stage}
+ */
+Layer.prototype.stage = function() {
+  return this._stage;
+};
+
+
+/**
+ * Returns the underlying {@link Source source}.
  * @return {Source}
  */
 Layer.prototype.source = function() {
@@ -105,7 +113,7 @@ Layer.prototype.source = function() {
 
 
 /**
- * Get the underlying geometry.
+ * Returns the underlying {@link Geometry geometry}.
  * @return {Geometry}
  */
 Layer.prototype.geometry = function() {
@@ -114,7 +122,7 @@ Layer.prototype.geometry = function() {
 
 
 /**
- * Get the underlying view.
+ * Returns the underlying {@link View view}.
  * @return {View}
  */
 Layer.prototype.view = function() {
@@ -123,7 +131,7 @@ Layer.prototype.view = function() {
 
 
 /**
- * Get the underlying TextureStore.
+ * Returns the underlying {@link TextureStore texture store}.
  * @return {TextureStore}
  */
 Layer.prototype.textureStore = function() {
@@ -132,7 +140,7 @@ Layer.prototype.textureStore = function() {
 
 
 /**
- * Get the effects.
+ * Returns the currently set {@link Effects effects}.
  * @return {Effects}
  */
 Layer.prototype.effects = function() {
@@ -141,17 +149,7 @@ Layer.prototype.effects = function() {
 
 
 /**
- * Set the underlying view.
- * @param {View} view
- */
-Layer.prototype.setView = function(view) {
-  this._view = view;
-  this.emit('viewChange', this._view);
-};
-
-
-/**
- * Set the effects.
+ * Sets the {@link Effects effects}.
  * @param {Effects} effects
  */
 Layer.prototype.setEffects = function(effects) {
@@ -161,7 +159,7 @@ Layer.prototype.setEffects = function(effects) {
 
 
 /**
- * Merge effects into the current ones. The merge is non-recursive; for
+ * Merges effects into the currently set ones. The merge is non-recursive; for
  * instance, if current effects are `{ rect: { relativeWidth: 0.5 } }`,
  * calling this method with `{ rect: { relativeX: 0.5 }}` will reset
  * `rect.relativeWidth`.
@@ -175,7 +173,7 @@ Layer.prototype.mergeEffects = function(effects) {
 
 
 /**
- * Get the fixed level index.
+ * Returns the fixed level index.
  * @return {(number|null)}
  */
 Layer.prototype.fixedLevel = function() {
@@ -184,13 +182,16 @@ Layer.prototype.fixedLevel = function() {
 
 
 /**
- * Set the fixed level index. When set, the corresponding level will be
+ * Sets the fixed level index. When set, the corresponding level will be
  * used regardless of the view parameters. Unset with a null argument.
+ *
  * @param {(number|null)} levelIndex
+ * @throws An error if the level index is out of range.
  */
 Layer.prototype.setFixedLevel = function(levelIndex) {
   if (levelIndex !== this._fixedLevelIndex) {
-    if (levelIndex != null && (levelIndex >= this._geometry.levelList.length || levelIndex < 0)) {
+    if (levelIndex != null && (levelIndex >= this._geometry.levelList.length ||
+        levelIndex < 0)) {
       throw new Error("Level index out of range: " + levelIndex);
     }
     this._fixedLevelIndex = levelIndex;
@@ -203,8 +204,7 @@ Layer.prototype._selectLevel = function() {
   var level;
   if (this._fixedLevelIndex != null) {
     level = this._geometry.levelList[this._fixedLevelIndex];
-  }
-  else {
+  } else {
     level = this._view.selectLevel(this._geometry.selectableLevelList);
   }
   return level;

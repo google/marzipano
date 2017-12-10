@@ -73,10 +73,47 @@ a, a:hover, a:active, a:visited {
   border-top: 1px solid rgb(103,115,131);
 }
 
-.layerControls .name {
-  padding: 10px;
+.layerControls .title {
+  position: relative;
   background-color: rgb(103,115,131);
+  height: 32px;
 }
+
+.layerControls .name {
+  width: 100%;
+  padding-left: 8px;
+  padding-right: 32px;
+  line-height: 32px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.layerControls .remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.layerControls .remove:before, .layerControls .remove:after {
+  position: absolute;
+  left: 8px;
+  content: ' ';
+  height: 16px;
+  width: 2px;
+  background-color: #fff;
+}
+
+.layerControls .remove:before {
+  transform: rotate(45deg);
+}
+
+.layerControls .remove:after {
+  transform: rotate(-45deg);
+}
+
 
 input[type="number"] {
   width: 54px;

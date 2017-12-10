@@ -16,5 +16,18 @@
 'use strict';
 
 var WebGlBaseRenderer = require('./WebGlBase');
+var inherits = require('../util/inherits');
 
-module.exports = WebGlBaseRenderer;
+/**
+ * @class
+ * @classdesc A renderer for {@link CubeGeometry} and {@link RectilinearView},
+ *     appropriate for a {@link WebGlStage}.
+ * @implements Renderer
+ */
+function WebGlCubeRenderer() {
+  this.constructor.super_.apply(this, arguments);
+}
+
+inherits(WebGlCubeRenderer, WebGlBaseRenderer);
+
+module.exports = WebGlCubeRenderer;

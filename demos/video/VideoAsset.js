@@ -16,43 +16,39 @@
 'use strict';
 
 // Dynamic asset containing a video element.
-// IE does not support video textures. We work around it by painting the video
-// into a canvas and using the canvas as a texture. Note that the workaround
-// won't work on videos loaded from a different domain:
-// https://connect.microsoft.com/IE/feedback/details/789809/ie10-cors-headers-not-being-honoured-with-canvas-drawimage-and-getimagedata
-function VideoAsset(wrappedVideo) {
-  this._wrappedVideo = null;
+// Note that this won't work on IE 11 because of lack of support for video
+// textures. Refer to the video-multi-res demo for a possible workaround.
+function VideoAsset(videoElement) {
+  this._videoElement = null;
   this._destroyed = false;
   this._emitChange = this.emit.bind(this, 'change');
   this._lastTimestamp = -1;
 
-  this.setVideo(wrappedVideo);
+  this._emptyCanvas = document.createElement('canvas');
+  this._emptyCanvas.width = 1;
+  this._emptyCanvas.height = 1;
 
-  this.emptyCanvas = document.createElement('canvas');
-  this.emptyCanvas.width = 1;
-  this.emptyCanvas.height = 1;
+  this.setVideo(videoElement);
 }
 
 Marzipano.dependencies.eventEmitter(VideoAsset);
 
 VideoAsset.prototype.dynamic = true;
 
-VideoAsset.prototype.setVideo = function(wrappedVideo) {
+VideoAsset.prototype.setVideo = function(videoElement) {
   var self = this;
 
-  this._wrappedVideo = wrappedVideo;
-
-  if (this._wrappedVideo) {
-    this._wrappedVideo.videoElement().removeEventListener('timeupdate', this._emitChange);
+  if (this._videoElement) {
+    this._videoElement.removeEventListener('timeupdate', this._emitChange);
   }
 
-  if (wrappedVideo == null) {
+  this._videoElement = videoElement;
+
+  if (!this._videoElement) {
     return;
   }
 
-  var videoElement = wrappedVideo.videoElement();
-
-  videoElement.addEventListener('timeupdate', this._emitChange);
+  this._videoElement.addEventListener('timeupdate', this._emitChange);
 
   // Emit a change event on every frame while the video is playing.
   // TODO: make the loop sleep when video is not playing.
@@ -62,7 +58,7 @@ VideoAsset.prototype.setVideo = function(wrappedVideo) {
   }
 
   function emitChangeIfPlaying() {
-    if (!videoElement.paused) {
+    if (!self._videoElement.paused) {
       self.emit('change');
     }
     if (!self._destroyed) {
@@ -75,46 +71,42 @@ VideoAsset.prototype.setVideo = function(wrappedVideo) {
 };
 
 VideoAsset.prototype.width = function() {
-  if (this._wrappedVideo) {
-    return this._wrappedVideo.videoElement().videoWidth;
+  if (this._videoElement) {
+    return this._videoElement.videoWidth;
   } else {
-    return this.emptyCanvas.width;
+    return this._emptyCanvas.width;
   }
 };
 
 VideoAsset.prototype.height = function() {
-  if (this._wrappedVideo) {
-    return this._wrappedVideo.videoElement().videoHeight;
+  if (this._videoElement) {
+    return this._videoElement.videoHeight;
   } else {
-    return this.emptyCanvas.height;
+    return this._emptyCanvas.height;
   }
 };
 
 VideoAsset.prototype.element = function() {
   // If element is null, show an empty canvas. This will cause a transparent
   // image to be rendered when no video is present.
-  if (this._wrappedVideo) {
-    return this._wrappedVideo.drawElement();
+  if (this._videoElement) {
+    return this._videoElement;
   } else {
-    return this.emptyCanvas;
+    return this._emptyCanvas;
   }
 };
 
-VideoAsset.prototype.video = function() {
-  return this._wrappedVideo;
-};
-
 VideoAsset.prototype.timestamp = function() {
-  if (this._wrappedVideo) {
-    this._lastTimestamp = this._wrappedVideo.videoElement().currentTime;
+  if (this._videoElement) {
+    this._lastTimestamp = this._videoElement.currentTime;
   }
   return this._lastTimestamp;
 };
 
 VideoAsset.prototype.destroy = function() {
   this._destroyed = true;
-  if (this._wrappedVideo) {
-    this._wrappedVideo.videoElement().removeEventListener('timeupdate', this._emitChange);
+  if (this._videoElement) {
+    this._videoElement.removeEventListener('timeupdate', this._emitChange);
   }
   if (this._emitChangeIfPlayingLoop) {
     cancelAnimationFrame(this._emitChangeIfPlayingLoop);

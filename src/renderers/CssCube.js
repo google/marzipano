@@ -21,6 +21,12 @@ var decimal = require('../util/decimal');
 var inherits = require('../util/inherits');
 
 
+/**
+ * @class
+ * @classdesc A renderer for {@link CubeGeometry} and {@link RectilinearView},
+ *     appropriate for a {@link CssStage}.
+ * @implements Renderer
+ */
 function CssCubeRenderer(root, quirks) {
   this.constructor.super_.call(this, root, quirks, CubeTile);
 }

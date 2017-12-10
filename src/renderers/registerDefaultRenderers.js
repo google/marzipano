@@ -25,6 +25,14 @@ var CssFlat = require('./CssFlat');
 var FlashCube = require('./FlashCube');
 var FlashFlat = require('./FlashFlat');
 
+/**
+ * Registers all known renderers for the given stage type into that stage.
+ * Most users will not need to register renderers, as {@link Viewer} does it for
+ * them.
+ *
+ * @param {Stage} stage The stage where the renderers are to be registered.
+ * @throws An error if the stage type is unknown.
+ */
 function registerDefaultRenderers(stage) {
   switch (stage.type) {
     case 'webgl':

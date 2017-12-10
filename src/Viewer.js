@@ -60,9 +60,6 @@ var stagePrefList = [
   FlashStage
 ];
 
-// TODO: it might make sense to support multiple scenes to be visible at the
-// same time, which would allow e.g. overlapping effects with transparency.
-
 /**
  * Signals that the current scene has changed.
  * @event Viewer#sceneChange
@@ -76,19 +73,25 @@ var stagePrefList = [
 
 /**
  * @class
- * @classdesc A Viewer is a single-{@link Stage stage} container for multiple
- * {@link Scene scenes}.
- * @param {HTMLElement} domElement the HTML element inside which the viewer
- *        should be initialized.
- * @param {Object} opts
- * @param {(null|'webgl'|'css'|'flash')} opts.stageType stage type to use.
- * @param {Object} opts.controls options to be passed to
- * {@link registerDefaultControls}.
- * @param {Object} opts.stage options to be passed to the {@link Stage}
- * constructor.
+ * @classdesc
+ * A Viewer is a container for multiple {@link Scene scenes} to be displayed
+ * inside a {@link Stage stage} contained in the DOM.
+ *
+ * Scenes may be created by calling {@link Viewer#createScene}. Except during a
+ * scene switch, a single one of them, called the current scene, is visible.
+ * Calling {@link Viewer#switchScene} sets the current scene and switches to it.
+ *
+ * @param {Element} domElement The DOM element to contain the stage.
+ * @param {Object} opts Viewer creation options.
+ * @param {(null|'webgl'|'css'|'flash')} [opts.stageType=null] The type of stage
+ *     to create. The default is to choose the most appropriate type depending
+ *     on the browser capabilities.
+ * @param {Object} opts.controls Options to be passed to
+ *     {@link registerDefaultControls}.
+ * @param {Object} opts.stage Options to be passed to the {@link Stage}
+ *     constructor.
  */
 function Viewer(domElement, opts) {
-
   opts = opts || {};
 
   this._domElement = domElement;
@@ -187,13 +190,23 @@ function Viewer(domElement, opts) {
   this._scenes = [];
 
   // The currently visible scene.
-  this._scene = null;
+  // During a scene transition, this is the scene being switched to.
+  this._currentScene = null;
+
+  // The scene being switched from during a scene transition.
+  // This is necessary to update the layers correctly when they are added or
+  // removed during a transition.
+  this._replacedScene = null;
 
   // The current transition.
   this._cancelCurrentTween = null;
 
-  // The event listener fired when the current view changes.
-  // This is attached to the correct view whenever the current scene changes.
+  // The event listener fired when the current scene layers change.
+  // This is attached to the correct scene whenever the current scene changes.
+  this._layerChangeHandler = this._updateSceneLayers.bind(this);
+
+  // The event listener fired when the current scene view changes.
+  // This is attached to the correct scene whenever the current scene changes.
   this._viewChangeHandler = this.emit.bind(this, 'viewChange');
 
   // Setup the idle timer.
@@ -231,9 +244,17 @@ Viewer.prototype.destroy = function() {
   this._updateSizeListener = null;
   this._size = null;
 
-  if (this._scene) {
-    this._scene.view().removeEventListener('change', this._viewChangeHandler);
+  if (this._currentScene) {
+    this._removeSceneEventListeners(this._currentScene);
   }
+  this._currentScene = null;
+
+  if (this._replacedScene) {
+    this._removeSceneEventListeners(this._replacedScene);
+  }
+  this._replacedScene = null;
+
+  this._layerChangeHandler = null;
   this._viewChangeHandler = null;
 
   for (var methodName in this._controlMethods) {
@@ -244,9 +265,7 @@ Viewer.prototype.destroy = function() {
   while (this._scenes.length) {
     this.destroyScene(this._scenes[0]);
   }
-
   this._scenes = null;
-  this._scene = null;
 
   // The Flash renderer must be torn down before the element is removed from
   // the DOM, so all scenes must have been destroyed before this point.
@@ -273,7 +292,7 @@ Viewer.prototype.destroy = function() {
 
 
 /**
- * Update the stage size to fill the containing element.
+ * Updates the stage size to fill the containing element.
  *
  * This method is automatically called when the browser window is resized.
  * Most clients won't need to explicitly call it to keep the size up to date.
@@ -287,7 +306,7 @@ Viewer.prototype.updateSize = function() {
 
 
 /**
- * Return the underlying {@link Stage}.
+ * Returns the underlying {@link Stage stage}.
  * @return {Stage}
  */
 Viewer.prototype.stage = function() {
@@ -296,7 +315,7 @@ Viewer.prototype.stage = function() {
 
 
 /**
- * Return the underlying {@link RenderLoop}.
+ * Returns the underlying {@link RenderLoop render loop}.
  * @return {RenderLoop}
  */
 Viewer.prototype.renderLoop = function() {
@@ -305,7 +324,7 @@ Viewer.prototype.renderLoop = function() {
 
 
 /**
- * Return the underlying {@link Controls}.
+ * Returns the underlying {@link Controls controls}.
  * @return {Controls}
  */
 Viewer.prototype.controls = function() {
@@ -314,7 +333,7 @@ Viewer.prototype.controls = function() {
 
 
 /**
- * Return the underlying DOM element.
+ * Returns the underlying DOM element.
  * @return {Element}
  */
 Viewer.prototype.domElement = function() {
@@ -323,74 +342,143 @@ Viewer.prototype.domElement = function() {
 
 
 /**
- * Create a new {@link Scene scene}.
- * @param {Object} opts
- * @param {Source} opts.source The underlying {@link Source}.
- * @param {Geometry} opts.geometry The underlying +{@link Geometry}.
- * @param {View} opts.view The underlying {@link View}.
- * @param {boolean} opts.pinFirstLevel Pin the first level to provide a
- *        last-resort fallback at the cost of memory consumption.
- * @param {Object} opts.textureStore Options to pass to the {@link TextureStore}
- *        constructor.
- * @param {Object} opts.layerOpts Options to pass to the {@link Layer}
- *        constructor.
+ * Creates a new {@link Scene scene} with a single layer and adds it to the
+ * viewer.
+ *
+ * The current scene does not change. To switch to the scene, call
+ * {@link Viewer#switchScene}.
+ *
+ * @param {Object} opts Scene creation options.
+ * @param {View} opts.view The scene's underlying {@link View}.
+ * @param {Source} opts.source The layer's underlying {@link Source}.
+ * @param {Geometry} opts.geometry The layer's underlying {@link Geometry}.
+ * @param {boolean} [opts.pinFirstLevel=false] Whether to pin the first level to
+ *     provide a fallback of last resort, at the cost of memory consumption.
+ * @param {Object} [opts.textureStoreOpts={}] Options to pass to the
+ *     {@link TextureStore} constructor.
+ * @param {Object} [opts.layerOpts={}] Options to pass to the {@link Layer}
+ *     constructor.
  * @return {Scene}
  */
 Viewer.prototype.createScene = function(opts) {
-  // TODO: set textureStore size to 0 for video scenes somehow?
-
   opts = opts || {};
 
-  var stage = this._stage;
-  var layers = [];
+  var scene = this.createEmptyScene({ view: opts.view });
 
-  // Multilayer options now passed as Array of opts, wrapping in Array in case for single layer argument for backward compatibility
-  if (type(opts) !== 'array') opts = Array(opts);
-
-  opts.forEach(function(opts) {
-
-    var source = opts.source;
-    var geometry = opts.geometry;
-    var view = opts.view;
-    var textureStore = new TextureStore(geometry, source, stage, opts.textureStore);
-    var layer = new Layer(stage, source, geometry, view, textureStore, opts.layerOpts);
-
-    layers.push(layer);
-
-    if (opts.pinFirstLevel) {
-      layer.pinFirstLevel();
-    }
+  var layer = scene.createLayer({
+    source: opts.source,
+    geometry: opts.geometry,
+    pinFirstLevel: opts.pinFirstLevel,
+    textureStoreOpts: opts.textureStoreOpts,
+    layerOpts: opts.layerOpts
   });
 
-  var scene = new Scene(this, layers);
+  return scene;
+};
+
+
+/**
+ * Creates a new {@link Scene scene} with no layers and adds it to the viewer.
+ *
+ * Layers may be added to the scene by calling {@link Scene#createLayer}.
+ * However, if the scene has a single layer, it is simpler to call
+ * {@link Viewer#createScene} instead of this method.
+ *
+ * The current scene does not change. To switch to the scene, call
+ * {@link Viewer#switchScene}.
+ *
+ * @param {Object} opts Scene creation options.
+ * @param {View} opts.view The scene's underlying {@link View}.
+ * @return {Scene}
+ */
+Viewer.prototype.createEmptyScene = function(opts) {
+  opts = opts || {};
+
+  var scene = new Scene(this, opts.view);
   this._scenes.push(scene);
 
   return scene;
 };
 
 
-Viewer.prototype._addLayers = function(layers) {
-  var self = this;
-  layers.forEach(function(layer) {
-    // Pin the first level to serve as a last-resort fallback.
-    layer.pinFirstLevel();
-    self._stage.addLayer(layer);
-  });
+Viewer.prototype._updateSceneLayers = function() {
+  var stage = this._stage;
+  var currentScene = this._currentScene;
+  var replacedScene = this._replacedScene;
+
+  var oldLayers = stage.listLayers();
+
+  // The stage contains layers from at most two scenes: the current one, on top,
+  // and the one currently being switched away from, on the bottom.
+  var newLayers = [];
+  if (replacedScene) {
+    newLayers = newLayers.concat(replacedScene.listLayers());
+  }
+  if (currentScene) {
+    newLayers = newLayers.concat(currentScene.listLayers());
+  }
+
+  // A single layer can be added or removed from the scene at a time.
+  if (Math.abs(oldLayers.length - newLayers.length) !== 1) {
+    throw new Error('Stage and scene out of sync');
+  }
+
+  if (newLayers.length < oldLayers.length) {
+    // A layer was removed.
+    for (var i = 0; i < oldLayers.length; i++) {
+      var layer = oldLayers[i];
+      if (newLayers.indexOf(layer) < 0) {
+        this._removeLayerFromStage(layer);
+        break;
+      }
+    }
+  }
+  if (newLayers.length > oldLayers.length) {
+    // A layer was added.
+    for (var i = 0; i < newLayers.length; i++) {
+      var layer = newLayers[i];
+      if (oldLayers.indexOf(layer) < 0) {
+        this._addLayerToStage(layer, i);
+      }
+    }
+  }
+
+  // TODO: When in the middle of a scene transition, call the transition update
+  // function immediately to prevent an added layer from flashing with the wrong
+  // opacity.
 };
 
 
-Viewer.prototype._removeLayers = function(layers) {
-  var self = this;
-  layers.forEach(function(layer) {
-    layer.unpinFirstLevel();
-    self._stage.removeLayer(layer);
-    layer.textureStore().clearNotPinned();
-  });
+Viewer.prototype._addLayerToStage = function(layer, i) {
+  // Pin the first level to ensure a fallback while the layer is visible.
+  // Note that this is distinct from the `pinFirstLevel` option passed to
+  // createScene(), which pins the layer even when it's not visible.
+  layer.pinFirstLevel();
+  this._stage.addLayer(layer, i);
+};
+
+
+Viewer.prototype._removeLayerFromStage = function(layer) {
+  this._stage.removeLayer(layer);
+  layer.unpinFirstLevel();
+  layer.textureStore().clearNotPinned();
+};
+
+
+Viewer.prototype._addSceneEventListeners = function(scene) {
+  scene.addEventListener('layerChange', this._layerChangeHandler);
+  scene.addEventListener('viewChange', this._viewChangeHandler);
+};
+
+
+Viewer.prototype._removeSceneEventListeners = function(scene) {
+  scene.removeEventListener('layerChange', this._layerChangeHandler);
+  scene.removeEventListener('viewChange', this._viewChangeHandler);
 };
 
 
 /**
- * Destroy a {@link Scene}.
+ * Destroys a {@link Scene scene} and removes it from the viewer.
  * @param {Scene} scene
  */
 Viewer.prototype.destroyScene = function(scene) {
@@ -399,32 +487,41 @@ Viewer.prototype.destroyScene = function(scene) {
     throw new Error('No such scene in viewer');
   }
 
-  this._removeLayers(scene._layers);
-
-  if (this._scene === scene) {
-    this._scene = null;
-    if(this._cancelCurrentTween) {
+  if (this._currentScene === scene) {
+    // The destroyed scene is the current scene.
+    // Remove event listeners, remove layers from stage and cancel transition.
+    this._removeSceneEventListeners(scene);
+    var layers = scene.listLayers();
+    for (var j = 0; j < layers.length; j++) {
+      this._removeLayerFromStage(layers[j]);
+    }
+    if (this._cancelCurrentTween) {
       this._cancelCurrentTween();
       this._cancelCurrentTween = null;
     }
+    this._currentScene = null;
+    this.emit('sceneChange');
   }
+
+  if (this._replacedScene === scene) {
+    // The destroyed scene is being switched away from.
+    // Remove event listeners and remove layers from stage.
+    this._removeSceneEventListeners(scene);
+    var layers = scene.listLayers();
+    for (var j = 0; j < layers.length; j++) {
+      this._removeLayerFromStage(layers[j]);
+    }
+    this._replacedScene = null;
+  }
+
   this._scenes.splice(i, 1);
 
-  var layers = scene._layers;
-
-  layers.forEach(function(layer) {
-    var textureStore = layer.textureStore();
-    layer.destroy();
-    textureStore.destroy();
-  });
-
-  scene._destroy();
-
+  scene.destroy();
 };
 
 
 /**
- * Destroy all {@link Scene scenes}.
+ * Destroys all {@link Scene scenes} and removes them from the viewer.
  */
 Viewer.prototype.destroyAllScenes = function() {
   while (this._scenes.length > 0) {
@@ -434,7 +531,7 @@ Viewer.prototype.destroyAllScenes = function() {
 
 
 /**
- * Return whether the viewer contains a {@link Scene scene}.
+ * Returns whether the viewer contains a {@link Scene scene}.
  * @param {Scene} scene
  * @return {boolean}
  */
@@ -444,7 +541,7 @@ Viewer.prototype.hasScene = function(scene) {
 
 
 /**
- * Get a list of all {@link Scene scenes}.
+ * Returns a list of all {@link Scene scenes}.
  * @return {Scene[]}
  */
 Viewer.prototype.listScenes = function() {
@@ -453,37 +550,43 @@ Viewer.prototype.listScenes = function() {
 
 
 /**
- * Get the current {@link Scene scene}, i.e., the last scene for which
- * {@link Viewer#switchScene} was called.
+ * Returns the current {@link Scene scene}, or null if there isn't one.
+ *
+ * To change the current scene, call {@link Viewer#switchScene}.
+ *
  * @return {Scene}
  */
 Viewer.prototype.scene = function() {
-  return this._scene;
+  return this._currentScene;
 };
 
 
 /**
- * Get the {@link View view} for the current {@link Scene scene}, as would be
- * obtained by calling {@link Scene#view}.
+ * Returns the {@link View view} for the current {@link Scene scene}, or null
+ * if there isn't one.
  * @return {View}
  */
 Viewer.prototype.view = function() {
-  var scene = this._scene;
+  var scene = this._currentScene;
   if (scene) {
-    // assuming all the layers share the same view, refering to the view of the first layer
-    return scene.listLayers()[0].view();
+    return scene.view();
   }
   return null;
 };
 
 
 /**
- * Tween the {@link View view} for the current {@link Scene scene}, as would be
- * obtained by calling {@link Scene#lookTo}.
+ * Tweens the {@link View view} for the current {@link Scene scene}.
+ *
+ * This method is equivalent to calling {@link Scene#lookTo} on the current
+ * scene.
+ *
+ * @param {Object} opts Options to pass into {@link Scene#lookTo}.
+ * @param {function} done Function to call when the tween is complete.
  */
 Viewer.prototype.lookTo = function(params, opts, done) {
   // TODO: is it an error to call lookTo when no scene is displayed?
-  var scene = this._scene;
+  var scene = this._currentScene;
   if (scene) {
     scene.lookTo(params, opts, done);
   }
@@ -491,12 +594,18 @@ Viewer.prototype.lookTo = function(params, opts, done) {
 
 
 /**
- * Start a movement, as would be obtained by calling {@link Scene#startMovement}
- * on the current scene.
+ * Starts a movement.
+ *
+ * This method is equivalent to calling {@link Scene#startMovement} on the
+ * current scene.
+ *
+ * @param {function} fn The movement function.
+ * @param {function} done Function to be called when the movement finishes or is
+ *     interrupted.
  */
 Viewer.prototype.startMovement = function(fn, cb) {
   // TODO: is it an error to call startMovement when no scene is displayed?
-  var scene = this._scene;
+  var scene = this._currentScene;
   if (scene) {
     scene.startMovement(fn, cb);
   }
@@ -504,11 +613,13 @@ Viewer.prototype.startMovement = function(fn, cb) {
 
 
 /**
- * Stop the current movement, as would be obtained by calling
- * {@link Scene#stopMovement} on the current scene.
+ * Stops the current movement.
+ *
+ * This method is equivalent to calling {@link Scene#stopMovement} on the
+ * current scene.
  */
 Viewer.prototype.stopMovement = function() {
-  var scene = this._scene;
+  var scene = this._currentScene;
   if (scene) {
     scene.stopMovement();
   }
@@ -516,10 +627,15 @@ Viewer.prototype.stopMovement = function() {
 
 
 /**
- * Schedule an automatic movement to be started when the view remains unchanged
- * for the given timeout period.
- * @param {Number} timeout Timeout period in milliseconds.
- * @param {Function} movement Automatic movement function, or null to disable.
+ * Schedules an idle movement to be automatically started when the view remains
+ * unchanged for the given timeout period.
+ *
+ * Changing the view while the idle movement is active stops the movement and
+ * schedules it to start again after the same timeout period. To disable it
+ * permanently, call with a null movement or an infinite timeout.
+ *
+ * @param {number} timeout Timeout period in milliseconds.
+ * @param {function} movement Automatic movement function, or null to disable.
  */
 Viewer.prototype.setIdleMovement = function(timeout, movement) {
   this._idleTimer.setDuration(timeout);
@@ -528,9 +644,9 @@ Viewer.prototype.setIdleMovement = function(timeout, movement) {
 
 
 /**
-  * Stop the idle movement. It will be started again after the timeout set by
-  * {@link Viewer#setIdleMovement}.
-  */
+ * Stops the idle movement. It will be started again after the timeout set by
+ * {@link Viewer#setIdleMovement}.
+ */
 Viewer.prototype.breakIdleMovement = function() {
   this._leaveIdle();
   this._resetIdleTimer();
@@ -543,7 +659,7 @@ Viewer.prototype._resetIdleTimer = function() {
 
 
 Viewer.prototype._enterIdle = function() {
-  var scene = this._scene;
+  var scene = this._currentScene;
   var idleMovement = this._idleMovement;
   if (!scene || !idleMovement) {
     return;
@@ -553,7 +669,7 @@ Viewer.prototype._enterIdle = function() {
 
 
 Viewer.prototype._leaveIdle = function() {
-  var scene = this._scene;
+  var scene = this._currentScene;
   if (!scene) {
     return;
   }
@@ -576,25 +692,34 @@ function defaultTransitionUpdate(val, newScene, oldScene) {
 
 
 /**
- * Switch to another {@link Scene scene} with a fade transition.
+ * Switches to another {@link Scene scene} with a fade transition. This scene
+ * becomes the current one.
+ *
+ * If a transition is already taking place, it is interrupted before the new one
+ * starts.
+ *
  * @param {Scene} newScene The scene to switch to.
- * @param {Object} opts
- * @param {Number} [opts.transitionDuration=1000]
- *        Transition duration in milliseconds.
- * @param {Number} [opts.transitionUpdate=defaultTransitionUpdate]
- *        Transition function with signature `f(t, newScene, oldScene)`.
- *        The function is called on each frame with `t` increasing from 0 to 1.
- *        An initial call with `t=0` and a final call with `t=1` are guaranteed.
- *        The default function sets the scene opacity to `t`.
- * @param {Function} done Called when the transition finishes or is interrupted.
+ * @param {Object} opts Transition options.
+ * @param {number} [opts.transitionDuration=1000] Transition duration, in
+ *     milliseconds.
+ * @param {number} [opts.transitionUpdate=defaultTransitionUpdate]
+ *     Transition update function, with signature `f(t, newScene, oldScene)`.
+ *     This function is called on each frame with `t` increasing from 0 to 1.
+ *     An initial call with `t=0` and a final call with `t=1` are guaranteed.
+ *     The default function sets the opacity of the new scene to `t`.
+ * @param {function} done Function to call when the transition finishes or is
+ *     interrupted. If the new scene is equal to the old one, no transition
+ *     takes place, but this function is still called.
  */
 Viewer.prototype.switchScene = function(newScene, opts, done) {
+  var self = this;
+
   opts = opts || {};
   done = done || noop;
 
   var stage = this._stage;
 
-  var oldScene = this._scene;
+  var oldScene = this._currentScene;
 
   // Do nothing if the target scene is the current one.
   if (oldScene === newScene) {
@@ -606,58 +731,76 @@ Viewer.prototype.switchScene = function(newScene, opts, done) {
     throw new Error('No such scene in viewer');
   }
 
-  // Consistency check -- updated for multiple layers
-  var layerList = stage.listLayers();
-  if (oldScene && oldScene.listLayers()[oldScene.listLayers().length - 1] !== layerList[layerList.length - 1]) {
-    throw new Error('Stage not in sync with viewer');
-  }
-
-  // Cancel ongoing transition, if any.
+  // Cancel an already ongoing transition. This ensures that the stage contains
+  // layers from exactly one scene before the transition begins.
   if (this._cancelCurrentTween) {
     this._cancelCurrentTween();
     this._cancelCurrentTween = null;
   }
 
+  var oldSceneLayers = oldScene ? oldScene.listLayers() : [];
+  var newSceneLayers = newScene.listLayers();
+  var stageLayers = stage.listLayers();
 
-  // Setup the transition
-  var duration = opts.transitionDuration != null ? opts.transitionDuration : defaultSwitchDuration;
-  var update = opts.transitionUpdate != null ? opts.transitionUpdate : defaultTransitionUpdate;
+  // Check that the stage contains exactly as many layers as the current scene,
+  // and that the top layer is the right one. If this test fails, either there
+  // is a bug or the user tried to modify the stage concurrently.
+  if (oldScene && ((stageLayers.length !== oldSceneLayers.length) ||
+      (stageLayers.length > 1 && stageLayers[0] != oldSceneLayers[0]))) {
+    throw new Error('Stage not in sync with viewer');
+  }
 
-  var self = this;
+  // Get the transition parameters.
+  var duration = opts.transitionDuration != null ?
+      opts.transitionDuration : defaultSwitchDuration;
+  var update = opts.transitionUpdate != null ?
+      opts.transitionUpdate : defaultTransitionUpdate;
 
-  // Start by adding the new layers
-  self._addLayers(newScene.listLayers());
+  // Add new scene layers into the stage before starting the transition.
+  var newSceneLayers = newScene.listLayers();
+  for (var i = 0; i < newSceneLayers.length; i++) {
+    this._addLayerToStage(newSceneLayers[i]);
+  }
 
-  // Call provided update function
+  // Update function to be called on every frame.
   function tweenUpdate(val) {
     update(val, newScene, oldScene);
   }
 
-  // Remove old layers when tween is complete
+  // Once the transition is complete, remove old scene layers from the stage and
+  // remove the event listeners. If the old scene was destroyed during the
+  // transition, this has already been taken care of. Otherwise, we still need
+  // to get a fresh copy of the scene's layers, since they might have changed
+  // during the transition.
   function tweenDone() {
-    if(oldScene) {
-      self._removeLayers(oldScene.listLayers());
+    if (self._replacedScene) {
+      self._removeSceneEventListeners(self._replacedScene);
+      oldSceneLayers = self._replacedScene.listLayers();
+      for (var i = 0; i < oldSceneLayers.length; i++) {
+        self._removeLayerFromStage(oldSceneLayers[i]);
+      }
+      self._replacedScene = null;
     }
-    //Remove tween to ensure objects referenced on callbacks are garbage collected
     self._cancelCurrentTween = null;
     done();
   }
 
+  // Store the cancelable for the transition.
   this._cancelCurrentTween = tween(duration, tweenUpdate, tweenDone);
 
-  // Update current scene.
-  this._scene = newScene;
+  // Update the current and replaced scene.
+  this._currentScene = newScene;
+  this._replacedScene = oldScene;
 
   // Emit scene and view change events.
   this.emit('sceneChange');
   this.emit('viewChange');
 
-  // Listen to the view change events for the new scene.
-  if (oldScene) {
-    oldScene.view().removeEventListener('change', this._viewChangeHandler);
-  }
-  newScene.view().addEventListener('change', this._viewChangeHandler);
-
+  // Add event listeners to the new scene.
+  // Note that event listeners can only be removed from the old scene once the
+  // transition is complete, since layers might get added or removed in the
+  // interim.
+  this._addSceneEventListeners(newScene);
 };
 
 
