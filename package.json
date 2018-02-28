@@ -23,6 +23,7 @@
   "dependencies": {
     "bowser": "^1.3.0",
     "gl-matrix": "git://github.com/toji/gl-matrix.git#7c8d5dd",
+    "glslify": "^6.1.0",
     "hammerjs": "git://github.com/digisfera/hammer.js.git",
     "minimal-event-emitter": "^0.1.0"
   },
@@ -35,7 +36,6 @@
     "browserify": "^13.0.0",
     "deep-equal": "^1.0.1",
     "flex-sdk": "^4.6.0-0",
-    "glslify": "^6.1.0",
     "jsdoc": "^3.4.0",
     "lr-http-server": "^0.1.1",
     "mocha": "^3.0.1",
