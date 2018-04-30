@@ -18,8 +18,10 @@
 var inherits = require('./util/inherits');
 
 // Class used to distinguish network failures from other kinds of errors.
-function NetworkError() {
+// https://stackoverflow.com/questions/1382107/whats-a-good-way-to-extend-error-in-javascript
+function NetworkError(message) {
   this.constructor.super_.apply(this, arguments);
+  this.message = message;
 }
 
 inherits(NetworkError, Error);
