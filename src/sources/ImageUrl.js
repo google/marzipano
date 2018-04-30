@@ -15,6 +15,7 @@
  */
 'use strict';
 
+var eventEmitter = require('minimal-event-emitter');
 var NetworkError = require('../NetworkError');
 var WorkPool = require('../collections/WorkPool');
 var chain = require('../util/chain');
@@ -86,6 +87,7 @@ ImageUrlSource.prototype.loadAsset = function(stage, tile, done) {
         if (err instanceof NetworkError) {
           // If a network error occurred, wait before retrying.
           retryMap[url] = clock();
+          self.emit('networkError', asset, err);
         }
         done(err, tile);
       } else {
@@ -200,5 +202,6 @@ function propertyRegExp(property) {
   return new RegExp(regExpStr, 'g');
 }
 
+eventEmitter(ImageUrlSource);
 
 module.exports = ImageUrlSource;
