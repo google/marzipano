@@ -773,8 +773,8 @@ RectilinearView.prototype.coordinatesToScreen = function(coords, result) {
  * @param {number} screen.x
  * @param {number} screen.y
  * @return {Object} result
- * @return {Object} result.x
- * @return {Object} result.y
+ * @return {Object} result.yaw
+ * @return {Object} result.pitch
  */
 RectilinearView.prototype.screenToCoordinates = function(screen, result) {
   var ray = this._vertex;
