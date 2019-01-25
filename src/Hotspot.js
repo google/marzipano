@@ -54,7 +54,7 @@ var clearOwnProperties = require('./util/clearOwnProperties');
  * @param {number} [opts.perspective.radius=null] If set, embed the hotspot
  *     into the image by transforming it into the surface of a sphere with this
  *     radius.
- * @param {string} [opt.perspective.extraRotations=null] If set, append this
+ * @param {string} [opt.perspective.extraTransforms=null] If set, append this
  *     value to the CSS `transform` property used to embed the hotspot. This
  *     may be used to rotate an embedded hotspot.
  */
@@ -62,8 +62,8 @@ function Hotspot(domElement, parentDomElement, view, coords, opts) {
 
   opts = opts || {};
   opts.perspective = opts.perspective || {};
-  opts.perspective.extraRotations =
-      opts.perspective.extraRotations != null ? opts.perspective.extraRotations : "";
+  opts.perspective.extraTransforms =
+      opts.perspective.extraTransforms != null ? opts.perspective.extraTransforms : "";
 
   if (opts.perspective.radius && !cssSupported()) {
     throw new Error('Embedded hotspots are not supported on this browser');
@@ -190,8 +190,7 @@ Hotspot.prototype._update = function() {
       // positioned behind the camera.
       isVisible = true;
       this._setEmbeddedPosition(view, params);
-    }
-    else {
+    } else {
       // Regular hotspots are only visible when positioned in front of the
       // camera. Note that they may be partially visible when positioned outside
       // the viewport.
@@ -221,13 +220,13 @@ Hotspot.prototype._update = function() {
 
 Hotspot.prototype._setEmbeddedPosition = function(view, params) {
   var transform = view.coordinatesToPerspectiveTransform(
-      params, this._perspective.radius, this._perspective.extraRotations);
+      params, this._perspective.radius, this._perspective.extraTransforms);
   setTransform(this._domElement, transform);
 };
 
 
 Hotspot.prototype._setPosition = function(x, y) {
-  positionAbsolutely(this._domElement, x, y);
+  positionAbsolutely(this._domElement, x, y, this._perspective.extraTransforms);
 };
 
 
