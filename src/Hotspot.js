@@ -54,8 +54,8 @@ var clearOwnProperties = require('./util/clearOwnProperties');
  * @param {number} [opts.perspective.radius=null] If set, embed the hotspot
  *     into the image by transforming it into the surface of a sphere with this
  *     radius.
- * @param {string} [opt.perspective.extraTransforms=null] If set, append this
- *     value to the CSS `transform` property used to embed the hotspot. This
+ * @param {string} [opts.perspective.extraTransforms=null] If set, append this
+ *     value to the CSS `transform` property used to position the hotspot. This
  *     may be used to rotate an embedded hotspot.
  */
 function Hotspot(domElement, parentDomElement, view, coords, opts) {
@@ -65,8 +65,8 @@ function Hotspot(domElement, parentDomElement, view, coords, opts) {
   opts.perspective.extraTransforms =
       opts.perspective.extraTransforms != null ? opts.perspective.extraTransforms : "";
 
-  if (opts.perspective.radius && !cssSupported()) {
-    throw new Error('Embedded hotspots are not supported on this browser');
+  if ((opts.perspective.radius || opts.perspective.extraTransforms) && !cssSupported()) {
+    throw new Error('CSS transforms on hotspots are not supported on this browser');
   }
 
   this._domElement = domElement;
