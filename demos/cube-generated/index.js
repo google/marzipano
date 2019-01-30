@@ -19,12 +19,12 @@
 var viewer = new Marzipano.Viewer(document.getElementById('pano'));
 
 // Create procedurally-generated single-color tile source.
-var source = new SolidColorSource(512, 512);
+var source = new SolidColorSource(1600, 1600, 512);
 
 // Create geometry with a very large number of levels.
 var levels = [];
 for(var i = 0; i < 32; i++) {
-  levels.push({ tileSize: 512, size: 512 * Math.pow(2,i) });
+  levels.push({ tileSize: 512, size: 800 * Math.pow(2,i) });
 }
 var geometry = new Marzipano.CubeGeometry(levels);
 

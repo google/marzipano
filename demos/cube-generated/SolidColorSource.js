@@ -16,18 +16,21 @@
 'use strict';
 
 // Custom tile source for procedurally generated solid color tiles.
-function SolidColorSource(width, height) {
+function SolidColorSource(width, height, tileSize) {
   this._width = width;
   this._height = height;
+  this._tileSize = tileSize;
 }
 
-SolidColorSource.prototype._tileText = function(tile) {
+SolidColorSource.prototype._tileText = function(tile, width, height) {
   var components = [];
   if (tile.face) {
     components.push("face:" + tile.face);
   }
   components.push("x:" + tile.x);
   components.push("y:" + tile.y);
+  components.push("width:" + width);
+  components.push("height:" + height);
   components.push("zoom:" + tile.z);
   return components.join(" ");
 };
@@ -45,11 +48,24 @@ SolidColorSource.prototype._tileColor = function(tile) {
 };
 
 SolidColorSource.prototype.loadAsset = function(stage, tile, done) {
-  var width = this._width;
-  var height = this._height;
-  var text = this._tileText(tile);
+  var _width = this._width * (tile.z + 1);
+  var _height = this._height * (tile.z + 1);
+  var width;
+  // Compute tile x remainder
+  if (this._tileSize * (tile.x + 1) > _width) {
+    width = (_width / this._tileSize - tile.x) * this._tileSize;
+  } else {
+    width = this._tileSize;
+  }
+  var height;
+  // Compute tile y remainder
+  if (this._tileSize * (tile.y + 1) > _height) {
+    height = (_height / this._tileSize - tile.y) * this._tileSize;
+  } else {
+    height = this._tileSize;
+  }
+  var text = this._tileText(tile, width, height);
   var color = this._tileColor(tile);
-
   // Create the canvas element.
   var element = document.createElement("canvas");
   element.width = width;

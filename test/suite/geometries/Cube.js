@@ -31,34 +31,6 @@ suite('CubeGeometry', function() {
     return false;
   }
 
-  suite('malformed levels', function() {
-
-    test('level size must not be smaller than parent level', function() {
-      assert.throws(function() {
-        new Cube([{ tileSize: 512, size: 512 }, { tileSize: 512, size: 500 }]);
-      });
-    });
-
-    test('level size must be multiple of parent level', function() {
-      assert.throws(function() {
-        new Cube([{ tileSize: 512, size: 512 }, { tileSize: 512, size: 1000 }]);
-      });
-    });
-
-    test('number of tiles in level must not be smaller than parent level', function() {
-      assert.throws(function() {
-        new Cube([{ tileSize: 128, size: 512 }, { tileSize: 512, size: 1024 }]);
-      });
-    });
-
-    test('number of tiles in level must be multiple of parent level', function() {
-      assert.throws(function() {
-        new Cube([{ tileSize: 256, size: 512 }, { tileSize: 512, size: 512*3 }]);
-      });
-    });
-
-  });
-
   suite('levels with constant tile size', function() {
 
     var cube = null;
