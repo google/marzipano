@@ -140,18 +140,16 @@ CubeTile.prototype.rotY = function() {
 
 
 CubeTile.prototype.centerX = function() {
-  var foreWidth = this._level.tileWidth() * this.x;
-  var partOfWidth = this.width() / 2;
-  // Compute tile centerX of face
-  return (foreWidth + partOfWidth + 0.5) / this._level.width() - 0.5;
+  var levelWidth = this._level.width();
+  var tileWidth = this._level.tileWidth();
+  return (this.x * tileWidth + 0.5 * this.width()) / levelWidth - 0.5;
 };
 
 
 CubeTile.prototype.centerY = function() {
-  var foreWidth = this._level.tileWidth() * this.y;
-  var partOfWidth = this.height() / 2;
-  // Compute tile centerY of face
-  return 0.5 - (foreWidth + partOfWidth + 0.5) / this._level.width();
+  var levelHeight = this._level.height();
+  var tileHeight = this._level.tileHeight();
+  return 0.5 - (this.y * tileHeight + 0.5 * this.height()) / levelHeight;
 };
 
 
@@ -499,6 +497,47 @@ CubeLevel.prototype.tileHeight = function() {
 };
 
 
+CubeLevel.prototype._validateWithParentLevel = function(parentLevel) {
+
+  var width = this.width();
+  var height = this.height();
+  var tileWidth = this.tileWidth();
+  var tileHeight = this.tileHeight();
+  var numHorizontal = this.numHorizontalTiles();
+  var numVertical = this.numVerticalTiles();
+
+  var parentWidth = parentLevel.width();
+  var parentHeight = parentLevel.height();
+  var parentTileWidth = parentLevel.tileWidth();
+  var parentTileHeight = parentLevel.tileHeight();
+  var parentNumHorizontal = parentLevel.numHorizontalTiles();
+  var parentNumVertical = parentLevel.numVerticalTiles();
+
+  if (width % parentWidth !== 0) {
+    throw new Error('Level width must be multiple of parent level: ' +
+                    width + ' vs. ' + parentWidth);
+  }
+
+  if (height % parentHeight !== 0) {
+    throw new Error('Level height must be multiple of parent level: ' +
+                    height + ' vs. ' + parentHeight);
+  }
+
+  if (numHorizontal % parentNumHorizontal !== 0) {
+    throw new Error('Number of horizontal tiles must be multiple of parent level: ' +
+      numHorizontal + " (" + width + '/' + tileWidth + ')' + " vs. " +
+      parentNumHorizontal + " (" + parentWidth + '/' + parentTileWidth + ')');
+  }
+
+  if (numVertical % parentNumVertical !== 0) {
+    throw new Error('Number of vertical tiles must be multiple of parent level: ' +
+      numVertical + " (" + height + '/' + tileHeight + ')' + " vs. " +
+      parentNumVertical + " (" + parentHeight + '/' + parentTileHeight + ')');
+  }
+
+};
+
+
 /**
  * @class CubeGeometry
  * @implements Geometry
@@ -510,6 +549,9 @@ CubeLevel.prototype.tileHeight = function() {
  * The following restrictions apply:
  *   - All tiles must be square, except when in the last row or column position,
  *     and must form a rectangular grid;
+ *   - The size of a level must be a multiple of the parent level size;
+ *   - The tile width (respectively, height) for a level must be a submultiple
+ *     of the tile width (respectively, height) for the parent level.
  *
  * @param {Object[]} levelPropertiesList Level description
  * @param {number} levelPropertiesList[].size Cube face size in pixels
@@ -522,6 +564,10 @@ function CubeGeometry(levelPropertiesList) {
 
   this.levelList = makeLevelList(levelPropertiesList, CubeLevel);
   this.selectableLevelList = makeSelectableLevelList(this.levelList);
+
+  for (var i = 1; i < this.levelList.length; i++) {
+    this.levelList[i]._validateWithParentLevel(this.levelList[i-1]);
+  }
 
   this._tileSearcher = new TileSearcher(this);
 
