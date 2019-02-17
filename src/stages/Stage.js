@@ -24,13 +24,6 @@ var clearOwnProperties = require('../util/clearOwnProperties');
 
 var RendererRegistry = require('./RendererRegistry');
 
-
-// Time to wait before creating successive textures, in milliseconds.
-// We wait for at least one frame to be rendered between assets.
-// This improves performance significantly on older iOS devices.
-var createTextureDelay = 20;
-
-
 function reverseTileCmp(t1, t2) {
   return -t1.cmp(t2);
 }
@@ -93,9 +86,7 @@ function Stage(opts) {
   this._tmpSize = {};
 
   // Work queue for createTexture.
-  this._createTextureWorkQueue = new WorkQueue({
-    delay: createTextureDelay
-  });
+  this._createTextureWorkQueue = new WorkQueue();
 
   // Function to emit event when render parameters have changed.
   this._emitRenderInvalid = this._emitRenderInvalid.bind(this);
