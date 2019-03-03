@@ -16,9 +16,16 @@
 'use strict';
 
 var Hammer = require('hammerjs');
-var Map = require('../collections/Map');
-var hash = require('../util/hash');
 var browser = require('bowser');
+
+var nextId = 1;
+var idProperty = 'MarzipanoHammerElementId';
+function getKeyForElementAndType(element, type) {
+  if (!element[idProperty]) {
+    element[idProperty] = nextId++;
+  }
+  return type + element[idProperty];
+}
 
 
 /**
@@ -29,23 +36,19 @@ var browser = require('bowser');
  * DOM element and pointer type.
  */
 function HammerGestures() {
-  this._managers = new Map(domElementEquals, domElementHash);
+  this._managers = {};
+  this._refCount = {};
 }
 
 
 HammerGestures.prototype.get = function(element, type) {
-  if (!this._managers.has(element)) {
-    this._managers.set(element, {});
+  var key = getKeyForElementAndType(element, type);
+  if (!this._managers[key]) {
+    this._managers[key] = this._createManager(element, type);
+    this._refCount[key] = 0;
   }
-  var elementManagers = this._managers.get(element);
-
-  if (!elementManagers[type]) {
-    elementManagers[type] = this._createManager(element, type);
-  }
-  var elementTypeManager = elementManagers[type];
-  elementTypeManager.refs += 1;
-
-  return new HammerGesturesHandle(this, elementTypeManager.manager, element, type);
+  this._refCount[key]++;
+  return new HammerGesturesHandle(this, this._managers[key], element, type);
 };
 
 
@@ -68,35 +71,21 @@ HammerGestures.prototype._createManager = function(element, type) {
     }
   }
 
-  return {
-    manager: manager,
-    refs: 0
-  };
+  return manager;
 };
 
 
 HammerGestures.prototype._releaseHandle = function(element, type) {
-  var elementTypeManager = this._managers.get(element)[type];
-  elementTypeManager.refs -= 1;
-  if(elementTypeManager.refs <= 0) {
-    elementTypeManager.manager.destroy();
-    this._managers.get(element)[type] = null;
+  var key = getKeyForElementAndType(element, type);
+  if (this._refCount[key]) {
+    this._refCount[key]--;
+    if (!this._refCount[key]) {
+      this._managers[key].destroy();
+      delete this._managers[key];
+      delete this._refCount[key];
+    }
   }
 };
-
-
-function domElementEquals(e1, e2) {
-  return e1 === e2;
-}
-
-
-function domElementHash(e) {
-  var elementStr = e.id || e.toString();
-  while (elementStr.length < 5) {
-    elementStr += '0';
-  }
-  return hash(elementStr.charCodeAt(0), elementStr.charCodeAt(1), elementStr.charCodeAt(2), elementStr.charCodeAt(3), elementStr.charCodeAt(4));
-}
 
 
 function HammerGesturesHandle(hammerGestures, manager, element, type) {
