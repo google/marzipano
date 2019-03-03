@@ -49,15 +49,11 @@ function MockAsset(tile, dynamic) {
 eventEmitter(MockAsset);
 
 // Mock texture.
-// For these tests we only need the used() and destroy() methods; we also need
-// the mock texture to be an event emitter.
 function MockTexture(asset) {
   this.id = asset.id;
   this.refresh = sinon.spy();
   this.destroy = sinon.spy();
 }
-
-eventEmitter(MockTexture);
 
 var loadAssetError = new Error('Asset error');
 var createTextureError = new Error('Create texture');
