@@ -278,9 +278,17 @@ Stage.prototype.addLayer = function(layer, i) {
 
   this.validateLayer(layer); // must be defined by subclasses.
 
-  // The rendered is created lazily by _updateRenderer().
+  var geometryType = layer.geometry().type;
+  var viewType = layer.view().type;
+  var rendererClass = this._rendererRegistry.get(geometryType, viewType);
+  if (!rendererClass) {
+    throw new Error('No ' + this.type + ' renderer avaiable for ' +
+        geometryType + ' geometry and ' + viewType + ' view');
+  }
+  var renderer = this.createRenderer(rendererClass);
+
   this._layers.splice(i, 0, layer);
-  this._renderers.splice(i, 0, null);
+  this._renderers.splice(i, 0, renderer);
 
   // Listeners for render invalid.
   layer.addEventListener('viewChange', this._emitRenderInvalid);
@@ -334,10 +342,7 @@ Stage.prototype.removeLayer = function(layer) {
   var removedLayer = this._layers.splice(index, 1)[0];
   var renderer = this._renderers.splice(index, 1)[0];
 
-  // Renderer is created by _updateRenderer(), so it may not always exist.
-  if (renderer) {
-    this.destroyRenderer(renderer);
-  }
+  this.destroyRenderer(renderer);
 
   removedLayer.removeEventListener('viewChange', this._emitRenderInvalid);
   removedLayer.removeEventListener('effectsChange', this._emitRenderInvalid);
@@ -417,9 +422,9 @@ Stage.prototype.render = function() {
     var layer = this._layers[i];
     var effects = layer.effects();
     var view = layer.view();
-    var renderer = this._updateRenderer(i);
-    var depth = this._layers.length - i;
     var textureStore = layer.textureStore();
+    var renderer = this._renderers[i];
+    var depth = this._layers.length - i;
 
     // Convert the rect effect into a normalized rect.
     // TODO: avoid doing this on every frame.
@@ -500,34 +505,6 @@ Stage.prototype.render = function() {
   this.endFrame(); // defined by subclasses
 
   this.emit('renderComplete', stableStage);
-};
-
-
-Stage.prototype._updateRenderer = function(layerIndex) {
-  var layer = this._layers[layerIndex];
-
-  var stageType = this.type;
-  var geometryType = layer.geometry().type;
-  var viewType = layer.view().type;
-
-  var Renderer = this._rendererRegistry.get(geometryType, viewType);
-  if (!Renderer) {
-    throw new Error('No ' + stageType + ' renderer avaiable for ' + geometryType + ' geometry and ' + viewType + ' view');
-  }
-
-  var currentRenderer = this._renderers[layerIndex];
-
-  if (!currentRenderer) {
-    // If layer does not have a renderer, create it now.
-    this._renderers[layerIndex] = this.createRenderer(Renderer);
-  }
-  else if (!(currentRenderer instanceof Renderer)) {
-    // If the existing renderer is of the wrong type, replace it.
-    this._renderers[layerIndex] = this.createRenderer(Renderer);
-    this.destroyRenderer(currentRenderer);
-  }
-
-  return this._renderers[layerIndex];
 };
 
 

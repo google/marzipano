@@ -29,12 +29,19 @@ function TestStage() {
   this.constructor.super_.call(this);
   this.validateLayer = sinon.stub();
   this.setSizeForType = sinon.spy();
+  this.createRenderer = function() {};
+  this.destroyRenderer = function() {};
+  this.registerRenderer('fake', 'fake', function() {});
 }
 
 inherits(TestStage, Stage);
 
 // Mock layer.
-function MockLayer() {}
+var nextId = 0;
+function MockLayer() {
+  this.geometry = function() { return {type: 'fake'} };
+  this.view = function() { return {type: 'fake'} };
+}
 
 eventEmitter(MockLayer);
 

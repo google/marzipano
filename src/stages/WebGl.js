@@ -19,10 +19,8 @@ var Stage = require('./Stage');
 var HtmlImageLoader = require('../loaders/HtmlImage');
 var webGlSupported = require('../support/WebGl');
 var browser = require('bowser');
-var Map = require('../collections/Map');
 var inherits = require('../util/inherits');
 var pixelRatio = require('../util/pixelRatio');
-var hash = require('../util/hash');
 var ispot = require('../util/ispot');
 var setAbsolute = require('../util/dom').setAbsolute;
 var setFullSize = require('../util/dom').setFullSize;
@@ -121,20 +119,10 @@ function WebGlStage(opts) {
   // Handle WebGl context loss.
   this._domElement.addEventListener('webglcontextlost', this._handleContextLoss);
 
-  // WebGl renderers are singletons for a given stage, so we store them in a
-  // map for quick retrieval when several layers use the same renderer.
-  // Map keys are renderer classes, map values are renderer instances.
-
-  function renderersEqual(Renderer1, Renderer2) {
-    return Renderer1 === Renderer2;
-  }
-
-  function renderersHash(Renderer) {
-    return hash(Renderer.toString());
-  }
-
-  this._rendererInstances = new Map(renderersEqual, renderersHash);
-
+  // WebGl renderers are singletons for a given stage. This list stores the
+  // existing renderers so they can be reused across layers with the same
+  // geometry and view type.
+  this._rendererInstances = [];
 }
 
 inherits(WebGlStage, Stage);
@@ -211,25 +199,26 @@ WebGlStage.prototype.validateLayer = function(layer) {
 
 
 WebGlStage.prototype.createRenderer = function(Renderer) {
-  // WebGl renderers are singletons for a given stage, so we check for an
-  // already existing renderer of the required type before creating a new one.
-  if (this._rendererInstances.has(Renderer)) {
-    return this._rendererInstances.get(Renderer);
+  var rendererInstances = this._rendererInstances;
+  for (var i = 0; i < rendererInstances.length; i++) {
+    if (rendererInstances[i] instanceof Renderer) {
+      return rendererInstances[i];
+    }
   }
-  else {
-    var renderer = new Renderer(this._gl);
-    this._rendererInstances.set(Renderer, renderer);
-    return renderer;
-  }
+  var renderer = new Renderer(this._gl);
+  rendererInstances.push(renderer);
+  return renderer;
 };
 
 
 WebGlStage.prototype.destroyRenderer = function(renderer) {
-  // WebGl renderers are singletons for a given stage, so check that a
-  // renderer is no longer in use before destroying it.
+  var rendererInstances = this._rendererInstances;
   if (this._renderers.indexOf(renderer) < 0) {
     renderer.destroy();
-    this._rendererInstances.del(renderer.constructor);
+    var index = rendererInstances.indexOf(renderer);
+    if (index >= 0) {
+      rendererInstances.splice(index, 1);
+    }
   }
 };
 
