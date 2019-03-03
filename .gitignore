@@ -9,4 +9,4 @@ package-lock.json
 /build/*
 /dist/*
 /docs/*
-/test/test_suite.js
+/test/test_suite.js*
