@@ -24,6 +24,10 @@ var viewerElement = document.querySelector("#pano");
 var enterVrElement = document.querySelector("#enter-vr");
 var noVrElement = document.querySelector("#no-vr");
 
+// Install the WebVR polyfill, which makes the demo functional on "fake" WebVR
+// displays such as Google Cardboard.
+var polyfill = new WebVRPolyfill();
+
 // Create stage and register renderers.
 var stage = new Marzipano.WebGlStage();
 Marzipano.registerDefaultRenderers(stage);
@@ -33,14 +37,13 @@ viewerElement.appendChild(stage.domElement());
 
 // Update the stage size whenever the window is resized.
 function updateSize() {
-  stage.setSize({ width: viewerElement.clientWidth, height: viewerElement.clientHeight });
+  stage.setSize({
+    width: viewerElement.clientWidth,
+    height: viewerElement.clientHeight
+  });
 }
 updateSize();
 window.addEventListener('resize', updateSize);
-
-// Create and start the render loop.
-var renderLoop = new Marzipano.RenderLoop(stage);
-renderLoop.start();
 
 // Create geometry.
 var geometry = new Marzipano.CubeGeometry([
@@ -53,8 +56,8 @@ var geometry = new Marzipano.CubeGeometry([
 
 // Create view.
 var limiter = Marzipano.RectilinearView.limit.traditional(4096, 110*Math.PI/180);
-var viewLeft = new Marzipano.RectilinearView(null, limiter);
-var viewRight = new Marzipano.RectilinearView(null, limiter);
+var viewLeft = new WebVrView();
+var viewRight = new WebVrView();
 
 // Create layers.
 var layerLeft = createLayer(stage, viewLeft, geometry, 'left',
@@ -66,45 +69,53 @@ var layerRight = createLayer(stage, viewRight, geometry, 'right',
 stage.addLayer(layerLeft);
 stage.addLayer(layerRight);
 
-// Query browser for VR devices.
-var vrDevices = null;
-getHMD().then(function(detectedDevices) {
-  vrDevices = detectedDevices;
-
-  // Set the projection center.
-  if (vrDevices.hmd) {
-    setProjectionCenter(viewLeft, vrDevices.hmd.getEyeParameters("left"));
-    setProjectionCenter(viewRight, vrDevices.hmd.getEyeParameters("right"));
+// Check for an available VR device and initialize accordingly.
+var vrDisplay = null;
+navigator.getVRDisplays().then(function(vrDisplays) {
+  if (vrDisplays.length > 0) {
+    vrDisplay = vrDisplays[0];
+    vrDisplay.requestAnimationFrame(render);
   }
-
-  // Update view on movements.
-  if (vrDevices.positionSensor) {
-    requestAnimationFrame(syncViewWithPositionSensor);
-  }
-
-  enterVrElement.style.display = vrDevices.hmd ? 'block' : 'none';
-  noVrElement.style.display = vrDevices.hmd ? 'none' : 'block';
+  enterVrElement.style.display = vrDisplay ? 'block' : 'none';
+  noVrElement.style.display = vrDisplay ? 'none' : 'block';
 });
 
-// Lock the screen orientation.
-if (screen.orientation && screen.orientation.lock) {
-  screen.orientation.lock('landscape');
-}
-
-// Prevent display from sleeping on mobile devices.
-var wakeLock = new WakeLock();
-wakeLock.request();
-
-// Enter fullscreen mode when available.
+// Enter WebVR mode when the button is clicked.
 enterVrElement.addEventListener('click', function() {
-  if (viewerElement.mozRequestFullScreen) {
-    viewerElement.mozRequestFullScreen({ vrDisplay: vrDevices.hmd });
-  }
-  else if (viewerElement.webkitRequestFullscreen) {
-    console.log("vrDisplay", vrDevices.hmd);
-    viewerElement.webkitRequestFullscreen({ vrDisplay: vrDevices.hmd });
-  }
+  vrDisplay.requestPresent([{source: stage.domElement()}]);
 });
+
+var proj = mat4.create();
+var pose = mat4.create();
+
+function render() {
+  var frameData = new VRFrameData;
+  vrDisplay.getFrameData(frameData);
+
+  // Update the view.
+  // The panorama demo at https://github.com/toji/webvr.info/tree/master/samples
+  // recommends computing the view matrix from `frameData.pose.orientation`
+  // instead of using `frameData.{left,right}ViewMatrix.
+  if (frameData.pose.orientation) {
+    mat4.fromQuat(pose, frameData.pose.orientation);
+    mat4.invert(pose, pose);
+
+    mat4.copy(proj, frameData.leftProjectionMatrix);
+    mat4.multiply(proj, proj, pose);
+    viewLeft.setProjection(proj);
+
+    mat4.copy(proj, frameData.rightProjectionMatrix);
+    mat4.multiply(proj, proj, pose);
+    viewRight.setProjection(proj);
+  }
+
+  // Render and submit to WebVR display.
+  stage.render();
+  vrDisplay.submitFrame();
+
+  // Render again on the next frame.
+  vrDisplay.requestAnimationFrame(render);
+}
 
 function createLayer(stage, view, geometry, eye, rect) {
   var urlPrefix = "//www.marzipano.net/media/music-room";
@@ -120,99 +131,3 @@ function createLayer(stage, view, geometry, eye, rect) {
 
   return layer;
 }
-
-function setProjectionCenter(view, eyeParameters) {
-  var fovs = eyeParameters.recommendedFieldOfView;
-
-  var left = degToRad(fovs.leftDegrees),
-      right = degToRad(fovs.rightDegrees),
-      up = degToRad(fovs.upDegrees),
-      down = degToRad(fovs.downDegrees);
-
-  var hfov = left + right;
-  var offsetAngleX = left - hfov/2;
-  var projectionCenterX = Math.tan(offsetAngleX) / (2 * Math.tan(hfov/2));
-
-  var vfov = up + down;
-  var offsetAngleY = up - vfov/2;
-  var projectionCenterY = Math.tan(offsetAngleY) / (2 * Math.tan(vfov/2));
-
-  view.setParameters({
-    projectionCenterX: projectionCenterX,
-    projectionCenterY: projectionCenterY,
-    fov: vfov
-  });
-}
-
-var positionSensorQuartenion = quat.create();
-var positionSensorMatrix = mat4.create();
-var positionSensorParameters = {};
-
-function syncViewWithPositionSensor() {
-  var state = vrDevices.positionSensor.getState();
-
-  if (state.hasOrientation) {
-    if (state.orientation) {
-      var o = state.orientation;
-      quat.set(positionSensorQuartenion, o.x, o.y, o.z, o.w);
-      mat4.fromQuat(positionSensorMatrix, positionSensorQuartenion);
-
-      eulerFromMat4(positionSensorMatrix, positionSensorParameters);
-
-      var parameters = {
-        yaw: -positionSensorParameters._y,
-        pitch: -positionSensorParameters._x,
-        roll: -positionSensorParameters._z
-      };
-
-      viewLeft.setParameters(parameters);
-      viewRight.setParameters(parameters);
-    }
-  }
-  requestAnimationFrame(syncViewWithPositionSensor);
-}
-
-function getHMD() {
-  return new Promise(function(resolve, reject) {
-    var detectedHmd = null;
-    var detectedPositionSensor = null;
-
-    navigator.getVRDevices().then(function(devices) {
-      var i;
-      for (i = 0; i < devices.length; i++) {
-        if (devices[i] instanceof HMDVRDevice) {
-          detectedHmd = devices[i];
-          break;
-        }
-      }
-      for (i = 0; i < devices.length; i++) {
-        if (devices[i] instanceof PositionSensorVRDevice) {
-          detectedPositionSensor = devices[i];
-          break;
-        }
-      }
-      resolve({ hmd: detectedHmd, positionSensor: detectedPositionSensor });
-    }, function() {
-      resolve({});
-    });
-  });
-}
-
-// Adapted from Three.js
-// https://github.com/mrdoob/three.js/blob/master/src/math/Euler.js
-// Assumes the upper 3x3 of m is a pure (unscaled) rotation matrix.
-function eulerFromMat4(m, result) {
-  var m11 = m[0], m12 = m[4], m13 = m[8];
-  var m21 = m[1], m22 = m[5], m23 = m[9];
-  var m31 = m[2], m32 = m[6], m33 = m[10];
-
-  var m23clamped = ((m23 < -1) ? -1 : ((m23 > 1) ? 1 : m23));
-  result._x = Math.asin(-m23clamped);
-  if (Math.abs(m23) < 0.99999 ) {
-    result._y = Math.atan2(m13, m33);
-    result._z = Math.atan2(m21, m22);
-  } else {
-    result._y = Math.atan2(-m31, m11);
-    result._z = 0;
-  }
-};
