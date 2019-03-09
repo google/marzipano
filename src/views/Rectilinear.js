@@ -125,14 +125,12 @@ function RectilinearView(params, limiter) {
   // The initial value for the view limiter.
   this._limiter = limiter || null;
 
-  // The last calculated projection matrix.
-  this._projectionMatrix = mat4.create();
-
-  // Whether the projection matrix needs to be updated.
-  this._projectionChanged = true;
+  // The last calculated projection matrix and its inverse.
+  this._projMatrix = mat4.create();
+  this._invProjMatrix = mat4.create();
 
   // The last calculated view frustum.
-  this._viewFrustum = [
+  this._frustum = [
     vec4.create(), // left
     vec4.create(), // right
     vec4.create(), // bottom
@@ -140,11 +138,13 @@ function RectilinearView(params, limiter) {
     vec4.create()  // camera
   ];
 
+  // Whether the projection matrices and the view frustum need to be updated.
+  this._projectionChanged = true;
+
   // Temporary variables used for calculations.
   this._params = {};
   this._fovs = {};
   this._tmpVec = vec4.create();
-  this._tmpMat = mat4.create();
 
   // Force view limiting on initial parameters.
   this._update();
@@ -585,19 +585,12 @@ RectilinearView.prototype.updateWithControlParameters = function(parameters) {
 };
 
 
-/**
- * Compute and return the projection matrix for the current view.
- * @returns {mat4}
- */
-RectilinearView.prototype.projection = function() {
-
-  var p = this._projectionMatrix;
-  var f = this._viewFrustum;
+RectilinearView.prototype._updateProjection = function() {
+  var projMatrix = this._projMatrix;
+  var invProjMatrix = this._invProjMatrix;
+  var frustum = this._frustum;
 
   if (this._projectionChanged) {
-
-    // Recalculate the projection matrix.
-
     var width = this._width;
     var height = this._height;
 
@@ -616,29 +609,52 @@ RectilinearView.prototype.projection = function() {
       fovs.rightDegrees = (hfov/2 - offsetAngleX) * 180/Math.PI;
       fovs.upDegrees = (vfov/2 + offsetAngleY) * 180/Math.PI;
       fovs.downDegrees = (vfov/2 - offsetAngleY) * 180/Math.PI;
-      mat4.perspectiveFromFieldOfView(p, fovs, -1, 1);
+      mat4.perspectiveFromFieldOfView(projMatrix, fovs, -1, 1);
     } else {
-      mat4.perspective(p, vfov, aspect, -1, 1);
+      mat4.perspective(projMatrix, vfov, aspect, -1, 1);
     }
 
-    mat4.rotateZ(p, p, this._roll);
-    mat4.rotateX(p, p, this._pitch);
-    mat4.rotateY(p, p, this._yaw);
+    mat4.rotateZ(projMatrix, projMatrix, this._roll);
+    mat4.rotateX(projMatrix, projMatrix, this._pitch);
+    mat4.rotateY(projMatrix, projMatrix, this._yaw);
 
-    // Extract frustum planes from projection matrix.
-    // http://www8.cs.umu.se/kurser/5DV051/HT12/lab/plane_extraction.pdf
+    mat4.invert(invProjMatrix, projMatrix);
 
-    vec4.set(f[0], p[3] + p[0], p[7] + p[4], p[11] + p[8],  0); // left
-    vec4.set(f[1], p[3] - p[0], p[7] - p[4], p[11] - p[8],  0); // right
-    vec4.set(f[2], p[3] + p[1], p[7] + p[5], p[11] + p[9],  0); // top
-    vec4.set(f[3], p[3] - p[1], p[7] - p[5], p[11] - p[9],  0); // bottom
-    vec4.set(f[4], p[3] + p[2], p[7] + p[6], p[11] + p[10], 0); // camera
+    this._matrixToFrustum(projMatrix, frustum);
 
     this._projectionChanged = false;
   }
+};
 
-  return p;
 
+RectilinearView.prototype._matrixToFrustum = function(p, f) {
+  // Extract frustum planes from projection matrix.
+  // http://www8.cs.umu.se/kurser/5DV051/HT12/lab/plane_extraction.pdf
+  vec4.set(f[0], p[3] + p[0], p[7] + p[4], p[11] + p[8],  0); // left
+  vec4.set(f[1], p[3] - p[0], p[7] - p[4], p[11] - p[8],  0); // right
+  vec4.set(f[2], p[3] + p[1], p[7] + p[5], p[11] + p[9],  0); // top
+  vec4.set(f[3], p[3] - p[1], p[7] - p[5], p[11] - p[9],  0); // bottom
+  vec4.set(f[4], p[3] + p[2], p[7] + p[6], p[11] + p[10], 0); // camera
+};
+
+
+/**
+ * Returns the projection matrix for the current view.
+ * @returns {mat4}
+ */
+RectilinearView.prototype.projection = function() {
+  this._updateProjection();
+  return this._projMatrix;
+};
+
+
+/**
+ * Returns the inverse projection matrix for the current view.
+ * @returns {mat4}
+ */
+RectilinearView.prototype.inverseProjection = function() {
+  this._updateProjection();
+  return this._invProjMatrix;
 };
 
 
@@ -652,18 +668,16 @@ RectilinearView.prototype.projection = function() {
  * @param {vec2[]} rectangle The vertices of the rectangle.
  */
 RectilinearView.prototype.intersects = function(rectangle) {
+  this._updateProjection();
 
-  var planes = this._viewFrustum;
+  var frustum = this._frustum;
   var vertex = this._tmpVec;
-
-  // Call projection() for the side effect of updating the view frustum.
-  this.projection();
 
   // Check whether the rectangle is on the outer side of any of the frustum
   // planes. This is a sufficient condition, though not necessary, for the
   // rectangle to be completely outside the frustum.
-  for (var i = 0; i < planes.length; i++) {
-    var plane = planes[i];
+  for (var i = 0; i < frustum.length; i++) {
+    var plane = frustum[i];
     var inside = false;
     for (var j = 0; j < rectangle.length; j++) {
       var corner = rectangle[j];
@@ -677,7 +691,6 @@ RectilinearView.prototype.intersects = function(rectangle) {
     }
   }
   return true;
-
 };
 
 
@@ -779,7 +792,6 @@ RectilinearView.prototype.coordinatesToScreen = function(coords, result) {
  */
 RectilinearView.prototype.screenToCoordinates = function(coords, result) {
   var ray = this._tmpVec;
-  var invProj = this._tmpMat;
 
   if (!result) {
     result = {};
@@ -788,17 +800,13 @@ RectilinearView.prototype.screenToCoordinates = function(coords, result) {
   var width = this._width;
   var height = this._height;
 
-  // Calculate the inverse projection matrix.
-  // TODO: cache result?
-  mat4.invert(invProj, this.projection());
-
   // Convert viewport coordinates to clip space.
-  var vecx = 2.0 * coords.x / width - 1.0;
-  var vecy = 1.0 - 2.0 * coords.y / height;
+  var vecx = 2 * coords.x / width - 1;
+  var vecy = 1 - 2 * coords.y / height;
   vec4.set(ray, vecx, vecy, 1, 1);
 
   // Project back to world space.
-  vec4.transformMat4(ray, ray, invProj);
+  vec4.transformMat4(ray, ray, this.inverseProjection());
 
   // Convert to spherical coordinates.
   var r = Math.sqrt(ray[0] * ray[0] + ray[1] * ray[1] + ray[2] * ray[2]);

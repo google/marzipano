@@ -26,6 +26,7 @@ var clamp = require('../util/clamp');
 var cmp = require('../util/cmp');
 var type = require('../util/type');
 var vec3 = require('gl-matrix').vec3;
+var vec4 = require('gl-matrix').vec4;
 
 // Some renderer implementations require tiles to be padded around with
 // repeated pixels to prevent the appearance of visible seams between tiles.
@@ -564,11 +565,9 @@ function CubeGeometry(levelPropertiesList) {
 
   this._neighborsCache = new LruMap(CubeTile.equals, CubeTile.hash, 64);
 
-  this._vec = vec3.create();
+  this._vec = vec4.create();
 
   this._viewSize = {};
-
-  this._viewParams = {};
 }
 
 
@@ -604,16 +603,15 @@ CubeGeometry.prototype.levelTiles = function(level, result) {
 };
 
 
-CubeGeometry.prototype._closestTile = function(params, level) {
-
+CubeGeometry.prototype._closestTile = function(view, level) {
   var ray = this._vec;
+
+  // Compute a view ray into the central screen point.
+  vec4.set(ray, 0, 0, 1, 1);
+  vec4.transformMat4(ray, ray, view.inverseProjection());
 
   var minAngle = Infinity;
   var closestFace = null;
-
-  // Calculate a view ray pointing to the tile.
-  vec3.set(ray, 0, 0, -1);
-  rotateVector(ray, -params.roll, -params.pitch, -params.yaw);
 
   // Find the face whose vector makes a minimal angle with the view ray.
   // This is the face into which the view ray points.
@@ -644,10 +642,8 @@ CubeGeometry.prototype._closestTile = function(params, level) {
   var numY = level.numVerticalTiles();
 
   // Find the coordinates of the tile that the view ray points into.
-  var x = ray[0];
-  var y = ray[1];
-  var tileX = clamp(Math.floor((0.5 + x) * numX), 0, numX - 1);
-  var tileY = clamp(Math.floor((0.5 - y) * numY), 0, numY - 1);
+  var tileX = clamp(Math.floor((0.5 + ray[0]) * numX), 0, numX - 1);
+  var tileY = clamp(Math.floor((0.5 - ray[1]) * numY), 0, numY - 1);
 
   return new CubeTile(closestFace, tileX, tileY, tileZ, this);
 };
@@ -655,7 +651,6 @@ CubeGeometry.prototype._closestTile = function(params, level) {
 
 CubeGeometry.prototype.visibleTiles = function(view, level, result) {
   var viewSize = this._viewSize;
-  var viewParams = this._viewParams;
   var tileSearcher = this._tileSearcher;
 
   result = result || [];
@@ -666,7 +661,7 @@ CubeGeometry.prototype.visibleTiles = function(view, level, result) {
     return result;
   }
 
-  var startingTile = this._closestTile(view.parameters(viewParams), level);
+  var startingTile = this._closestTile(view, level);
   var count = tileSearcher.search(view, startingTile, result);
   if (!count) {
     throw new Error('Starting tile is not visible');

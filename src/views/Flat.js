@@ -142,24 +142,24 @@ function FlatView(params, limiter) {
   // The initial value for the view limiter.
   this._limiter = limiter || null;
 
+  // The last calculated projection matrix and its inverse.
+  this._projMatrix = mat4.create();
+  this._invProjMatrix = mat4.create();
+
   // The last calculated view frustum.
-  this._viewFrustum = [
+  this._frustum = [
     0, // top
     0, // right
     0, // bottom
     0  // left
   ];
 
-  // The last calculated projection matrix.
-  this._projectionMatrix = mat4.create();
-
-  // Whether the projection matrix needs to be updated.
+  // Whether the projection matrices and view frustum need to be updated.
   this._projectionChanged = true;
 
   // Temporary variables used for calculations.
   this._params = {};
-  this._vertex = vec4.create();
-  this._invProj = mat4.create();
+  this._vec = vec4.create();
 
   // Force view limiting on initial parameters.
   this._update();
@@ -489,13 +489,10 @@ FlatView.prototype.updateWithControlParameters = function(parameters) {
 };
 
 
-/**
- * Compute and return the projection matrix for the current view.
- * @returns {mat4}
- */
-FlatView.prototype.projection = function() {
-
-  var projectionMatrix = this._projectionMatrix;
+FlatView.prototype._updateProjection = function() {
+  var projMatrix = this._projMatrix;
+  var invProjMatrix = this._invProjMatrix;
+  var frustum = this._frustum;
 
   // Recalculate projection matrix when required.
   if (this._projectionChanged) {
@@ -504,20 +501,38 @@ FlatView.prototype.projection = function() {
     var zoomX = this._zoomX();
     var zoomY = this._zoomY();
 
-    // Update view frustum.
-    var frustum = this._viewFrustum;
+    // Recalculate view frustum.
     var top     = frustum[0] = (0.5 - y) + 0.5 * zoomY;
     var right   = frustum[1] = (x - 0.5) + 0.5 * zoomX;
     var bottom  = frustum[2] = (0.5 - y) - 0.5 * zoomY;
     var left    = frustum[3] = (x - 0.5) - 0.5 * zoomX;
 
-    // Recalculate projection matrix.
-    mat4.ortho(projectionMatrix, left, right, bottom, top, -1, 1);
+    // Recalculate projection matrix and its inverse.
+    mat4.ortho(projMatrix, left, right, bottom, top, -1, 1);
+    mat4.invert(invProjMatrix, projMatrix);
+
     this._projectionChanged = false;
   }
+};
 
-  return projectionMatrix;
 
+/**
+ * Returns the projection matrix for the current view.
+ * @returns {mat4}
+ */
+FlatView.prototype.projection = function() {
+  this._updateProjection();
+  return this._projMatrix;
+};
+
+
+/**
+ * Returns the inverse projection matrix for the current view.
+ * @returns {mat4}
+ */
+FlatView.prototype.inverseProjection = function() {
+  this._updateProjection();
+  return this._invProjMatrix;
 };
 
 
@@ -531,11 +546,9 @@ FlatView.prototype.projection = function() {
  * @param {vec3[]} rectangle The vertices of the rectangle.
  */
 FlatView.prototype.intersects = function(rectangle) {
+  this._updateProjection();
 
-  var frustum = this._viewFrustum;
-
-  // Call projection() for the side effect of updating the frustum.
-  this.projection();
+  var frustum = this._frustum;
 
   // Check whether the rectangle is on the outer side of any of the frustum
   // planes. This is a sufficient condition, though not necessary, for the
@@ -557,7 +570,6 @@ FlatView.prototype.intersects = function(rectangle) {
     }
   }
   return true;
-
 };
 
 
@@ -603,7 +615,7 @@ FlatView.prototype.selectLevel = function(levels) {
  * @return {Coords}
  */
 FlatView.prototype.coordinatesToScreen = function(coords, result) {
-  var ray = this._vertex;
+  var ray = this._vec;
 
   if (!result) {
     result = {};
@@ -650,8 +662,7 @@ FlatView.prototype.coordinatesToScreen = function(coords, result) {
  * @return {FlatViewCoords}
  */
 FlatView.prototype.screenToCoordinates = function(coords, result) {
-  var ray = this._vertex;
-  var invProj = this._invProj;
+  var ray = this._vec;
 
   if (!result) {
     result = {};
@@ -660,17 +671,13 @@ FlatView.prototype.screenToCoordinates = function(coords, result) {
   var width = this._width;
   var height = this._height;
 
-  // Calculate the inverse projection matrix.
-  // TODO: cache result?
-  mat4.invert(invProj, this.projection());
-
   // Convert viewport coordinates to clip space.
-  var vecx = 2.0 * coords.x / width - 1.0;
-  var vecy = 1.0 - 2.0 * coords.y / height;
+  var vecx = 2 * coords.x / width - 1;
+  var vecy = 1 - 2 * coords.y / height;
   vec4.set(ray, vecx, vecy, 1, 1);
 
   // Project back to world space.
-  vec4.transformMat4(ray, ray, invProj);
+  vec4.transformMat4(ray, ray, this.inverseProjection());
 
   // Convert to flat coordinates.
   result.x = 0.5 + ray[0];

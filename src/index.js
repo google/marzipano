@@ -90,6 +90,7 @@ module.exports = {
     cancelize: require('./util/cancelize'),
     chain: require('./util/chain'),
     clamp: require('./util/clamp'),
+    clearOwnProperties: require('./util/clearOwnProperties'),
     clock: require('./util/clock'),
     cmp: require('./util/cmp'),
     compose: require('./util/compose'),

@@ -27,6 +27,7 @@ var mod = require('../util/mod');
 var cmp = require('../util/cmp');
 var type = require('../util/type');
 var vec2 = require('gl-matrix').vec2;
+var vec4 = require('gl-matrix').vec4;
 
 // Some renderer implementations require tiles to be padded around with
 // repeated pixels to prevent the appearance of visible seams between tiles.
@@ -441,16 +442,9 @@ function FlatGeometry(levelPropertiesList) {
 
   this._neighborsCache = new LruMap(FlatTile.equals, FlatTile.hash, 64);
 
+  this._vec = vec4.create();
+
   this._viewSize = {};
-
-  this._viewParams = {};
-
-  this._tileVertices = [
-    vec2.create(),
-    vec2.create(),
-    vec2.create(),
-    vec2.create()
-  ];
 }
 
 
@@ -485,11 +479,16 @@ FlatGeometry.prototype.levelTiles = function(level, result) {
 };
 
 
-FlatGeometry.prototype._closestTile = function(params, level) {
+FlatGeometry.prototype._closestTile = function(view, level) {
+  var ray = this._vec;
 
-  // Get view parameters.
-  var x = params.x;
-  var y = params.y;
+  // Compute a view ray into the central screen point.
+  vec4.set(ray, 0, 0, 1, 1);
+  vec4.transformMat4(ray, ray, view.inverseProjection());
+
+  // Compute the image coordinates that the view ray points into.
+  var x = 0.5 + ray[0];
+  var y = 0.5 - ray[1];
 
   // Get the desired zoom level.
   var tileZ = this.levelList.indexOf(level);
@@ -505,13 +504,11 @@ FlatGeometry.prototype._closestTile = function(params, level) {
   var tileY = clamp(Math.floor(y * levelHeight / tileHeight), 0, numY - 1);
 
   return new FlatTile(tileX, tileY, tileZ, this);
-
 };
 
 
 FlatGeometry.prototype.visibleTiles = function(view, level, result) {
   var viewSize = this._viewSize;
-  var viewParams = this._viewParams;
   var tileSearcher = this._tileSearcher;
 
   result = result || [];
@@ -522,7 +519,7 @@ FlatGeometry.prototype.visibleTiles = function(view, level, result) {
     return result;
   }
 
-  var startingTile = this._closestTile(view.parameters(viewParams), level);
+  var startingTile = this._closestTile(view, level);
   var count = tileSearcher.search(view, startingTile, result);
   if (!count) {
     throw new Error('Starting tile is not visible');
