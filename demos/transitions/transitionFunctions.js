@@ -75,7 +75,7 @@ var transitionFunctions = {
   fromCenterAndOpacity: function(ease) {
     ease = ease || linear;
     return function(val, newScene) {
-      eased = ease(val);
+      var eased = ease(val);
       newScene.layer().setEffects({ rect: {
         relativeWidth: eased,
         relativeHeight: eased,
@@ -97,7 +97,6 @@ var transitionFunctions = {
   fromWhite: function(ease) {
     ease = ease || linear;
     return function(val, newScene) {
-      var eased = ease(val);
       newScene.layer().setEffects({ colorOffset: [ 1-val, 1-val, 1-val, 0 ] });
     }
   },
@@ -107,13 +106,11 @@ var transitionFunctions = {
     return function(val, newScene, oldScene) {
       var eased = ease(val);
       var offset;
-
-      if(eased < 0.5) {
+      if (eased < 0.5) {
         offset = eased * 2;
         newScene.layer().setEffects({ opacity: 0 });
         oldScene.layer().setEffects({ colorOffset: [ -offset, -offset, -offset, 0 ] })
-      }
-      else {
+      } else {
         offset = 1 - ((eased - 0.5) * 2);
         newScene.layer().setEffects({ opacity: 1, colorOffset: [ -offset, -offset, -offset, 0 ] })
       }
