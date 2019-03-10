@@ -50,6 +50,7 @@ function MockLayer(mockTextureStore) {
   this.geometry = sinon.stub().returns(new MockGeometry());
   this.view = sinon.stub().returns(new MockView());
   this.effects = sinon.stub().returns({});
+  this.isProgressive = sinon.stub();
   this.visibleTiles = sinon.stub();
   this.textureStore = function() {
     return mockTextureStore;
@@ -371,6 +372,7 @@ suite('Stage', function() {
     ]);
     var visibleTile = new CubeTile('f', 0, 0, 2, geometry);
     var parentTile = new CubeTile('f', 0, 0, 1, geometry);
+    var grandparentTile = new CubeTile('f', 0, 0, 0, geometry);
     var store = new MockTextureStore();
     store.texture.returns(null).withArgs(parentTile).returns({});
     var layer = new MockLayer(store);
@@ -385,9 +387,10 @@ suite('Stage', function() {
     assert.calledOnce(renderer.renderTile);
     assert.calledWith(renderer.renderTile, parentTile);
 
-    assert.calledTwice(store.markTile);
+    assert.calledThrice(store.markTile);
     assert.calledWith(store.markTile, visibleTile);
     assert.calledWith(store.markTile, parentTile);
+    assert.calledWith(store.markTile, grandparentTile);
   });
 
   test('falls back to a grandparent tile', function() {
@@ -400,6 +403,7 @@ suite('Stage', function() {
       { tileSize: 512, size: 2048 }
     ]);
     var visibleTile = new CubeTile('f', 0, 0, 2, geometry);
+    var parentTile = new CubeTile('f', 0, 0, 1, geometry);
     var grandparentTile = new CubeTile('f', 0, 0, 0, geometry);
     var store = new MockTextureStore();
     store.texture.returns(null).withArgs(grandparentTile).returns({});
@@ -415,8 +419,9 @@ suite('Stage', function() {
     assert.calledOnce(renderer.renderTile);
     assert.calledWith(renderer.renderTile, grandparentTile);
 
-    assert.calledTwice(store.markTile);
+    assert.calledThrice(store.markTile);
     assert.calledWith(store.markTile, visibleTile);
+    assert.calledWith(store.markTile, parentTile);
     assert.calledWith(store.markTile, grandparentTile);
   });
 
@@ -458,8 +463,9 @@ suite('Stage', function() {
     assert.calledWith(renderer.renderTile, childTile3);
     assert.calledWith(renderer.renderTile, childTile4);
 
-    assert.callCount(store.markTile, 5);
+    assert.callCount(store.markTile, 6);
     assert.calledWith(store.markTile, visibleTile);
+    assert.calledWith(store.markTile, parentTile);
     assert.calledWith(store.markTile, childTile1);
     assert.calledWith(store.markTile, childTile2);
     assert.calledWith(store.markTile, childTile3);
@@ -589,6 +595,7 @@ suite('Stage', function() {
     var visibleTile1 = new CubeTile('f', 0, 0, 2, geometry);
     var visibleTile2 = new CubeTile('f', 1, 1, 2, geometry);
     var parentTile = new CubeTile('f', 0, 0, 1, geometry);
+    var grandparentTile = new CubeTile('f', 0, 0, 0, geometry);
     var store = new MockTextureStore();
     store.texture.returns(null).withArgs(parentTile).returns({});
     var layer = new MockLayer(store);
@@ -603,10 +610,11 @@ suite('Stage', function() {
     assert.calledOnce(renderer.renderTile);
     assert.calledWith(renderer.renderTile, parentTile);
 
-    assert.calledThrice(store.markTile);
+    assert.callCount(store.markTile, 4);
     assert.calledWith(store.markTile, visibleTile1);
     assert.calledWith(store.markTile, visibleTile2);
     assert.calledWith(store.markTile, parentTile);
+    assert.calledWith(store.markTile, grandparentTile);
   });
 
   test('does not fall back when unnecessary', function() {
@@ -639,11 +647,12 @@ suite('Stage', function() {
     assert.calledOnce(renderer.renderTile);
     assert.calledWith(renderer.renderTile, visibleTile);
 
-    assert.calledOnce(store.markTile);
+    assert.calledTwice(store.markTile);
     assert.calledWith(store.markTile, visibleTile);
+    assert.calledWith(store.markTile, parentTile);
   });
 
-  test('renders fallbacks in the right order', function() {
+  test('renders and loads tiles in the right order', function() {
     var renderer = new MockRenderer();
     var stage = new TestStage(renderer);
 
@@ -653,21 +662,22 @@ suite('Stage', function() {
       { tileSize: 512, size: 2048 },
       { tileSize: 512, size: 4096 },
     ]);
-    // `visibleTile1` falls back to child and parent.
+    // `visibleTile1` falls back to `childTile` and `parentTile1`.
     // `visibleTile2` does not need a fallback.
     // `visibleTile3` falls back to grandparent.
     var visibleTile1 = new CubeTile('f', 0, 0, 2, geometry);
     var visibleTile2 = new CubeTile('f', 0, 1, 2, geometry);
     var visibleTile3 = new CubeTile('f', 0, 2, 2, geometry);
+    var parentTile1 = new CubeTile('f', 0, 0, 1, geometry);
+    var parentTile2 = new CubeTile('f', 0, 1, 1, geometry);
     var grandparentTile = new CubeTile('f', 0, 0, 0, geometry);
-    var parentTile = new CubeTile('f', 0, 0, 1, geometry);
     var childTile = new CubeTile('f', 0, 0, 3, geometry);
     var store = new MockTextureStore();
     store.texture
       .returns(null)
       .withArgs(visibleTile2).returns({})
       .withArgs(grandparentTile).returns({})
-      .withArgs(parentTile).returns({})
+      .withArgs(parentTile1).returns({})
       .withArgs(childTile).returns({});
     var layer = new MockLayer(store);
     layer.visibleTiles.callsFake(function(result) {
@@ -679,9 +689,18 @@ suite('Stage', function() {
     stage.render();
 
     assert.callCount(renderer.renderTile, 4);
-    assert.calledWith(renderer.renderTile.getCall(0), visibleTile2);
-    assert.calledWith(renderer.renderTile.getCall(1), childTile);
-    assert.calledWith(renderer.renderTile.getCall(2), parentTile);
+    assert.calledWith(renderer.renderTile.getCall(0), childTile);
+    assert.calledWith(renderer.renderTile.getCall(1), visibleTile2);
+    assert.calledWith(renderer.renderTile.getCall(2), parentTile1);
     assert.calledWith(renderer.renderTile.getCall(3), grandparentTile);
+
+    assert.callCount(store.markTile, 7);
+    assert.calledWith(store.markTile.getCall(0), grandparentTile);
+    assert.calledWith(store.markTile.getCall(1), parentTile1);
+    assert.calledWith(store.markTile.getCall(2), parentTile2);
+    assert.calledWith(store.markTile.getCall(3), visibleTile1);
+    assert.calledWith(store.markTile.getCall(4), visibleTile2);
+    assert.calledWith(store.markTile.getCall(5), visibleTile3);
+    assert.calledWith(store.markTile.getCall(6), childTile);
   });
 });
