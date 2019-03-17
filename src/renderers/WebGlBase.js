@@ -83,11 +83,6 @@ WebGlBaseRenderer.prototype.startLayer = function(layer, rect) {
 
   enableAttributes(gl, shaderProgram);
 
-  var numAttributes = gl.getProgramParameter(shaderProgram, gl.ACTIVE_ATTRIBUTES);
-  for (var i = 0; i < numAttributes; i++) {
-    gl.enableVertexAttribArray(i);
-  }
-
   setViewport(gl, layer, rect, viewportMatrix);
   gl.uniformMatrix4fv(shaderProgram.uViewportMatrix, false, viewportMatrix);
 
