@@ -15,7 +15,7 @@
  */
 'use strict';
 
-var clock = require('../util/clock');
+var now = require('../util/now');
 
 
 function WorkTask(fn, cb) {
@@ -107,7 +107,7 @@ WorkQueue.prototype._finish = function(task) {
 
   // Mark as not busy and record task finish time, then advance to next task.
   this._currentTask = null;
-  this._lastFinished = clock();
+  this._lastFinished = now();
   this._next();
 
 };
@@ -155,7 +155,7 @@ WorkQueue.prototype._next = function() {
   }
 
   if (this._lastFinished != null) {
-    var elapsed = clock() - this._lastFinished;
+    var elapsed = now() - this._lastFinished;
     var remaining = this._delay - elapsed;
     if (remaining > 0) {
       // Too soon. Run again after the inter-task delay.

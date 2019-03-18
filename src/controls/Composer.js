@@ -17,7 +17,7 @@
 
 var eventEmitter = require('minimal-event-emitter');
 var Dynamics = require('./Dynamics');
-var defaultClock = require('../util/clock');
+var now = require('../util/now');
 var clearOwnProperties = require('../util/clearOwnProperties');
 
 /**
@@ -36,7 +36,7 @@ function ControlComposer(opts) {
 
   this._parameters = [ 'x' ,'y', 'axisScaledX', 'axisScaledY', 'zoom', 'yaw', 'pitch', 'roll' ];
 
-  this._clock = opts.clock || defaultClock;
+  this._now = opts.nowForTesting || now;
 
   this._composedOffsets = { };
 
@@ -113,7 +113,7 @@ ControlComposer.prototype._updateDynamics = function(storedDynamics, parameter, 
     throw new Error("Unknown control parameter " + parameter);
   }
 
-  var newTime = this._clock();
+  var newTime = this._now();
   parameterDynamics.dynamics.update(dynamics, (newTime - parameterDynamics.time)/1000);
   parameterDynamics.time = newTime;
 
@@ -132,7 +132,7 @@ ControlComposer.prototype.offsets = function() {
   var parameter;
   var changing = false;
 
-  var currentTime = this._clock();
+  var currentTime = this._now();
 
   this._resetComposedOffsets();
 

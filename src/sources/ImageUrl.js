@@ -20,7 +20,7 @@ var NetworkError = require('../NetworkError');
 var WorkPool = require('../collections/WorkPool');
 var chain = require('../util/chain');
 var delay = require('../util/delay');
-var clock = require('../util/clock');
+var now = require('../util/now');
 
 
 // Map template properties to their corresponding tile properties.
@@ -97,7 +97,7 @@ ImageUrlSource.prototype.loadAsset = function(stage, tile, done) {
       if (err) {
         if (err instanceof NetworkError) {
           // If a network error occurred, wait before retrying.
-          retryMap[url] = clock();
+          retryMap[url] = now();
           self.emit('networkError', asset, err);
         }
         done(err, tile);
@@ -113,7 +113,7 @@ ImageUrlSource.prototype.loadAsset = function(stage, tile, done) {
   var delayAmount;
   var lastTime = retryMap[url];
   if (lastTime != null) {
-    var now = clock();
+    var now = now();
     var elapsed = now - lastTime;
     if (elapsed < retryDelay) {
       // Wait before retrying.

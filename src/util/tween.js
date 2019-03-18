@@ -15,16 +15,16 @@
  */
 'use strict';
 
-var clock = require('./clock');
+var now = require('./now');
 
 function tween(duration, update, done) {
   var cancelled = false;
 
-  var startTime = clock();
+  var startTime = now();
 
   function runUpdate() {
     if(cancelled) { return; }
-    var tweenVal = (clock() - startTime)/duration;
+    var tweenVal = (now() - startTime)/duration;
     if(tweenVal < 1) {
       update(tweenVal);
       requestAnimationFrame(runUpdate);

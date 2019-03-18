@@ -15,21 +15,15 @@
  */
 'use strict';
 
-function getPerformanceClock() {
-  if (window.performance && window.performance.now) {
-    return function performanceClock() {
-      return window.performance.now();
+function getNow() {
+  if (typeof performance !== 'undefined' && performance.now) {
+    return function performanceNow() {
+      return performance.now();
     };
   }
-  return null;
-}
-
-function getDateClock() {
-  return function dateNowClock() {
+  return function dateNow() {
     return Date.now();
   };
 }
 
-var clock = getPerformanceClock() || getDateClock();
-
-module.exports = clock;
+module.exports = getNow();

@@ -17,7 +17,7 @@
 
 var eventEmitter = require('minimal-event-emitter');
 var defaults = require('./util/defaults');
-var clock = require('./util/clock');
+var now = require('./util/now');
 
 var defaultOptions = {
   duration: Infinity
@@ -66,7 +66,7 @@ eventEmitter(Timer);
  * stopping and starting again (i.e. resetting the timer).
  */
 Timer.prototype.start = function() {
-  this._startTime = clock();
+  this._startTime = now();
   if (this._handle == null && this._duration < Infinity) {
     this._setup(this._duration);
   }
@@ -106,7 +106,7 @@ Timer.prototype._teardown = function() {
 
 
 Timer.prototype._check = function() {
-  var currentTime = clock();
+  var currentTime = now();
   var elapsed = currentTime - this._startTime;
   var remaining = this._duration - elapsed;
 
