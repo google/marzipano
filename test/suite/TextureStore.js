@@ -42,7 +42,7 @@ function MockTile(opts) {
 // Mock asset.
 function MockAsset(tile, dynamic) {
   this.id = tile.id;
-  this.dynamic = !!dynamic;
+  this.isDynamic = sinon.stub().returns(dynamic);
   this.destroy = sinon.spy();
 }
 

@@ -33,8 +33,6 @@ function VideoAsset(videoElement) {
 
 Marzipano.dependencies.eventEmitter(VideoAsset);
 
-VideoAsset.prototype.dynamic = true;
-
 VideoAsset.prototype.setVideo = function(videoElement) {
   var self = this;
 
@@ -94,6 +92,10 @@ VideoAsset.prototype.element = function() {
   } else {
     return this._emptyCanvas;
   }
+};
+
+VideoAsset.prototype.isDynamic = function() {
+  return true;
 };
 
 VideoAsset.prototype.timestamp = function() {

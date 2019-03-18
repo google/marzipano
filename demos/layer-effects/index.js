@@ -80,8 +80,7 @@ function importLayer(file) {
     }
 
     // Create layer.
-    var stage = viewer.stage();
-    var asset = new Marzipano.DynamicCanvasAsset(canvas);
+    var asset = new Marzipano.DynamicAsset(canvas);
     var source = new Marzipano.SingleAssetSource(asset);
     var geometry = new Marzipano.EquirectGeometry([{ width: canvas.width }]);
     var layer = scene.createLayer({

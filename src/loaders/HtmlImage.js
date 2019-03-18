@@ -15,8 +15,7 @@
  */
 'use strict';
 
-var StaticImageAsset = require('../assets/StaticImage');
-var StaticCanvasAsset = require('../assets/StaticCanvas');
+var StaticAsset = require('../assets/Static');
 var NetworkError = require('../NetworkError');
 var once = require('../util/once');
 
@@ -77,7 +76,7 @@ HtmlImageLoader.prototype.loadImage = function(url, rect, done) {
 
   img.onload = function() {
     if (x === 0 && y === 0 && width === 1 && height === 1) {
-      done(null, new StaticImageAsset(img));
+      done(null, new StaticAsset(img));
     }
     else {
       x *= img.naturalWidth;
@@ -92,7 +91,7 @@ HtmlImageLoader.prototype.loadImage = function(url, rect, done) {
 
       context.drawImage(img, x, y, width, height, 0, 0, width, height);
 
-      done(null, new StaticCanvasAsset(canvas));
+      done(null, new StaticAsset(canvas));
     }
   };
 

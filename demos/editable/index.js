@@ -71,7 +71,7 @@
         previousPressPosition = pressPosition;
 
         ctx.putImageData(imageData, 0, 0);
-        canvasAsset.changed();
+        canvasAsset.markDirty();
       }
     });
 
@@ -85,7 +85,7 @@
         paintBetween(previousPressPosition, pressPosition);
         previousPressPosition = pressPosition;
         ctx.putImageData(imageData, 0, 0);
-        canvasAsset.changed();
+        canvasAsset.markDirty();
         e.stopPropagation();
       }
       brush.updateCursor(e);

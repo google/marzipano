@@ -121,7 +121,7 @@
  */
 
 /**
- * Loads an asset from the source.
+ * Loads an {@link Asset} from the source.
  * @function
  * @name Source.prototype.loadAsset
  * @param {Stage} stage
@@ -132,52 +132,51 @@
 
 /**
  * @interface Asset
- * @classdesc Asset loaded by a {@link Source}
- * @property {boolean} dynamic Whether the asset can change, requiring its
- * texture to be refreshed. Dynamic assets should fire
- * {@link Asset#event:change} when they change.
+ * @classdesc A rectangular pixel source from which a {@link Texture} may be
+ * created.
+ */
+
+ /**
+ * Signals that the contents of the underlying pixel source have changed.
+ * @event Asset#change
  */
 
 /**
- * Destroys the instance.
- * @function
- * @name Asset.prototype.destroy
- */
-
-/**
- * Retrieves the element that will be used for rendering.
+ * Returns the asset's underlying pixel source. The type varies depending on the
+ * {@link Stage} types the asset is compatible with.
  * @function
  * @name Asset.prototype.element
- * @returns {*} Something that the Texture can use to refresh itself. e.g. for
- * CssTexture, this is some value that can be used in
- * CanvasRenderingContext2D.drawImage().
+ * @returns {*}
  */
 
 /**
- * Retrieves the width of the Asset.
+ * Returns the asset's intrinsic width in CSS pixels.
  * @function
  * @name Asset.prototype.width
  * @returns {number}
  */
 
 /**
- * Retrieves the height of the Asset.
+ * Returns the asset's intrinsic height in CSS pixels.
  * @function
  * @name Asset.prototype.height
  * @returns {number}
  */
 
 /**
- * Retrieves a timestamp which identifies the current version of the Asset.
- * This is used to prevent dynamic textures from refreshing when not necessary.
+ * Returns the asset's timestamp, which increases monotonically whenever the
+ * contents of the underlying pixel source change.
  * @function
  * @name Asset.prototype.timestamp
  * @returns {number}
  */
 
 /**
- * Signals that the asset has changed.
- * @event Asset#change
+ * Returns whether the asset is dynamic, i.e., whether the contents of the
+ * underlying pixel source may change.
+ * @function
+ * @name Asset.prototype.isDynamic
+ * @returns {boolean}
  */
 
 /**

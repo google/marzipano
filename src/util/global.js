@@ -15,36 +15,18 @@
  */
 'use strict';
 
-/**
- * @class SingleAssetSource
- * @implements Source
- * @classdesc
- *
- * A {@link Source} that always provides the same {@link Asset}.
- *
- * @param {Asset} asset The asset.
-*/
-function SingleAssetSource(asset) {
-  this._asset = asset;
-}
-
-SingleAssetSource.prototype.asset = function() {
-  return this._asset;
-};
-
-SingleAssetSource.prototype.loadAsset = function(stage, tile, done) {
-  var self = this;
-
-  var timeout = setTimeout(function() {
-    done(null, tile, self._asset);
-  }, 0);
-
-  function cancel() {
-    clearTimeout(timeout);
-    done.apply(null, arguments);
+// The global object.
+var globalObject = (function() {
+  if (typeof window !== 'undefined') {
+    return window;
   }
+  if (typeof self !== 'undefined') {
+    return self;
+  }
+  if (typeof global !== 'undefined') {
+    return global;
+  }
+  return null;
+})();
 
-  return cancel;
-};
-
-module.exports = SingleAssetSource;
+module.exports = globalObject;

@@ -148,10 +148,10 @@ function TextureStoreItem(store, tile) {
     // Save a local reference to the texture.
     self._texture = texture;
 
-    // If the asset is dynamic, save a local reference to it and setup
-    // handler to be called whenever it changes.
-    // Otherwise, destroy the asset as we won't be needing it any more.
-    if (asset.dynamic) {
+    // If the asset is dynamic, save a local reference to it and set up a
+    // handler to be called whenever it changes. Otherwise, destroy the asset
+    // as we won't be needing it any longer.
+    if (asset.isDynamic()) {
       self._asset = asset;
       asset.addEventListener('change', self._changeHandler);
     } else {

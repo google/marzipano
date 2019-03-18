@@ -15,7 +15,7 @@
  */
 'use strict';
 
-var FlashImageAsset = require('../assets/FlashImage');
+var FlashAsset = require('../assets/Flash');
 var NetworkError = require('../NetworkError');
 var once = require('../util/once');
 
@@ -75,7 +75,7 @@ FlashImageLoader.prototype.loadImage = function(url, rect, done) {
     if (err) {
       done(new NetworkError('Network error: ' + url));
     } else {
-      done(null, new FlashImageAsset(flashElement, imageId));
+      done(null, new FlashAsset(flashElement, imageId));
     }
   }
 

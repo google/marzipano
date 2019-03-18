@@ -15,50 +15,61 @@
  */
 'use strict';
 
+var eventEmitter = require('minimal-event-emitter');
 var clearOwnProperties = require('../util/clearOwnProperties');
 
 /**
- * @class FlashImageAsset
+ * @class FlashAsset
  * @implements Asset
  * @classdesc
  *
- * Static asset referencing an image loaded by a Flash application.
+ * An immutable {@link Asset} compatible with {@link FlashStage}.
+ * 
+ * The asset's underlying pixel source is a unique image ID associated with
+ * a Flash application.
  *
- * @param {Element} flashElement HTML element with the Flash application that
- *     loaded the image.
- * @param {number} imageId Unique ID of the image inside the Flash application.
+ * @param {Element} flashElement The HTML element for the Flash application.
+ * @param {number} imageId The unique image ID inside the Flash application.
  */
-function FlashImageAsset(flashElement, imageId) {
+function FlashAsset(flashElement, imageId) {
   this._flashElement = flashElement;
   this._imageId = imageId;
 }
 
-FlashImageAsset.prototype.dynamic = false;
+eventEmitter(FlashAsset);
 
 /**
  * Destructor.
  */
-FlashImageAsset.prototype.destroy = function() {
+FlashAsset.prototype.destroy = function() {
   this._flashElement.unloadImage(this._imageId);
   clearOwnProperties(this);
 };
 
-FlashImageAsset.prototype.element = function() {
+FlashAsset.prototype.element = function() {
   return this._imageId;
 };
 
-FlashImageAsset.prototype.width = function() {
-  // TODO: Return the real value.
+FlashAsset.prototype.width = function() {
+  // Not actually used anywhere.
   return 0;
 };
 
-FlashImageAsset.prototype.height = function() {
-  // TODO: Return the real value.
+FlashAsset.prototype.height = function() {
+  // Not actually used anywhere.
   return 0;
 };
 
-FlashImageAsset.prototype.timestamp = function() {
+FlashAsset.prototype.timestamp = function() {
   return 0;
 };
 
-module.exports = FlashImageAsset;
+FlashAsset.prototype.isDynamic = function() {
+  return false;
+};
+
+FlashAsset.prototype.markDirty = function() {
+  throw new Error('Not a dynamic asset');
+};
+
+module.exports = FlashAsset;

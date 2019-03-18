@@ -73,7 +73,7 @@ SolidColorSource.prototype.loadAsset = function(stage, tile, done) {
 
   // Pass result into callback.
   var timeout = setTimeout(function() {
-    var asset = new Marzipano.StaticCanvasAsset(element);
+    var asset = new Marzipano.StaticAsset(element);
     done(null, tile, asset);
   }, 0);
 

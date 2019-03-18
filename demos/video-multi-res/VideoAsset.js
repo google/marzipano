@@ -38,8 +38,6 @@ function VideoAsset(wrappedVideo) {
 
 Marzipano.dependencies.eventEmitter(VideoAsset);
 
-VideoAsset.prototype.dynamic = true;
-
 VideoAsset.prototype.setVideo = function(wrappedVideo) {
   var self = this;
 
@@ -105,6 +103,10 @@ VideoAsset.prototype.element = function() {
 
 VideoAsset.prototype.video = function() {
   return this._wrappedVideo;
+};
+
+VideoAsset.prototype.isDynamic = function() {
+  return true;
 };
 
 VideoAsset.prototype.timestamp = function() {

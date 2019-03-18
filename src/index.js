@@ -46,8 +46,8 @@ module.exports = {
   SingleAssetSource: require('./sources/SingleAsset'),
 
   // Assets.
-  DynamicCanvasAsset: require('./assets/DynamicCanvas'),
-  StaticCanvasAsset: require('./assets/StaticCanvas'),
+  StaticAsset: require('./assets/Static'),
+  DynamicAsset: require('./assets/Dynamic'),
 
   // Texture store.
   TextureStore: require('./TextureStore'),
