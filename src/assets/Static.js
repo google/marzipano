@@ -37,7 +37,7 @@ var propertyMap = {
  *     underlying pixel source.
  * @throws If the pixel source is unsupported.
  */
-function StaticAsset(element, opts) {
+function StaticAsset(element) {
   var supported = false;
   for (var type in propertyMap) {
     if (global[type] && element instanceof global[type]) {

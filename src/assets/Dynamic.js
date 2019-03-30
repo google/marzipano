@@ -20,12 +20,6 @@ var inherits = require('../util/inherits');
 var eventEmitter = require('minimal-event-emitter');
 var clearOwnProperties = require('../util/clearOwnProperties');
 
-var propertyMap = {
-  HTMLImageElement: ['naturalWidth', 'naturalHeight'],
-  HTMLCanvasElement: ['width', 'height'],
-  ImageBitmap: ['width', 'height']
-};
-
 /**
  * @class DynamicAsset
  * @implements Asset

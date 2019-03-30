@@ -68,8 +68,4 @@ FlashAsset.prototype.isDynamic = function() {
   return false;
 };
 
-FlashAsset.prototype.markDirty = function() {
-  throw new Error('Not a dynamic asset');
-};
-
 module.exports = FlashAsset;
