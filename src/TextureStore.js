@@ -423,7 +423,7 @@ TextureStore.prototype.clearNotPinned = function() {
  */
 TextureStore.prototype.startFrame = function() {
   // Check that we are in an appropriate state.
-  if (this._state !== State.IDLE) {
+  if (this._state !== State.IDLE && this._state !== State.START) {
     throw new Error('TextureStore: startFrame called out of sequence');
   }
 
@@ -466,7 +466,7 @@ TextureStore.prototype.markTile = function(tile) {
  */
 TextureStore.prototype.endFrame = function() {
   // Check that we are in an appropriate state.
-  if (this._state !== State.START && this._state !== State.MARK) {
+  if (this._state !== State.START && this._state !== State.MARK && this._state !== State.END) {
     throw new Error('TextureStore: endFrame called out of sequence');
   }
 

@@ -119,6 +119,7 @@ suite('TextureStore', function() {
     test('mark tile as visible', function() {
       var store = makeTextureStore();
       var tile = new MockTile();
+      assert.isFalse(store.query(tile).visible);
       store.startFrame();
       store.markTile(tile);
       store.endFrame();
@@ -128,6 +129,7 @@ suite('TextureStore', function() {
     test('mark tile as not visible', function() {
       var store = makeTextureStore();
       var tile = new MockTile();
+      assert.isFalse(store.query(tile).visible);
       store.startFrame();
       store.markTile(tile);
       store.endFrame();
@@ -136,6 +138,55 @@ suite('TextureStore', function() {
       assert.isFalse(store.query(tile).visible);
     });
 
+  });
+
+  suite('state machine', function() {
+
+    test('nested frames', function() {
+      var store = makeTextureStore();
+      var tile = new MockTile();
+      assert.isFalse(store.query(tile).visible);
+      store.startFrame();
+      store.startFrame();
+      store.markTile(tile);
+      store.endFrame();
+      assert.isFalse(store.query(tile).visible);
+      store.endFrame();
+      assert.isTrue(store.query(tile).visible);
+    });
+
+    test('start frame out of order', function() {
+      var store = makeTextureStore();
+      var tile = new MockTile();
+      store.startFrame();
+      store.markTile(tile);
+      assert.throws(function() { store.startFrame(); });
+      store.endFrame();
+      store.startFrame();
+      store.startFrame();
+      store.endFrame();
+      assert.throws(function() { store.startFrame(); });
+    });
+
+    test('mark tile out of order', function() {
+      var store = makeTextureStore();
+      var tile = new MockTile();
+      assert.throws(function() { store.markTile(tile); });
+      store.startFrame();
+      store.startFrame();
+      store.endFrame();
+      assert.throws(function() { store.markTile(tile); });
+      store.endFrame();
+      assert.throws(function() { store.markTile(tile); });
+    });
+
+    test('end frame out of order', function() {
+      var store = makeTextureStore();
+      assert.throws(function() { store.endFrame(); });
+      store.startFrame();
+      store.endFrame();
+      assert.throws(function() { store.endFrame(); });
+    });
   });
 
   suite('textures', function() {
