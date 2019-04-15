@@ -22,17 +22,13 @@ var Set = require('./collections/Set');
  * @classdesc
  *
  * A TileSearcher performs searches for visible tiles.
- *
- * @param {Geometry} geometry The geometry for which to perform searches.
  */
-function TileSearcher(geometry) {
-  var TileClass = geometry.TileClass;
-
+function TileSearcher() {
   // Stack of tiles to be explored.
   this._stack = [];
 
   // Set of already explored tiles.
-  this._visited = new Set(TileClass.equals, TileClass.hash);
+  this._visited = new Set();
 
   // Tile vertices. Allocated by Tile#vertices on first use.
   this._vertices = null;

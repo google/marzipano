@@ -161,41 +161,21 @@ EquirectTile.prototype.neighbors = function() {
 
 
 EquirectTile.prototype.hash = function() {
-  return EquirectTile.hash(this);
+  return hash(this.z);
 };
 
 
-EquirectTile.prototype.equals = function(other) {
-  return EquirectTile.equals(this, other);
+EquirectTile.prototype.equals = function(that) {
+  return this.geometry === that.geometry && this.z === that.z;
 };
 
 
-EquirectTile.prototype.cmp = function(other) {
-  return EquirectTile.cmp(this, other);
+EquirectTile.prototype.cmp = function(that) {
+  return cmp(this.z, that.z);
 };
 
 
 EquirectTile.prototype.str = function() {
-  return EquirectTile.str(this);
-};
-
-
-EquirectTile.hash = function(tile) {
-  return hash(tile.z);
-};
-
-
-EquirectTile.equals = function(tile1, tile2) {
-  return tile1.z === tile2.z;
-};
-
-
-EquirectTile.cmp = function(tile1, tile2) {
-  return cmp(tile1.z, tile2.z);
-};
-
-
-EquirectTile.str = function(tile) {
   return 'EquirectTile(' + tile.z + ')';
 };
 

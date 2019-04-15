@@ -28,6 +28,8 @@ var type = require('../util/type');
 var vec3 = require('gl-matrix').vec3;
 var vec4 = require('gl-matrix').vec4;
 
+var neighborsCacheSize = 64;
+
 // Some renderer implementations require tiles to be padded around with
 // repeated pixels to prevent the appearance of visible seams between tiles.
 //
@@ -406,50 +408,27 @@ CubeTile.prototype.neighbors = function() {
 
 
 CubeTile.prototype.hash = function() {
-  return CubeTile.hash(this);
+  return hash(faceList.indexOf(this.face), this.z, this.y, this.x);
 };
 
 
-CubeTile.prototype.equals = function(other) {
-  return CubeTile.equals(this, other);
+CubeTile.prototype.equals = function(that) {
+  return (this.geometry === that.geometry &&
+      this.face === that.face &&
+      this.z === that.z &&
+      this.y === that.y &&
+      this.x === that.x);
 };
 
 
-CubeTile.prototype.cmp = function(other) {
-  return CubeTile.cmp(this, other);
+CubeTile.prototype.cmp = function(that) {
+  return (cmp(this.z, that.z) ||
+  cmp(faceList.indexOf(this.face), faceList.indexOf(that.face)) ||
+  cmp(this.y, that.y) || cmp(this.x, that.x));
 };
 
 
 CubeTile.prototype.str = function() {
-  return CubeTile.str(this);
-};
-
-
-CubeTile.hash = function(tile) {
-  return tile != null ? hash(tile.face.charCodeAt(0), tile.z, tile.x, tile.y) : 0;
-};
-
-
-CubeTile.equals = function(tile1, tile2) {
-  return (tile1 != null && tile2 != null &&
-          tile1.face === tile2.face &&
-          tile1.z === tile2.z &&
-          tile1.x === tile2.x &&
-          tile1.y === tile2.y);
-};
-
-
-CubeTile.cmp = function(tile1, tile2) {
-  var face1 = faceList.indexOf(tile1.face);
-  var face2 = faceList.indexOf(tile2.face);
-  return (cmp(tile1.z, tile2.z) ||
-          cmp(face1, face2) ||
-          cmp(tile1.y, tile2.y) ||
-          cmp(tile1.x, tile2.x));
-};
-
-
-CubeTile.str = function(tile) {
   return 'CubeTile(' + tile.face + ', ' + tile.x + ', ' + tile.y + ', ' + tile.z + ')';
 };
 
@@ -563,7 +542,7 @@ function CubeGeometry(levelPropertiesList) {
 
   this._tileSearcher = new TileSearcher(this);
 
-  this._neighborsCache = new LruMap(CubeTile.equals, CubeTile.hash, 64);
+  this._neighborsCache = new LruMap(neighborsCacheSize);
 
   this._vec = vec4.create();
 

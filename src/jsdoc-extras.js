@@ -240,26 +240,23 @@
 /**
  * Tile hash function.
  * @function
- * @name Tile.hash
- * @param {Tile} tile
+ * @name Tile#hash
  * @returns {number}
  */
 
 /**
  * Tile equality predicate.
  * @function
- * @name Tile.equals
- * @param {Tile} tile1
- * @param {Tile} tile2
+ * @name Tile#equals
+ * @param {Tile} that The tile to compare against.
  * @returns {boolean}
  */
 
 /**
  * Tile comparison function. Sorts tiles in bottom-to-top stacking order.
  * @function
- * @name Tile.cmp
- * @param {Tile} tile1
- * @param {Tile} tile2
+ * @name Tile#cmp
+ * @param {Tile} that The tile to compare against.
  * @returns {number}
  */
 

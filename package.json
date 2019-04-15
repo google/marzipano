@@ -30,7 +30,6 @@
   "devDependencies": {
     "browserify": "^16.2.2",
     "chai": "^4.2.0",
-    "deep-equal": "^1.0.1",
     "flex-sdk": "^4.6.0-0",
     "jsdoc": "^3.5.5",
     "lr-http-server": "^0.1.5",

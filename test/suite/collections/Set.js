@@ -17,13 +17,19 @@
 
 var assert = require('chai').assert;
 
-var deepEqual = require('deep-equal');
-
 var Set = require('../../../src/collections/Set');
 
-// Finite numbers hash to their absolute value; everything else hashes to zero.
-var hash = function(x) {
-  return typeof x === 'number' && isFinite(x) ? Math.floor(Math.abs(x)) : 0;
+function Item(element) {
+  this._element = element;
+}
+
+Item.prototype.hash = function() {
+  // Finite numbers hash to their absolute value; everything else hashes to 0.
+  return isFinite(this._element) ? Math.floor(Math.abs(this._element)) : 0;
+};
+
+Item.prototype.equals = function(that) {
+  return this._element === that._element;
 };
 
 suite('Set', function() {
@@ -31,24 +37,45 @@ suite('Set', function() {
   suite('add', function() {
 
     test('single element', function() {
-      var set = new Set(deepEqual, hash);
-      assert.isNull(set.add(42));
-      assert.isTrue(set.has(42));
+      var set = new Set();
+      var element1 = new Item(1);
+      var element2 = new Item(1);
+      assert.isNull(set.add(element1));
+      assert.isTrue(set.has(element2));
+      assert.strictEqual(set.size(), 1);
     });
 
-    test('two elements with same hash', function() {
-      var set = new Set(deepEqual, hash);
-      assert.isNull(set.add({}));
-      assert.isNull(set.add(""));
-      assert.isTrue(set.has({}));
-      assert.isTrue(set.has(""));
+    test('nonexisting element with same hash as existing element', function() {
+      var set = new Set();
+      var element1 = new Item(1);
+      var element2 = new Item(-1);
+      assert.isNull(set.add(element1));
+      assert.isNull(set.add(element2));
+      assert.isTrue(set.has(element1));
+      assert.isTrue(set.has(element2));
+      assert.strictEqual(set.size(), 2);
+    });
+
+    test('nonexisting element with different hash than existing element', function() {
+      var set = new Set();
+      var element1 = new Item(1);
+      var element2 = new Item(2);
+      assert.isNull(set.add(element1));
+      assert.isNull(set.add(element2));
+      assert.isTrue(set.has(element1));
+      assert.isTrue(set.has(element2));
+      assert.strictEqual(set.size(), 2);
     });
 
     test('existing element', function() {
-      var set = new Set(deepEqual, hash);
-      assert.isNull(set.add(42));
-      assert.isTrue(set.add(42) !== null);
-      assert.isTrue(set.has(42));
+      var set = new Set();
+      var element1 = new Item(1);
+      var element2 = new Item(1);
+      assert.isNull(set.add(element1));
+      assert.strictEqual(set.add(element2), element1);
+      assert.isTrue(set.has(element1));
+      assert.isTrue(set.has(element2));
+      assert.strictEqual(set.size(), 1);
     });
 
   });
@@ -56,33 +83,63 @@ suite('Set', function() {
   suite('remove', function() {
 
     test('existing element', function() {
-      var set = new Set(deepEqual, hash);
-      var elem = {};
-      assert.isNull(set.add(elem));
-      assert.strictEqual(set.remove({}), elem);
-      assert.isFalse(set.has(elem));
+      var set = new Set();
+      var element1 = new Item(1);
+      var element2 = new Item(1);
+      assert.isNull(set.add(element1));
+      assert.strictEqual(set.remove(element2), element1);
+      assert.isFalse(set.has(element1));
+      assert.strictEqual(set.size(), 0);
     });
 
     test('nonexisting element', function() {
-      var set = new Set(deepEqual, hash);
-      set.add(42);
-      assert.isNull(set.remove(37));
+      var set = new Set();
+      var element1 = new Item(1);
+      var element2 = new Item(2);
+      set.add(element1);
+      assert.isNull(set.remove(element2));
+      assert.isTrue(set.has(element1));
+      assert.strictEqual(set.size(), 1);
     });
 
-    test('existing element with same hash', function() {
-      var set = new Set(deepEqual, hash);
-      set.add({});
-      set.add("");
-      assert.strictEqual(set.remove(""), "");
-      assert.isFalse(set.has(""));
-      assert.isTrue(set.has({}));
+    test('existing element with same hash as existing element', function() {
+      var set = new Set();
+      var element1 = new Item(1);
+      var element2 = new Item(-1);
+      set.add(element1);
+      set.add(element2);
+      assert.strictEqual(set.remove(element2), element2);
+      assert.isFalse(set.has(element2));
+      assert.isTrue(set.has(element1));
+      assert.strictEqual(set.size(), 1);
     });
 
-    test('nonexisting element with same hash', function() {
-      var set = new Set(deepEqual, hash);
-      set.add({});
-      assert.isNull(set.remove(""));
-      assert.isTrue(set.has({}));
+    test('nonexisting element with same hash as existing element', function() {
+      var set = new Set();
+      var element1 = new Item(1);
+      var element2 = new Item(-1);
+      set.add(element1);
+      assert.isNull(set.remove(element2));
+      assert.isTrue(set.has(element1));
+      assert.strictEqual(set.size(), 1);
+    });
+
+  });
+
+  suite('has', function() {
+
+    test('nonexisting element', function() {
+      var set = new Set();
+      var element = new Item(1);
+      assert.isFalse(set.has(element));
+    });
+
+    test('nonexisting element with same hash as existing element', function() {
+      var set = new Set();
+      var element1 = new Item(1);
+      var element2 = new Item(-1);
+      assert.isNull(set.add(element1));
+      assert.isFalse(set.has(element2));
     });
 
   });
@@ -90,20 +147,14 @@ suite('Set', function() {
   suite('size', function() {
 
     test('empty', function() {
-      var set = new Set(deepEqual, hash);
+      var set = new Set();
       assert.strictEqual(set.size(), 0);
     });
 
-    test('single element', function() {
-      var set = new Set(deepEqual, hash);
-      set.add(42);
-      assert.strictEqual(set.size(), 1);
-    });
-
     test('more elements than buckets', function() {
-      var set = new Set(deepEqual, hash, 16);
+      var set = new Set(16);
       for (var i = 0; i < 32; i++) {
-        set.add(i);
+        set.add(new Item(i));
       }
       assert.strictEqual(set.size(), 32);
     });
@@ -113,34 +164,44 @@ suite('Set', function() {
   suite('clear', function() {
 
     test('clear', function() {
-      var set = new Set(deepEqual, hash);
+      var set = new Set();
       for (var i = 0; i < 10; i++) {
-        set.add(i);
+        set.add(new Item(i));
       }
       set.clear();
+      for (var i = 0; i < 10; i++) {
+        assert.isFalse(set.has(new Item(i)));
+      }
       assert.strictEqual(set.size(), 0);
     });
 
   });
 
-  suite('each', function() {
+  suite('forEach', function() {
 
-    test('each', function() {
-      var set = new Set(deepEqual, hash);
+    test('empty', function() {
+      var set = new Set();
+      assert.strictEqual(set.forEach(function() {
+        assert.fail('unexpected call');
+      }), 0);
+    });
+
+    test('nonempty', function() {
+      var set = new Set();
+      var elements = [];
       for (var i = 0; i < 10; i++) {
-        set.add(i);
+        var element = new Item(i);
+        set.add(element);
+        elements.push(element);
       }
 
-      var seen = [];
-      var count = set.each(function(i) {
-        seen.push(i);
+      var seenElements = [];
+      var count = set.forEach(function(element) {
+        seenElements.push(element);
       });
 
       assert.strictEqual(count, 10);
-
-      for (var i = 0; i < 10; i++) {
-        assert.include(seen, i);
-      }
+      assert.sameMembers(elements, seenElements);
     });
 
   });

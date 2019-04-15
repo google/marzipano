@@ -29,6 +29,8 @@ var type = require('../util/type');
 var vec2 = require('gl-matrix').vec2;
 var vec4 = require('gl-matrix').vec4;
 
+var neighborsCacheSize = 64;
+
 // Some renderer implementations require tiles to be padded around with
 // repeated pixels to prevent the appearance of visible seams between tiles.
 //
@@ -293,46 +295,22 @@ FlatTile.prototype.neighbors = function() {
 
 
 FlatTile.prototype.hash = function() {
-  return FlatTile.hash(this);
+  return hash(this.z, this.y, this.x);
 };
 
 
-FlatTile.prototype.equals = function(other) {
-  return FlatTile.equals(this, other);
+FlatTile.prototype.equals = function(that) {
+  return (this.geometry === that.geometry &&
+      this.z === that.z && this.y === that.y && this.x === that.x);
 };
 
 
-FlatTile.prototype.cmp = function(other) {
-  return FlatTile.cmp(this, other);
+FlatTile.prototype.cmp = function(that) {
+  return (cmp(this.z, that.z) || cmp(this.y, that.y) || cmp(this.x, that.x));
 };
 
 
 FlatTile.prototype.str = function() {
-  return FlatTile.str(this);
-};
-
-
-FlatTile.hash = function(tile) {
-  return tile != null ? hash(tile.z, tile.x, tile.y) : 0;
-};
-
-
-FlatTile.equals = function(tile1, tile2) {
-  return (tile1 != null && tile2 != null &&
-          tile1.z === tile2.z &&
-          tile1.x === tile2.x &&
-          tile1.y === tile2.y);
-};
-
-
-FlatTile.cmp = function(tile1, tile2) {
-  return (cmp(tile1.z, tile2.z) ||
-          cmp(tile1.y, tile2.y) ||
-          cmp(tile1.x, tile2.x));
-};
-
-
-FlatTile.str = function(tile) {
   return 'FlatTile(' + tile.x + ', ' + tile.y + ', ' + tile.z + ')';
 };
 
@@ -440,7 +418,7 @@ function FlatGeometry(levelPropertiesList) {
 
   this._tileSearcher = new TileSearcher(this);
 
-  this._neighborsCache = new LruMap(FlatTile.equals, FlatTile.hash, 64);
+  this._neighborsCache = new LruMap(neighborsCacheSize);
 
   this._vec = vec4.create();
 

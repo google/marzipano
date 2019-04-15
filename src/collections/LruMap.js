@@ -15,167 +15,118 @@
  */
 'use strict';
 
-
 var mod = require('../util/mod');
 
-
-// Creates a new LRU map given an equality predicate, hash function and
-// maximum size. An LRU map holds up to a maximum number of items, ordered
-// by their age. When the addition of an item would cause the maximum size
-// to be exceeded, the new item replaces the oldest item in the map.
-// As a special case, an LRU map with maximum size 0 always rejects the
-// insertion of an item.
-function LruMap(equals, hash, maxsize) {
-
-  if (typeof equals !== 'function') {
-    throw new Error('LruMap: bad equals function');
+// An LruMap holds up to a maximum number of key-value pairs, ordered by their
+// time of insertion. When the addition of a key-value pair would cause the
+// capacity to be exceeded, the oldest key-value pair in the set is evicted.
+// As a special case, an LruMap with zero capacity always rejects the insertion
+// of a key-value pair.
+//
+// Keys must implement hash() and equals(). Note that the implementation doesn't
+// currently use hash(), but a future version might.
+function LruMap(capacity) {
+  if (!isFinite(capacity) || Math.floor(capacity) !== capacity || capacity < 0) {
+    throw new Error('LruMap: invalid capacity');
   }
-  this._equals = equals;
-
-  if (typeof hash !== 'function') {
-    throw new Error('LruMap: bad hash function');
-  }
-  this._hash = hash;
-
-  if (typeof maxsize != 'number' || isNaN(maxsize) || maxsize < 0) {
-    throw new Error('LruMap: bad maximum size');
-  }
-  this._maxsize = maxsize;
+  this._capacity = capacity;
 
   // Keys and values are stored in circular arrays ordered by decreasing age.
-  // Pivot is the index where the next insertion will take place.
-  this._keys = [];
-  this._values = [];
-  this._pivot = 0;
+  // Start is the index of the oldest key/value and size is the number of valid
+  // key/values; the region containing valid keys/values may wrap around.
+  this._keys = new Array(this._capacity);
+  this._values = new Array(this._capacity);
+  this._start = 0;
+  this._size = 0;
 }
 
-
-LruMap.prototype._modulus = function() {
-  if (this._maxsize > this._keys.length) {
-    return this._keys.length + 1;
-  }
-  return this._maxsize;
+LruMap.prototype._index = function(i) {
+  return mod(this._start + i, this._capacity);
 };
-
 
 // Returns the value associated to the specified key, or null if not found.
 LruMap.prototype.get = function(key) {
-  for (var i = 0; i < this._keys.length; i++) {
-    var elemKey = this._keys[i];
-    if (this._equals(key, elemKey)) {
-      var elemValue = this._values[i];
-      return elemValue;
+  for (var i = 0; i < this._size; i++) {
+    var existingKey = this._keys[this._index(i)];
+    if (key.equals(existingKey)) {
+      return this._values[this._index(i)];
     }
   }
   return null;
 };
 
-
-// Sets the specified key to the specified value, replacing either an existing
-// item with the same key, or the oldest item when the maximum size would be
-// exceeded; the added item becomes the newest. Returns the replaced key if it
-// does not equal the inserted key, otherwise null.
-//
-// If the maximum size is 0, do nothing and return the key.
+// Associates the specified value with the specified key, possibly replacing the
+// currently associated value. The key-value pair becomes the newest. If the map
+// is at capacity, the oldest key-value pair is removed. Returns the removed
+// key, or null otherwise. If the capacity is zero, does nothing and returns
+// the key.
 LruMap.prototype.set = function(key, value) {
-
-  var oldest = null;
-  var found = false;
-
-  if (this._maxsize === 0) {
+  if (this._capacity === 0) {
     return key;
   }
-
-  for (var i = 0; i < this._keys.length; i++) {
-    var elemKey = this._keys[i];
-    if (this._equals(key, elemKey)) {
-      var j = i;
-      var modulus = this._modulus();
-      while (j !== this._pivot) {
-        var k = mod(j + 1, modulus);
-        this._keys[j] = this._keys[k];
-        this._values[j] = this._values[k];
-        j = k;
-      }
-      found = true;
-      break;
-    }
+  this.del(key);
+  var evictedKey =
+      this._size === this._capacity ? this._keys[this._index(0)] : null;
+  this._keys[this._index(this._size)] = key;
+  this._values[this._index(this._size)] = value;
+  if (this._size < this._capacity) {
+    this._size++;
+  } else {
+    this._start = this._index(1);
   }
-
-  if (!found) {
-    oldest = this._pivot < this._keys.length ? this._keys[this._pivot] : null;
-  }
-
-  this._keys[this._pivot] = key;
-  this._values[this._pivot] = value;
-  this._pivot = mod(this._pivot + 1, this._modulus());
-
-  return oldest;
+  return evictedKey;
 };
 
-
-// Removes the item associated with the specified key.
+// Removes the key-value pair associated with the specified key.
 // Returns the removed value, or null if not found.
 LruMap.prototype.del = function(key) {
-  for (var i = 0; i < this._keys.length; i++) {
-    var elemKey = this._keys[i];
-    if (this._equals(key, elemKey)) {
-      var elemValue = this._values[i];
-      for (var j = i; j < this._keys.length - 1; j++) {
-        this._keys[j] = this._keys[j + 1];
-        this._values[j] = this._values[j + 1];
+  for (var i = 0; i < this._size; i++) {
+    if (key.equals(this._keys[this._index(i)])) {
+      var existingValue = this._values[this._index(i)];
+      for (var j = i; j < this._size - 1; j++) {
+        this._keys[this._index(j)] = this._keys[this._index(j + 1)];
+        this._values[this._index(j)] = this._values[this._index(j + 1)];
       }
-      this._keys.length = this._keys.length - 1;
-      this._values.length = this._values.length - 1;
-      if (i < this._pivot) {
-        this._pivot = mod(this._pivot - 1, this._modulus());
-      }
-      return elemValue;
+      this._size--;
+      return existingValue;
     }
   }
   return null;
 };
-
 
 // Returns whether there is a value associated with the specified key.
 LruMap.prototype.has = function(key) {
-  for (var i = 0; i < this._keys.length; i++) {
-    var elemKey = this._keys[i];
-    if (this._equals(key, elemKey)) {
+  for (var i = 0; i < this._size; i++) {
+    if (key.equals(this._keys[this._index(i)])) {
       return true;
     }
   }
   return false;
 };
 
-
-// Returns the number of items in the map.
+// Returns the number of key-value pairs in the map.
 LruMap.prototype.size = function() {
-  return this._keys.length;
+  return this._size;
 };
 
-
-// Removes all items from the map.
+// Removes all key-value pairs from the map.
 LruMap.prototype.clear = function() {
   this._keys.length = 0;
   this._values.length = 0;
-  this._pivot = 0;
+  this._start = 0;
+  this._size = 0;
 };
 
-
-// Calls fn(key, value) for each item in the map, in an undefined order.
+// Calls fn(key, value) for each item in the map, in an unspecified order.
 // Returns the number of times fn was called.
-// The result is undefined if the map is mutated during iteration.
-LruMap.prototype.each = function(fn) {
+// The result is unspecified if the map is mutated during iteration.
+LruMap.prototype.forEach = function(fn) {
   var count = 0;
-  for (var i = 0; i < this._keys.length; i++) {
-    var key = this._keys[i];
-    var value = this._values[i];
-    fn(key, value);
+  for (var i = 0; i < this._size; i++) {
+    fn(this._keys[this._index(i)], this._values[this._index(i)]);
     count += 1;
   }
   return count;
 };
-
 
 module.exports = LruMap;

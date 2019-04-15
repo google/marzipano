@@ -15,146 +15,102 @@
  */
 'use strict';
 
-
 var mod = require('../util/mod');
 
-
-// Creates a new LRU set given an equality predicate, hash function and
-// maximum size. An LRU set holds up to a maximum number of items, ordered
-// by their age. When the addition of an item would cause the maximum size
-// to be exceeded, the new item replaces the oldest item in the set.
-// As a special case, an LRU set with maximum size 0 always rejects the
-// insertion of an item.
-function LruSet(equals, hash, maxsize) {
-
-  if (typeof equals !== 'function') {
-    throw new Error('LruSet: bad equals function');
+// An LruSet holds up to a maximum number of elements, ordered by their time of
+// insertion. When the addition of an element would cause the capacity to be
+// exceeded, the oldest element in the set is evicted. As a special case, an
+// LruSet with zero capacity always rejects the insertion of an element.
+//
+// Elements must implement hash() and equals(). Note that the implementation
+// doesn't currently use hash(), but a future version might.
+function LruSet(capacity) {
+  if (!isFinite(capacity) || Math.floor(capacity) !== capacity || capacity < 0) {
+    throw new Error('LruSet: invalid capacity');
   }
-  this._equals = equals;
+  this._capacity = capacity;
 
-  if (typeof hash !== 'function') {
-    throw new Error('LruSet: bad hash function');
-  }
-  this._hash = hash;
-
-  if (typeof maxsize != 'number' || isNaN(maxsize) || maxsize < 0) {
-    throw new Error('LruSet: bad maximum size');
-  }
-  this._maxsize = maxsize;
-
-  // Items are stored in a circular array ordered by decreasing age.
-  // Pivot is the index where the next insertion will take place.
-  this._items = [];
-  this._pivot = 0;
+  // Elements are stored in a circular array ordered by decreasing age.
+  // Start is the index of the oldest element and size is the number of valid
+  // elements; the region containing valid elements may wrap around.
+  this._elements = new Array(this._capacity);
+  this._start = 0;
+  this._size = 0;
 }
 
-
-LruSet.prototype._modulus = function() {
-  if (this._maxsize > this._items.length) {
-    return this._items.length + 1;
-  }
-  return this._maxsize;
+LruSet.prototype._index = function(i) {
+  return mod(this._start + i, this._capacity);
 };
 
-
-// Adds an item, replacing either an existing equal item, or the oldest item
-// when the maximum size would be exceeded; the added item becomes the newest.
-// Returns the replaced item if it does not equal the inserted item, otherwise
-// null.
-//
-// If the maximum size is 0, do nothing and return the item.
-LruSet.prototype.add = function(item) {
-
-  var oldest = null;
-  var found = false;
-
-  if (this._maxsize === 0) {
-    return item;
+// Adds an element into the set, possibly replacing an equal element already in
+// the set. The element becomes the newest. If the set is at capacity, the
+// oldest element is removed. Returns the removed element if it does not equal
+// the inserted element, or null otherwise. If the capacity is zero, does
+// nothing and returns the element.
+LruSet.prototype.add = function(element) {
+  if (this._capacity === 0) {
+    return element;
   }
-
-  for (var i = 0; i < this._items.length; i++) {
-    var elem = this._items[i];
-    if (this._equals(item, elem)) {
-      var j = i;
-      var modulus = this._modulus();
-      while (j !== this._pivot) {
-        var k = mod(j + 1, modulus);
-        this._items[j] = this._items[k];
-        j = k;
-      }
-      found = true;
-      break;
-    }
+  this.remove(element);
+  var evictedElement =
+      this._size === this._capacity ? this._elements[this._index(0)] : null;
+  this._elements[this._index(this._size)] = element;
+  if (this._size < this._capacity) {
+    this._size++;
+  } else {
+    this._start = this._index(1);
   }
-
-  if (!found) {
-    oldest = this._pivot < this._items.length ? this._items[this._pivot] : null;
-  }
-
-  this._items[this._pivot] = item;
-  this._pivot = mod(this._pivot + 1, this._modulus());
-
-  return oldest;
+  return evictedElement;
 };
 
-
-// Removes an item.
-// Returns the removed item, or null if the item was not found.
-LruSet.prototype.remove = function(item) {
-  for (var i = 0; i < this._items.length; i++) {
-    var elem = this._items[i];
-    if (this._equals(item, elem)) {
-      for (var j = i; j < this._items.length - 1; j++) {
-        this._items[j] = this._items[j + 1];
+// Removes an element from the set.
+// Returns the removed element, or null if the element was not found.
+LruSet.prototype.remove = function(element) {
+  for (var i = 0; i < this._size; i++) {
+    var existingElement = this._elements[this._index(i)];
+    if (element.equals(existingElement)) {
+      for (var j = i; j < this._size - 1; j++) {
+        this._elements[this._index(j)] = this._elements[this._index(j + 1)];
       }
-      this._items.length = this._items.length - 1;
-      if (i < this._pivot) {
-        this._pivot = mod(this._pivot - 1, this._modulus());
-      }
-      return elem;
+      this._size--;
+      return existingElement;
     }
   }
   return null;
 };
 
-
-// Returns whether an item is in the set.
-LruSet.prototype.has = function(item) {
-  for (var i = 0; i < this._items.length; i++) {
-    var elem = this._items[i];
-    if (this._equals(item, elem)) {
+// Returns whether an element is in the set.
+LruSet.prototype.has = function(element) {
+  for (var i = 0; i < this._size; i++) {
+    if (element.equals(this._elements[this._index(i)])) {
       return true;
     }
   }
   return false;
 };
 
-
-// Returns the number of items in the set.
+// Returns the number of elements in the set.
 LruSet.prototype.size = function() {
-  return this._items.length;
+  return this._size;
 };
 
-
-// Removes all items from the set.
+// Removes all elements from the set.
 LruSet.prototype.clear = function() {
-  this._items.length = 0;
-  this._pivot = 0;
+  this._elements.length = 0;
+  this._start = 0;
+  this._size = 0;
 };
 
-
-// Calls fn(item) for each item in the set, in an undefined order.
+// Calls fn(element) for each element in the set, in an unspecified order.
 // Returns the number of times fn was called.
-// The result is undefined if the set is mutated during iteration.
-LruSet.prototype.each = function(fn) {
+// The result is unspecified if the set is mutated during iteration.
+LruSet.prototype.forEach = function(fn) {
   var count = 0;
-  for (var i = 0; i < this._items.length; i++) {
-    var item = this._items[i];
-    fn(item);
+  for (var i = 0; i < this._size; i++) {
+    fn(this._elements[this._index(i)]);
     count += 1;
   }
   return count;
 };
-
 
 module.exports = LruSet;

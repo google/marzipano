@@ -32,7 +32,7 @@ suite('TileSearcher', function() {
       yaw: Math.PI, fov: Math.PI/4, width: 100, height: 100
     });
     var result = [];
-    var count = new TileSearcher(geometry).search(view, startingTile, result);
+    var count = new TileSearcher().search(view, startingTile, result);
     assert.equal(count, 0);
     assert.isEmpty(result);
   });
@@ -44,7 +44,7 @@ suite('TileSearcher', function() {
         yaw: Math.PI, fov: Math.PI/4, width: 100, height: 100
     });
     var result = [];
-    var count = new TileSearcher(geometry).search(view, startingTile, result);
+    var count = new TileSearcher().search(view, startingTile, result);
     assert.equal(count, 1);
     assert.lengthOf(result, 1);
     assert.isTrue(result[0].equals(startingTile));
@@ -63,7 +63,7 @@ suite('TileSearcher', function() {
       yaw: 0, fov: Math.PI/6, width: 100, height: 100
     });
     var result = [];
-    var count = new TileSearcher(geometry).search(view, startingTile, result);
+    var count = new TileSearcher().search(view, startingTile, result);
     assert.equal(count, 4);
     var seen = 0;
     for (var i = 0; i < result.length; i++) {
@@ -84,7 +84,7 @@ suite('TileSearcher', function() {
       yaw: Math.PI, fov: Math.PI/4, width: 100, height: 100
     });
     var result = [42];
-    var count = new TileSearcher(geometry).search(view, startingTile, result);
+    var count = new TileSearcher().search(view, startingTile, result);
     assert.equal(count, 1);
     assert.lengthOf(result, 2);
     assert.equal(result[0], 42);
@@ -101,7 +101,7 @@ suite('TileSearcher', function() {
     var view2 = new RectilinearView({
       yaw: Math.PI, fov: Math.PI/4, width: 100, height: 100
     });
-    var searcher = new TileSearcher(geometry);
+    var searcher = new TileSearcher();
     var result = [];
     var count1 = searcher.search(view1, startingTile1, result);
     var count2 = searcher.search(view2, startingTile2, result);

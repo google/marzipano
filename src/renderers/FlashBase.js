@@ -32,7 +32,7 @@ function FlashBaseRenderer(flashElement, layerId, quirks, tileClass) {
 
   this._tileList = [];
 
-  this._textureMap = new Map(tileClass.equals, tileClass.hash);
+  this._textureMap = new Map();
 
   // Whether the Flash layer for this renderer has already been created
   // by calling flashElement.createLayer(). Note that we cannot do this

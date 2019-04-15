@@ -37,6 +37,8 @@ function MockTile(opts) {
   this.dynamicAsset = opts && opts.dynamicAsset;
   this.assetFailures = opts && opts.assetFailures || 0;
   this.textureFailures = opts && opts.textureFailures || 0;
+  this.hash = function() { return 0; };
+  this.equals = function(that) { return this === that; };
 }
 
 // Mock asset.
@@ -57,18 +59,6 @@ function MockTexture(asset) {
 
 var loadAssetError = new Error('Asset error');
 var createTextureError = new Error('Create texture');
-
-// Mock a Geometry. For these tests we only need the TileClass property.
-var mockGeometry = {
-  TileClass: {
-    equals: function(x, y) {
-      return x === y;
-    },
-    hash: function() {
-      return 0;
-    }
-  }
-};
 
 // Mock a Source. For these tests we only need the loadAsset() method.
 var mockSource = {
@@ -109,7 +99,7 @@ var mockStage = {
 };
 
 function makeTextureStore(opts) {
-  return new TextureStore(mockGeometry, mockSource, mockStage, opts);
+  return new TextureStore({}, mockSource, mockStage, opts);
 }
 
 suite('TextureStore', function() {

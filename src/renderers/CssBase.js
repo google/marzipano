@@ -59,7 +59,7 @@ function CssBaseRenderer(root, quirks, tileClass) {
   this._oldTileList = [];
   this._newTileList = [];
 
-  this._textureMap = new Map(tileClass.equals, tileClass.hash);
+  this._textureMap = new Map();
 }
 
 
