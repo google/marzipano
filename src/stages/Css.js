@@ -59,6 +59,10 @@ var browserQuirks = {
  * @classdesc
  *
  * A {@link Stage} implementation using CSS 3D Transforms.
+ *
+ * @param {Object} opts
+ *
+ * Also see the available {@link Stage} options.
  */
 function CssStage(opts) {
   this.constructor.super_.call(this, opts);

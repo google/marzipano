@@ -91,6 +91,8 @@ function initWebGlContext(canvas, opts) {
  * Due to technical limitations, they are only generated for textures whose
  * dimensions are a power of two. See:
  * https://www.khronos.org/webgl/wiki/WebGL_and_OpenGL_Differences#Non-Power_of_Two_Texture_Support
+ *
+ * Also see the available {@link Stage} options.
  */
 function WebGlStage(opts) {
   opts = opts || {};

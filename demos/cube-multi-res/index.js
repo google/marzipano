@@ -16,7 +16,11 @@
 'use strict';
 
 // Create viewer.
-var viewer = new Marzipano.Viewer(document.getElementById('pano'));
+// Use progressive rendering to produce a more pleasing visual effect when
+// zooming past several resolution levels, at the cost of additional bandwidth
+// consumption.
+var viewer = new Marzipano.Viewer(
+    document.getElementById('pano'), {stage: {progressive: true}});
 
 // Create source.
 // The tiles were generated with the krpano tools, which indexes the tiles

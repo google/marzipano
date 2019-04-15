@@ -88,12 +88,18 @@ var flashQuirks = {
  * A {@link Stage} implementation using Flash.
  *
  * @param {Object} opts
- * @param {String} [wmode='transparent'] Flash `wmode` property. Read
- *   [this](http://helpx.adobe.com/flash/kb/flash-object-embed-tag-attributes.html)
- *   for more information.
- * @param {String} swfPath Path to the SWF file. By default, the SWF is
- *   assumed to be named `marzipano.swf` and located in the same directory
- *   as `marzipano.js`.
+ * @param {string} [opts.wmode='transparent']
+ * @param {string} [opts.swfPath]
+ *
+ * The `wmode` option controls transparency, layering and compositing of the
+ * Flash element into the web page. For more information see:
+ * http://helpx.adobe.com/flash/kb/flash-object-embed-tag-attributes.html
+ *
+ * The `swfPath` option denotes the path to the `marzipano.swf` file. It
+ * defaults to the location of `marzipano.js` by looking for a script tag with
+ * that name.
+ *
+ * Also see the available {@link Stage} options.
  */
 function FlashStage(opts) {
   this.constructor.super_.call(this, opts);

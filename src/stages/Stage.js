@@ -59,8 +59,21 @@ function reverseTileCmp(t1, t2) {
  * This is a superclass containing logic that is common to all implementations;
  * it should never be instantiated directly. Instead, use one of the
  * subclasses: {@link WebGlStage}, {@link CssStage} or {@link FlashStage}.
+ *
+ * @param {Object} opts
+ * @param {boolean} [opts.progressive=false]
+ *
+ * Options listed here may be passed into the `opts` constructor argument of
+ * subclasses.
+ *
+ * The `progressive` option controls whether resolution levels are loaded in
+ * order, from lowest to highest. This results in a more pleasing effect when
+ * zooming past several levels in a large panoramas, but consumes additional
+ * bandwidth.
  */
 function Stage(opts) {
+  this._progressive = !!(opts && opts.progressive);
+
   // The list of layers in display order (background to foreground).
   this._layers = [];
 
@@ -569,14 +582,20 @@ Stage.prototype._collectChildren = function(tile, textureStore) {
 };
 
 Stage.prototype._collectParents = function(tile, textureStore, needsFallback) {
-  // Recursively visit parent tiles until all parents have been marked for
-  // loading, and at least one parent has been marked for rendering if a
-  // fallback is required.
-  var needsLoading = true;
+  // Recursively visit parent tiles until:
+  //   - all parents have been marked for loading, if progressive rendering is
+  //     enabled; and
+  //   - at least one parent has been marked for both loading and rendering, if
+  //     a fallback is required.
+  var needsLoading = this._progressive;
   while ((needsLoading || needsFallback) && (tile = tile.parent()) != null) {
-    if (needsFallback && textureStore.texture(tile)) {
-      this._collectTileToRender(tile);
-      needsFallback = false;
+    if (needsFallback) {
+      if (textureStore.texture(tile)) {
+        this._collectTileToRender(tile);
+        needsFallback = false;
+      } else if (!this._progressive) {
+        continue;
+      }
     }
     if (!this._collectTileToLoad(tile)) {
       needsLoading = false;
