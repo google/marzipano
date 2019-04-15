@@ -14,6 +14,17 @@ Related GitHub issue or pull request numbers are indicated in brackets.
 
 # Upcoming release
 
+# v0.9.0 [2019-04-15]
+
+* New: `Layer#renderComplete` event (#200).
+* New: allow setting additional CSS transforms on non-embedded hotspot.
+* New: add Stage option for progressive loading (#99).
+* Fix: make it possible for multiple layers to share a TextureStore (#232).
+* Fix: increase the TextureStore default LRU size from 32 to 512.
+* Breaking: StaticAsset and DynamicAsset replace existing Asset classes.
+* Breaking: TextureStore no longer receives a Geometry argument.
+* Breaking: the `TileClass` property of classes is now called `Tile`.
+
 # v0.8.0 [2018-10-29]
 
 * New: `Stage#renderComplete` event (#40, #109, #181, #188).
