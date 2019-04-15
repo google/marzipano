@@ -20,7 +20,7 @@ var assert = require('chai').assert;
 var TileSearcher = require('../../src/TileSearcher');
 
 var CubeGeometry = require('../../src/geometries/Cube');
-var CubeTile = CubeGeometry.TileClass;
+var CubeTile = CubeGeometry.Tile;
 var RectilinearView = require('../../src/views/Rectilinear');
 
 suite('TileSearcher', function() {

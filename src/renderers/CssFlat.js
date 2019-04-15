@@ -15,7 +15,7 @@
  */
 'use strict';
 
-var FlatTile = require('../geometries/Flat').TileClass;
+var FlatTile = require('../geometries/Flat').Tile;
 var CssBaseRenderer = require('./CssBase');
 var decimal = require('../util/decimal');
 var inherits = require('../util/inherits');

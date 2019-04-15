@@ -104,17 +104,17 @@ layerAbove.setFixedLevel(2);
 // List of tiles to be preloaded.
 var preloadTiles = [
   // Level 1 tile on top right of front face (parent fallback).
-  new Marzipano.CubeGeometry.TileClass('f', 1, 0, 1, geometryAbove),
+  new Marzipano.CubeGeometry.Tile('f', 1, 0, 1, geometryAbove),
   // Level 2 tile on bottom right of front face (intended display level).
-  new Marzipano.CubeGeometry.TileClass('f', 3, 2, 2, geometryAbove),
+  new Marzipano.CubeGeometry.Tile('f', 3, 2, 2, geometryAbove),
   // Level 3 tiles on bottom right of front face (children fallback).
-  new Marzipano.CubeGeometry.TileClass('f', 6, 6, 3, geometryAbove),
-  new Marzipano.CubeGeometry.TileClass('f', 6, 7, 3, geometryAbove),
-  new Marzipano.CubeGeometry.TileClass('f', 7, 6, 3, geometryAbove),
-  new Marzipano.CubeGeometry.TileClass('f', 7, 7, 3, geometryAbove),
+  new Marzipano.CubeGeometry.Tile('f', 6, 6, 3, geometryAbove),
+  new Marzipano.CubeGeometry.Tile('f', 6, 7, 3, geometryAbove),
+  new Marzipano.CubeGeometry.Tile('f', 7, 6, 3, geometryAbove),
+  new Marzipano.CubeGeometry.Tile('f', 7, 7, 3, geometryAbove),
   // Level 3 tiles on bottom right of front face (incomplete children fallback).
-  new Marzipano.CubeGeometry.TileClass('f', 4, 4, 3, geometryAbove),
-  new Marzipano.CubeGeometry.TileClass('f', 4, 5, 3, geometryAbove)
+  new Marzipano.CubeGeometry.Tile('f', 4, 4, 3, geometryAbove),
+  new Marzipano.CubeGeometry.Tile('f', 4, 5, 3, geometryAbove)
 ];
 
 // Pin tiles to force them to load.

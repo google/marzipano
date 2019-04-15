@@ -15,7 +15,7 @@
  */
 'use strict';
 
-var CubeTile = require('../geometries/Cube').TileClass;
+var CubeTile = require('../geometries/Cube').Tile;
 var CssBaseRenderer = require('./CssBase');
 var decimal = require('../util/decimal');
 var inherits = require('../util/inherits');

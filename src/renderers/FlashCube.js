@@ -16,7 +16,7 @@
 'use strict';
 
 var FlashBaseRenderer = require('./FlashBase');
-var CubeTile = require('../geometries/Cube').TileClass;
+var CubeTile = require('../geometries/Cube').Tile;
 var inherits = require('../util/inherits');
 
 var radToDeg = require('../util/radToDeg');

@@ -255,7 +255,7 @@ EquirectGeometry.prototype.visibleTiles = function(view, level, result) {
 };
 
 
-EquirectGeometry.TileClass = EquirectGeometry.prototype.TileClass = EquirectTile;
+EquirectGeometry.Tile = EquirectGeometry.prototype.Tile = EquirectTile;
 EquirectGeometry.type = EquirectGeometry.prototype.type = 'equirect';
 EquirectTile.type = EquirectTile.prototype.type = 'equirect';
 

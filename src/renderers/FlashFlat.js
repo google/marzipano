@@ -16,7 +16,7 @@
 'use strict';
 
 var FlashBaseRenderer = require('./FlashBase');
-var FlatTile = require('../geometries/Flat').TileClass;
+var FlatTile = require('../geometries/Flat').Tile;
 var inherits = require('../util/inherits');
 
 

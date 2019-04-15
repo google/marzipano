@@ -507,7 +507,7 @@ FlatGeometry.prototype.visibleTiles = function(view, level, result) {
 };
 
 
-FlatGeometry.TileClass = FlatGeometry.prototype.TileClass = FlatTile;
+FlatGeometry.Tile = FlatGeometry.prototype.Tile = FlatTile;
 FlatGeometry.type = FlatGeometry.prototype.type = 'flat';
 FlatTile.type = FlatTile.prototype.type = 'flat';
 

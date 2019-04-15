@@ -25,9 +25,9 @@ var inherits = require('../../src/util/inherits');
 var Stage = require('../../src/stages/Stage');
 
 var CubeGeometry = require('../../src/geometries/Cube');
-var CubeTile = CubeGeometry.TileClass;
+var CubeTile = CubeGeometry.Tile;
 var EquirectGeometry = require('../../src/geometries/Equirect');
-var EquirectTile = EquirectGeometry.TileClass;
+var EquirectTile = EquirectGeometry.Tile;
 
 // Stage is an abstract class and cannot be instantiated directly.
 // We must stub methods and properties expected to be implemented by subclasses.

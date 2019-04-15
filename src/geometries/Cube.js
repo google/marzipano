@@ -650,7 +650,7 @@ CubeGeometry.prototype.visibleTiles = function(view, level, result) {
 };
 
 
-CubeGeometry.TileClass = CubeGeometry.prototype.TileClass = CubeTile;
+CubeGeometry.Tile = CubeGeometry.prototype.Tile = CubeTile;
 CubeGeometry.type = CubeGeometry.prototype.type = 'cube';
 CubeTile.type = CubeTile.prototype.type = 'cube';
 

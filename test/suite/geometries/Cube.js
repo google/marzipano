@@ -18,7 +18,7 @@
 var assert = require('chai').assert;
 
 var Cube = require('../../../src/geometries/Cube');
-var CubeTile = Cube.TileClass;
+var CubeTile = Cube.Tile;
 
 suite('CubeGeometry', function() {
 
