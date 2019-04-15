@@ -42,7 +42,7 @@ var limiter = Marzipano.RectilinearView.limit.traditional(1024, 100*Math.PI/180)
 var marzipanoObjects = rects.map(function(rect) {
   // Create layer.
   var view = new Marzipano.RectilinearView(null);
-  var textureStore = new Marzipano.TextureStore(geometry, source, stage);
+  var textureStore = new Marzipano.TextureStore(source, stage);
   var layer = new Marzipano.Layer(source, geometry, view, textureStore, { effects: { rect: rect }});
 
   // Add hotspot.

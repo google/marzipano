@@ -288,14 +288,13 @@ eventEmitter(TextureStoreItem);
  * instances, or belonging to a {@link CssStage} or a {@link FlashStage},
  * may not do so due to restrictions on the use of textures across stages.
  *
- * @param {Geometry} geometry The underlying geometry.
  * @param {Source} source The underlying source.
  * @param {Stage} stage The underlying stage.
  * @param {Object} opts Options.
  * @param {Number} [opts.previouslyVisibleCacheSize=32] The maximum number of
  *     previously visible textures to cache according to an LRU policy.
  */
-function TextureStore(geometry, source, stage, opts) {
+function TextureStore(source, stage, opts) {
   opts = defaults(opts || {}, defaultOptions);
 
   this._source = source;

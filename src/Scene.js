@@ -190,7 +190,7 @@ Scene.prototype.createLayer = function(opts) {
   var geometry = opts.geometry;
   var view = this._view;
   var stage = this._viewer.stage();
-  var textureStore = new TextureStore(geometry, source, stage, textureStoreOpts);
+  var textureStore = new TextureStore(source, stage, textureStoreOpts);
   var layer = new Layer(source, geometry, view, textureStore, layerOpts);
 
   this._layers.push(layer);

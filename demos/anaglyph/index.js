@@ -55,7 +55,7 @@ function createLayer(stage, view, geometry, eye) {
     { cubeMapPreviewUrl: urlPrefix + "/" + eye + "/preview.jpg" });
 
   // Create the texture store.
-  var textureStore = new Marzipano.TextureStore(geometry, source, stage);
+  var textureStore = new Marzipano.TextureStore(source, stage);
 
   // Create the layer.
   var layer = new Marzipano.Layer(source, geometry, view, textureStore);

@@ -99,7 +99,7 @@ var mockStage = {
 };
 
 function makeTextureStore(opts) {
-  return new TextureStore({}, mockSource, mockStage, opts);
+  return new TextureStore(mockSource, mockStage, opts);
 }
 
 suite('TextureStore', function() {

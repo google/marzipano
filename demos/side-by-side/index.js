@@ -52,7 +52,7 @@ function createLayer(stage, view, geometry, eye, rect) {
     urlPrefix + "/" + eye + "/{z}/{f}/{y}/{x}.jpg",
     { cubeMapPreviewUrl: urlPrefix + "/" + eye + "/preview.jpg" });
 
-  var textureStore = new Marzipano.TextureStore(geometry, source, stage);
+  var textureStore = new Marzipano.TextureStore(source, stage);
   var layer = new Marzipano.Layer(source, geometry, view, textureStore,
                                   { effects: { rect: rect }});
 
