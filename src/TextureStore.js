@@ -51,7 +51,7 @@ var State = {
 
 var defaultOptions = {
   // Maximum number of cached textures for previously visible tiles.
-  previouslyVisibleCacheSize: 32
+  previouslyVisibleCacheSize: 512
 };
 
 
