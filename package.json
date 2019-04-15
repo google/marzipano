@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "bowser": "^1.9.4",
-    "gl-matrix": "^3.0.0-0",
+    "gl-matrix": "git://github.com/toji/gl-matrix.git#7c8d5dd",
     "hammerjs": "git://github.com/digisfera/hammer.js.git",
     "minimal-event-emitter": "^1.0.0"
   },
