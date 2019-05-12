@@ -328,12 +328,12 @@ Scene.prototype.lookTo = function(params, opts, done) {
 
   var controlsEnabled = this._viewer.controls().enabled();
 
-  if(!controlsInterrupt) {
+  if (!controlsInterrupt) {
     this._viewer.controls().disable();
   }
 
   this.startMovement(movement, function() {
-    if(controlsEnabled && !this._viewer.controls().enabled()) {
+    if (controlsEnabled && !this._viewer.controls().enabled()) {
       this._viewer.controls().enable();
     }
     done();
