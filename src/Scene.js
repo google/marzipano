@@ -255,8 +255,6 @@ Scene.prototype.switchTo = function(opts, done) {
  *
  * @param {Object} params Target view parameters.
  * @param {Object} opts Transition options.
- * @param {number} [opts.controlsInterrupt=false] allow controls to interrupt
- *     an ongoing tween.
  * @param {number} [opts.transitionDuration=1000] Tween duration, in
  *     milliseconds.
  * @param {number} [opts.closest=true] Whether to tween through the shortest
@@ -267,6 +265,7 @@ Scene.prototype.switchTo = function(opts, done) {
  *    interrupted.
  */
 Scene.prototype.lookTo = function(params, opts, done) {
+  // TODO: allow controls to interrupt an ongoing tween.
   // TODO: provide a way to override the easing function.
   opts = opts || {};
   done = done || noop;
@@ -275,7 +274,6 @@ Scene.prototype.lookTo = function(params, opts, done) {
     throw new Error("Target view parameters must be an object");
   }
 
-  var controlsInterrupt = opts.controlsInterrupt != null ? opts.controlsInterrupt : false;
   var duration = opts.transitionDuration != null ? opts.transitionDuration : 1000;
   var shortest = opts.shortest != null ? opts.shortest : true;
 
@@ -328,12 +326,9 @@ Scene.prototype.lookTo = function(params, opts, done) {
 
   var controlsEnabled = this._viewer.controls().enabled();
 
-  if (!controlsInterrupt) {
-    this._viewer.controls().disable();
-  }
-
+  this._viewer.controls().disable();
   this.startMovement(movement, function() {
-    if (controlsEnabled && !this._viewer.controls().enabled()) {
+    if(controlsEnabled) {
       this._viewer.controls().enable();
     }
     done();

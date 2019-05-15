@@ -219,11 +219,11 @@ function Viewer(domElement, opts) {
   this._enterIdleHandler = this._enterIdle.bind(this);
   this._idleTimer.addEventListener('timeout', this._enterIdleHandler);
 
-  // Stop movement when the controls are activated or when the
+  // Stop the idle movement when the controls are activated or when the
   // scene changes.
-  this._stopMovementHandler = this._stopMovement.bind(this);
-  this._controls.addEventListener('active', this._stopMovementHandler);
-  this.addEventListener('sceneChange', this._stopMovementHandler);
+  this._leaveIdleHandler = this._leaveIdle.bind(this);
+  this._controls.addEventListener('active', this._leaveIdleHandler);
+  this.addEventListener('sceneChange', this._leaveIdleHandler);
 
   // The currently programmed idle movement.
   this._idleMovement = null;
@@ -637,7 +637,7 @@ Viewer.prototype.setIdleMovement = function(timeout, movement) {
  * {@link Viewer#setIdleMovement}.
  */
 Viewer.prototype.breakIdleMovement = function() {
-  this._stopMovement();
+  this._leaveIdle();
   this._resetIdleTimer();
 };
 
@@ -657,12 +657,12 @@ Viewer.prototype._enterIdle = function() {
 };
 
 
-Viewer.prototype._stopMovement = function() {
+Viewer.prototype._leaveIdle = function() {
   var scene = this._currentScene;
   if (!scene) {
     return;
   }
-  if (scene.movement()) {
+  if (scene.movement() === this._idleMovement) {
     scene.stopMovement();
   }
 };
