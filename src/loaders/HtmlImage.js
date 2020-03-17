@@ -42,6 +42,40 @@ function HtmlImageLoader(stage) {
     throw new Error('Stage type incompatible with loader');
   }
   this._stage = stage;
+
+  // This variable will have the response callbacks where the keys will be 
+  // the image URL and the value will be a function
+  this._imageFetchersCallbacks = {};
+
+  this._isSimpleImageFetcherWorker = true;
+
+  function imageFetcherWorkerOnMessage(event) {
+    this._imageFetchersCallbacks[event.data.imageURL](event);
+    delete this._imageFetchersCallbacks[event.data.imageURL];
+  }
+
+  // Check what method can use for loading the images
+  // Check if the browser supports `OffscreenCanvas` and `createImageBitmap`
+  // else using only fetch
+  if (
+   typeof window.OffscreenCanvas === "function" &&
+   typeof window.createImageBitmap === "function"
+  ) {
+    this._imageFetcherNoResizeWorker = 
+      new require("../workers/fetchImageUsingImageBitmap")();
+
+    this._imageFetcherResizeWorker = 
+      new require("../workers/fetchImageUsingOffscreenCanvas")();
+
+    this._imageFetcherNoResizeWorker.onmessage = imageFetcherWorkerOnMessage;
+    this._imageFetcherResizeWorker.onmessage = imageFetcherWorkerOnMessage;
+
+    this._isSimpleImageFetcherWorker = false;
+  } else {
+    this._imageFetcherWorker = new require("../workers/fetchImage")();
+
+    this._imageFetcherWorker.onmessage = imageFetcherWorkerOnMessage;
+  }
 }
 
 /**
@@ -53,20 +87,6 @@ function HtmlImageLoader(stage) {
  * @return {function()} A function to cancel loading.
  */
 HtmlImageLoader.prototype.loadImage = function(url, rect, done) {
-  var img = new Image();
-
-  // Allow cross-domain image loading.
-  // This is required to be able to create WebGL textures from images fetched
-  // from a different domain. Note that setting the crossorigin attribute to
-  // 'anonymous' will trigger a CORS preflight for cross-domain requests, but no
-  // credentials (cookies or HTTP auth) will be sent; to do so, the attribute
-  // would have to be set to 'use-credentials' instead. Unfortunately, this is
-  // not a safe choice, as it causes requests to fail when the response contains
-  // an Access-Control-Allow-Origin header with a wildcard. See the section
-  // "Credentialed requests and wildcards" on:
-  // https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
-  img.crossOrigin = 'anonymous';
-
   var x = rect && rect.x || 0;
   var y = rect && rect.y || 0;
   var width = rect && rect.width || 1;
@@ -74,43 +94,89 @@ HtmlImageLoader.prototype.loadImage = function(url, rect, done) {
 
   done = once(done);
 
-  img.onload = function() {
+  var cancelFunction;
+  var shouldCancel = false;
+
+  if (this._isSimpleImageFetcherWorker) {
+    var internalCancelFunction;
+
+    this._imageFetchersCallbacks[url] = function(event) {
+      if (shouldCancel) return;
+
+      var img = new Image();
+
+      const objectURL = URL.createObjectURL(event.data.blob);
+
+      img.onload = () => {
+          URL.revokeObjectURL(objectURL);
+
+          if (x === 0 && y === 0 && width === 1 && height === 1) {
+            done(null, new StaticAsset(img));
+          }
+          else {
+            x *= img.naturalWidth;
+            y *= img.naturalHeight;
+            width *= img.naturalWidth;
+            height *= img.naturalHeight;
+      
+            var canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            var context = canvas.getContext('2d');
+      
+            context.drawImage(img, x, y, width, height, 0, 0, width, height);
+      
+            done(null, new StaticAsset(canvas));
+          }
+      };
+
+      img.url = objectURL;
+
+      internalCancelFunction = function() {
+        img.onload = img.onerror = null;
+        img.src = '';
+      }
+    };
+
+    cancelFunction = function() {
+      shouldCancel = true;
+      if (internalCancelFunction) internalCancelFunction();
+      done.apply(null, arguments);
+    }
+
+    this._imageFetcherWorker.postMessage({ imageURL: url });
+  } else {
+    this._imageFetchersCallbacks[url] = function(event) {
+      if (shouldCancel) return;
+      done(null, new StaticAsset(event.data.imageBitmap));
+    };
+
+    cancelFunction = function() {
+      shouldCancel = true;
+      done.apply(null, arguments);
+    }
+
     if (x === 0 && y === 0 && width === 1 && height === 1) {
-      done(null, new StaticAsset(img));
+      this._imageFetcherNoResizeWorker.postMessage({ imageURL: url });
+    } else {
+      const mainCanvas = document.createElement("canvas");
+      const mainCanvasOffscreen = mainCanvas.transferControlToOffscreen();
+
+      this._imageFetcherResizeWorker.postMessage(
+        { 
+          imageURL: url, 
+          canvas: mainCanvasOffscreen,
+          x,
+          y,
+          width,
+          height
+        }, 
+        [mainCanvasOffscreen]
+      );
     }
-    else {
-      x *= img.naturalWidth;
-      y *= img.naturalHeight;
-      width *= img.naturalWidth;
-      height *= img.naturalHeight;
-
-      var canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      var context = canvas.getContext('2d');
-
-      context.drawImage(img, x, y, width, height, 0, 0, width, height);
-
-      done(null, new StaticAsset(canvas));
-    }
-  };
-
-  img.onerror = function() {
-    // TODO: is there any way to distinguish a network error from other
-    // kinds of errors? For now we always return NetworkError since this
-    // prevents images to be retried continuously while we are offline.
-    done(new NetworkError('Network error: ' + url));
-  };
-
-  img.src = url;
-
-  function cancel() {
-    img.onload = img.onerror = null;
-    img.src = '';
-    done.apply(null, arguments);
   }
 
-  return cancel;
+  return cancelFunction;
 };
 
 module.exports = HtmlImageLoader;
