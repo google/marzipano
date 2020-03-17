@@ -43,6 +43,8 @@ function HtmlImageLoader(stage) {
   }
   this._stage = stage;
 
+  const self = this;
+
   // This variable will have the response callbacks where the keys will be 
   // the image URL and the value will be a function
   this._imageFetchersCallbacks = {};
@@ -50,8 +52,8 @@ function HtmlImageLoader(stage) {
   this._isSimpleImageFetcherWorker = true;
 
   function imageFetcherWorkerOnMessage(event) {
-    this._imageFetchersCallbacks[event.data.imageURL](event);
-    delete this._imageFetchersCallbacks[event.data.imageURL];
+    self._imageFetchersCallbacks[event.data.imageURL](event);
+    delete self._imageFetchersCallbacks[event.data.imageURL];
   }
 
   // Check what method can use for loading the images
@@ -62,17 +64,17 @@ function HtmlImageLoader(stage) {
    typeof window.createImageBitmap === "function"
   ) {
     this._imageFetcherNoResizeWorker = 
-      new require("../workers/fetchImageUsingImageBitmap")();
+      new Worker("../workers/fetchImageUsingImageBitmap.js");
 
     this._imageFetcherResizeWorker = 
-      new require("../workers/fetchImageUsingOffscreenCanvas")();
+      new Worker("../workers/fetchImageUsingOffscreenCanvas.js");
 
     this._imageFetcherNoResizeWorker.onmessage = imageFetcherWorkerOnMessage;
     this._imageFetcherResizeWorker.onmessage = imageFetcherWorkerOnMessage;
 
     this._isSimpleImageFetcherWorker = false;
   } else {
-    this._imageFetcherWorker = new require("../workers/fetchImage")();
+    this._imageFetcherWorker = new Worker("../workers/fetchImage.js");
 
     this._imageFetcherWorker.onmessage = imageFetcherWorkerOnMessage;
   }
