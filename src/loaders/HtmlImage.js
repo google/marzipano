@@ -45,11 +45,11 @@ function HtmlImageLoader(stage) {
 
   const self = this;
 
+  this._useWorkers = false;
+
   // This variable will have the response callbacks where the keys will be 
   // the image URL and the value will be a function
   this._imageFetchersCallbacks = {};
-
-  this._isSimpleImageFetcherWorker = true;
 
   function imageFetcherWorkerOnMessage(event) {
     self._imageFetchersCallbacks[event.data.imageURL](event);
@@ -72,11 +72,7 @@ function HtmlImageLoader(stage) {
     this._imageFetcherNoResizeWorker.onmessage = imageFetcherWorkerOnMessage;
     this._imageFetcherResizeWorker.onmessage = imageFetcherWorkerOnMessage;
 
-    this._isSimpleImageFetcherWorker = false;
-  } else {
-    this._imageFetcherWorker = new Worker("../workers/fetchImage.js");
-
-    this._imageFetcherWorker.onmessage = imageFetcherWorkerOnMessage;
+    this._useWorkers = true;
   }
 }
 
@@ -99,54 +95,56 @@ HtmlImageLoader.prototype.loadImage = function(url, rect, done) {
   var cancelFunction;
   var shouldCancel = false;
 
-  if (this._isSimpleImageFetcherWorker) {
-    var internalCancelFunction;
+  if (!this._useWorkers) {
+    var img = new Image();
 
-    this._imageFetchersCallbacks[url] = function(event) {
-      if (shouldCancel) return;
+    // Allow cross-domain image loading.
+    // This is required to be able to create WebGL textures from images fetched
+    // from a different domain. Note that setting the crossorigin attribute to
+    // 'anonymous' will trigger a CORS preflight for cross-domain requests, but no
+    // credentials (cookies or HTTP auth) will be sent; to do so, the attribute
+    // would have to be set to 'use-credentials' instead. Unfortunately, this is
+    // not a safe choice, as it causes requests to fail when the response contains
+    // an Access-Control-Allow-Origin header with a wildcard. See the section
+    // "Credentialed requests and wildcards" on:
+    // https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+    img.crossOrigin = 'anonymous';
 
-      var img = new Image();
+    img.onload = () => {
+      if (x === 0 && y === 0 && width === 1 && height === 1) {
+        done(null, new StaticAsset(img));
+      }
+      else {
+        x *= img.naturalWidth;
+        y *= img.naturalHeight;
+        width *= img.naturalWidth;
+        height *= img.naturalHeight;
 
-      const objectURL = URL.createObjectURL(event.data.blob);
+        var canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        var context = canvas.getContext('2d');
 
-      img.onload = () => {
-          URL.revokeObjectURL(objectURL);
+        context.drawImage(img, x, y, width, height, 0, 0, width, height);
 
-          if (x === 0 && y === 0 && width === 1 && height === 1) {
-            done(null, new StaticAsset(img));
-          }
-          else {
-            x *= img.naturalWidth;
-            y *= img.naturalHeight;
-            width *= img.naturalWidth;
-            height *= img.naturalHeight;
-      
-            var canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
-            var context = canvas.getContext('2d');
-      
-            context.drawImage(img, x, y, width, height, 0, 0, width, height);
-      
-            done(null, new StaticAsset(canvas));
-          }
-      };
-
-      img.url = objectURL;
-
-      internalCancelFunction = function() {
-        img.onload = img.onerror = null;
-        img.src = '';
+        done(null, new StaticAsset(canvas));
       }
     };
 
+    img.onerror = function() {
+      // TODO: is there any way to distinguish a network error from other
+      // kinds of errors? For now we always return NetworkError since this
+      // prevents images to be retried continuously while we are offline.
+      done(new NetworkError('Network error: ' + url));
+    };
+
+    img.src = url;
+
     cancelFunction = function() {
-      shouldCancel = true;
-      if (internalCancelFunction) internalCancelFunction();
+      img.onload = img.onerror = null;
+      img.src = '';
       done.apply(null, arguments);
     }
-
-    this._imageFetcherWorker.postMessage({ imageURL: url });
   } else {
     this._imageFetchersCallbacks[url] = function(event) {
       if (shouldCancel) return;
