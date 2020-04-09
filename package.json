@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "bowser": "2.7.0",
+    "code": "^5.2.4",
     "gl-matrix": "3.1.0",
     "hammerjs": "2.0.4",
     "minimal-event-emitter": "1.0.0"

@@ -110,7 +110,7 @@ HtmlImageLoader.prototype.loadImage = function(url, rect, done) {
     // https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
     img.crossOrigin = 'anonymous';
 
-    img.onload = () => {
+    img.onload = function() {
       if (x === 0 && y === 0 && width === 1 && height === 1) {
         done(null, new StaticAsset(img));
       }
@@ -166,10 +166,10 @@ HtmlImageLoader.prototype.loadImage = function(url, rect, done) {
         { 
           imageURL: url, 
           canvas: mainCanvasOffscreen,
-          x,
-          y,
-          width,
-          height
+          x: x,
+          y: y,
+          width: width,
+          height: height
         }, 
         [mainCanvasOffscreen]
       );
