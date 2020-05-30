@@ -32,7 +32,7 @@ var source = Marzipano.ImageUrlSource.fromString(
 var geometry = new Marzipano.CubeGeometry([{ tileSize: 1024, size: 1024 }]);
 
 // Create view.
-var limiter = Marzipano.RectilinearView.limit.traditional(1024, 100*Math.PI/180);
+var limiter = Marzipano.RectilinearView.limit.traditional(1024, 100 * Math.PI / 180);
 var view = new Marzipano.RectilinearView(null, limiter);
 
 // Create scene.
@@ -52,8 +52,19 @@ var enabled = false;
 
 var toggleElement = document.getElementById('toggleDeviceOrientation');
 
-function enable() {
-  deviceOrientationControlMethod.getPitch(function(err, pitch) {
+function requestPermissionForIOS() {
+  window.DeviceOrientationEvent.requestPermission()
+    .then(response => {
+      if (response === 'granted') {
+        enableDeviceOrientation()
+      }
+    }).catch((e) => {
+      console.error(e)
+    })
+}
+
+function enableDeviceOrientation() {
+  deviceOrientationControlMethod.getPitch(function (err, pitch) {
     if (!err) {
       view.setPitch(pitch);
     }
@@ -61,6 +72,16 @@ function enable() {
   controls.enableMethod('deviceOrientation');
   enabled = true;
   toggleElement.className = 'enabled';
+}
+
+function enable() {
+  if (window.DeviceOrientationEvent) {
+    if (typeof (window.DeviceOrientationEvent.requestPermission) == 'function') {
+      requestPermissionForIOS()
+    } else {
+      enableDeviceOrientation()
+    }
+  }
 }
 
 function disable() {
