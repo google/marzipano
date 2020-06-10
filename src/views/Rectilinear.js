@@ -757,7 +757,7 @@ RectilinearView.prototype.coordinatesToScreen = function(coords, result) {
   var yaw = coords.yaw;
   var pitch = coords.pitch;
   var x = Math.sin(yaw) * Math.cos(pitch);
-  var y = -Math.sin(coords.pitch);
+  var y = -Math.sin(pitch);
   var z = -Math.cos(yaw) * Math.cos(pitch);
   vec4.set(ray, x, y, z, 1);
 
