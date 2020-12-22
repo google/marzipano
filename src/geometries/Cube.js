@@ -127,6 +127,8 @@ function CubeTile(face, x, y, z, geometry) {
   this.z = z;
   this._geometry = geometry;
   this._level = geometry.levelList[z];
+  // Pre compute last tile size, when all is square, it's 0
+  this._tileResidue = this._level.width() % this._level.tileWidth();
 }
 
 
@@ -141,32 +143,44 @@ CubeTile.prototype.rotY = function() {
 
 
 CubeTile.prototype.centerX = function() {
-  return (this.x + 0.5) / this._level.numHorizontalTiles() - 0.5;
+  var levelWidth = this._level.width();
+  var tileWidth = this._level.tileWidth();
+  return (this.x * tileWidth + 0.5 * this.width()) / levelWidth - 0.5;
 };
 
 
 CubeTile.prototype.centerY = function() {
-  return 0.5 - (this.y + 0.5) / this._level.numVerticalTiles();
+  var levelHeight = this._level.height();
+  var tileHeight = this._level.tileHeight();
+  return 0.5 - (this.y * tileHeight + 0.5 * this.height()) / levelHeight;
 };
 
 
 CubeTile.prototype.scaleX = function() {
-  return 1 / this._level.numHorizontalTiles();
+  return this.width() / this._level.width();
 };
 
 
 CubeTile.prototype.scaleY = function() {
-  return 1 / this._level.numVerticalTiles();
+  return this.height() / this._level.width();
 };
 
 
 CubeTile.prototype.width = function() {
+  // Return remainder when it's edge and the tile has residue
+  if (this.atRightEdge() && this._tileResidue !== 0) {
+    return this._tileResidue;
+  }
   return this._level.tileWidth();
 };
 
 
 CubeTile.prototype.height = function() {
-  return this._level.tileHeight();
+  // Return remainder when it's edge and the tile has residue
+  if (this.atBottomEdge() && this._tileResidue !== 0) {
+    return this._tileResidue;
+  }
+  return this._level.tileWidth();
 };
 
 
@@ -438,11 +452,6 @@ function CubeLevel(levelProperties) {
 
   this._size = levelProperties.size;
   this._tileSize = levelProperties.tileSize;
-
-  if (this._size % this._tileSize !== 0) {
-    throw new Error('Level size is not multiple of tile size: ' +
-                    this._size + ' ' + this._tileSize);
-  }
 }
 
 inherits(CubeLevel, Level);
@@ -518,11 +527,11 @@ CubeLevel.prototype._validateWithParentLevel = function(parentLevel) {
  * multiple resolution levels.
  *
  * The following restrictions apply:
- *   - All tiles in a level must be square and form a rectangular grid;
- *   - The size of a level must be a multiple of the tile size;
+ *   - All tiles must be square, except when in the last row or column position,
+ *     and must form a rectangular grid;
  *   - The size of a level must be a multiple of the parent level size;
- *   - The number of tiles in a level must be a multiple of the number of tiles
- *     in the parent level.
+ *   - The tile width (respectively, height) for a level must be a submultiple
+ *     of the tile width (respectively, height) for the parent level.
  *
  * @param {Object[]} levelPropertiesList Level description
  * @param {number} levelPropertiesList[].size Cube face size in pixels
