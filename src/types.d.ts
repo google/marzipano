@@ -1,5 +1,4 @@
 declare module 'marzipano' {
-
   /*****************
    **** Classes ***
    *****************/
@@ -14,7 +13,12 @@ declare module 'marzipano' {
    * ControlCursor
    */
   export class ControlCursor {
-    constructor(controls: Controls, id: string, element: HTMLElement, opts?: ControlCursorOptions)
+    constructor(
+      controls: Controls,
+      id: string,
+      element: HTMLElement,
+      opts?: ControlCursorOptions
+    )
   }
   export interface ControlCursorInterface extends ControlCursor {}
 
@@ -58,15 +62,13 @@ declare module 'marzipano' {
   }
   export interface ControlsInterface extends Controls {}
 
-
   /**
    * CubeGeometry
    */
   export class CubeGeometry extends Geometry {
-    constructor(levelPropertiesList: { size: number, tileSize: number}[])
+    constructor(levelPropertiesList: { size: number; tileSize: number }[])
   }
   export interface CubeGeometryInterface extends CubeGeometry {}
-
 
   /**
    * CubeTile
@@ -82,18 +84,19 @@ declare module 'marzipano' {
    * DragControlMethod
    */
   export class DragControlMethod {
-    constructor(element: HTMLElement, pointerType: string, opts?: { friction?: number, maxFrictionTime?: number})
+    constructor(
+      element: HTMLElement,
+      pointerType: string,
+      opts?: { friction?: number; maxFrictionTime?: number }
+    )
   }
   export interface DragControlMethodInterface extends DragControlMethod {}
 
   /**
    * DynamicAsset
    */
-  export class DynamicAsset extends StaticAsset {
-  }
+  export class DynamicAsset extends StaticAsset {}
   export interface DynamicAssetInterface extends DynamicAsset {}
-
-
 
   /**
    * Dynamics
@@ -109,11 +112,16 @@ declare module 'marzipano' {
    * ElementPressControlMethod
    */
   export class ElementPressControlMethod {
-    constructor(element: HTMLElement, parameter: string, velocity: number, friction: number)
+    constructor(
+      element: HTMLElement,
+      parameter: string,
+      velocity: number,
+      friction: number
+    )
     destroy(): void
   }
-  export interface ElementPressControlMethodInterface extends ElementPressControlMethod {}
-
+  export interface ElementPressControlMethodInterface
+    extends ElementPressControlMethod {}
 
   /**
    * EquirectGeometry
@@ -134,12 +142,18 @@ declare module 'marzipano' {
   }
   export interface EquirectTileInterface extends EquirectTile {}
 
-
   /**
    * FlatGeometry
    */
   export class FlatGeometry extends Geometry {
-    constructor(levelPropertiesList: { width: number, tileWidth: number, height: number, tileHeight: number}[])
+    constructor(
+      levelPropertiesList: {
+        width: number
+        tileWidth: number
+        height: number
+        tileHeight: number
+      }[]
+    )
     type: 'flat'
   }
   export interface FlatGeometryInterface extends FlatGeometry {}
@@ -198,15 +212,19 @@ declare module 'marzipano' {
   /**
    * HammerGestures
    */
-  export abstract class HammerGestures {
-  }
+  export abstract class HammerGestures {}
   export interface HammerGesturesInterface extends HammerGestures {}
 
   /**
    * Hotspot
    */
   export abstract class Hotspot {
-    constructor(domElement: HTMLElement, view: View, coords: Coords, opts: HotspotOptions)
+    constructor(
+      domElement: HTMLElement,
+      view: View,
+      coords: Coords,
+      opts: HotspotOptions
+    )
     destroy(): void
     domElement(): HTMLElement
     perspective(): Perspective
@@ -217,14 +235,26 @@ declare module 'marzipano' {
   }
   export interface HotspotInterface extends Hotspot {}
 
-  export interface HotspotOptions { perspective?: Perspective }
+  export interface HotspotOptions {
+    perspective?: Perspective
+  }
 
   /**
    * HotspotContainer
    */
   export class HotpsotContainer {
-    constructor(parentDomElement: HTMLElement, stage: Stage, view: View, renderLoop: RenderLoop, opts?: { rect?: RectSpec })
-    createHotspot(domElement: HTMLElement, coords: Coords, opts?: HotspotOptions): Hotspot
+    constructor(
+      parentDomElement: HTMLElement,
+      stage: Stage,
+      view: View,
+      renderLoop: RenderLoop,
+      opts?: { rect?: RectSpec }
+    )
+    createHotspot(
+      domElement: HTMLElement,
+      coords: Coords,
+      opts?: HotspotOptions
+    ): Hotspot
     destroy(): void
     destroyHotspot(hotspot: Hotspot): void
     domElement(): HTMLElement
@@ -237,7 +267,6 @@ declare module 'marzipano' {
   }
   export interface HotpsotContainerInterface extends HotpsotContainer {}
 
-
   /**
    * HtmlImageLoader
    */
@@ -247,12 +276,14 @@ declare module 'marzipano' {
   }
   export interface HtmlImageLoaderInteface extends HtmlImageLoader {}
 
-
   /**
    * ImageUrlSource
    */
   export class ImageUrlSource implements Source {
-    constructor(sourceFromTile: ((tile: Tile) => { url: string, rect?: Rect }), opts?: { concurrency?: number, retryDelay?: number})
+    constructor(
+      sourceFromTile: (tile: Tile) => { url: string; rect?: Rect },
+      opts?: { concurrency?: number; retryDelay?: number }
+    )
     static fromString: (
       url: string,
       options?: {
@@ -265,22 +296,32 @@ declare module 'marzipano' {
   }
   export interface ImageUrlSourceInterface extends ImageUrlSource {}
 
-
   /**
    * KeyControlMethod
    */
   export class KeyControlMethod {
-    constructor(keyCode: number, parameter: string, velocity: number, friction: number, element?: HTMLElement)
+    constructor(
+      keyCode: number,
+      parameter: string,
+      velocity: number,
+      friction: number,
+      element?: HTMLElement
+    )
     destroy(): void
   }
   export interface KeyControlMethodInterface extends KeyControlMethod {}
-
 
   /**
    * Layer
    */
   export class Layer {
-    constructor(source: Source, geometry: Geometry, view: View, textureStore: TextureStore, opts?: LayerOptions)
+    constructor(
+      source: Source,
+      geometry: Geometry,
+      view: View,
+      textureStore: TextureStore,
+      opts?: LayerOptions
+    )
     destroy(): void
     effects(): Effects
     fixedLevel(): number | null
@@ -297,15 +338,15 @@ declare module 'marzipano' {
   }
   export interface LayerInteface extends Layer {}
 
-  interface LayerOptions { effects?: Effects }
+  interface LayerOptions {
+    effects?: Effects
+  }
 
   /**
    * NetworkError
    */
-  export class NetworkError {
-  }
+  export class NetworkError {}
   export interface NetworkErrorInterface extends NetworkError {}
-
 
   /**
    * PinchZoomControlMethod
@@ -313,13 +354,18 @@ declare module 'marzipano' {
   export class PinchZoomControlMethod {
     constructor(element: HTMLElement, pointerType: string, opts: any)
   }
-  export interface PinchZoomControlMethodInterface extends PinchZoomControlMethod {}
+  export interface PinchZoomControlMethodInterface
+    extends PinchZoomControlMethod {}
 
   /**
    * PinchZoomControlMethod
    */
   export class QtvrControlMethod {
-    constructor(element: HTMLElement, pointerType: string, opts: { speed?: number, friction?: number, maxFrictionTime?: number})
+    constructor(
+      element: HTMLElement,
+      pointerType: string,
+      opts: { speed?: number; friction?: number; maxFrictionTime?: number }
+    )
     destroy(): void
   }
   export interface QtvrControlMethodInterface extends QtvrControlMethod {}
@@ -328,7 +374,10 @@ declare module 'marzipano' {
    * RectilinearView
    */
   export class RectilinearView implements View {
-    constructor(params?: RectilinearViewParams, limiter?: RectilinearViewLimiter)
+    constructor(
+      params?: RectilinearViewParams,
+      limiter?: RectilinearViewLimiter
+    )
     destroy(): void
     height(): number
     intersects(rectangle: [number, number][]): boolean
@@ -343,14 +392,20 @@ declare module 'marzipano' {
     coordinatesToScreen(coords: Coords, result?: Coords): Coords
     fov(): number
     limiter(): null | RectilinearViewLimiter
-    normalizeToClosest(coords: RectilinearCoords, result?: RectilinearCoords): void
+    normalizeToClosest(
+      coords: RectilinearCoords,
+      result?: RectilinearCoords
+    ): void
     offsetFov(fovOffset: number): void
     offsetPitch(pitchOffset: number): void
     offsetRoll(rollOffset: number): void
     offsetYaw(yawOffset: number): void
     parameters(opts?: RectilinearViewParams): RectilinearViewParams
     pitch(): number
-    screenToCoordinates(coords: Coords, opts?: RectilinearCoords): RectilinearCoords
+    screenToCoordinates(
+      coords: Coords,
+      opts?: RectilinearCoords
+    ): RectilinearCoords
     setFov(fov: number): void
     setLimiter(limiter: RectilinearViewLimiter): void
     setYaw(yaw: number): void
@@ -362,7 +417,9 @@ declare module 'marzipano' {
     roll: number
     fov: number
   }
-  export type RectilinearViewLimiter = (params: RectilinearViewParams) => RectilinearViewParams
+  export type RectilinearViewLimiter = (
+    params: RectilinearViewParams
+  ) => RectilinearViewParams
 
   /**
    * RendererRegistry
@@ -386,13 +443,18 @@ declare module 'marzipano' {
   }
   export interface RenderLoopInterface extends RenderLoop {}
 
-
   /**
    * Scene
    */
   export class Scene {
     constructor(viewer: Viewer, view: View)
-    createLayer(opts?: { source: Source, geometry: Source, pinFirstLevel?: boolean, textureStoreOpts?: TextureStoreOptions, layerOpts?: LayerOptions }): Layer
+    createLayer(opts?: {
+      source: Source
+      geometry: Source
+      pinFirstLevel?: boolean
+      textureStoreOpts?: TextureStoreOptions
+      layerOpts?: LayerOptions
+    }): Layer
     destroy(): void
     destroyAllLayers(): void
     destroyLayer(layer: Layer): void
@@ -414,21 +476,23 @@ declare module 'marzipano' {
    * ScrollZoomControlMethod
    */
   export class ScrollZoomControlMethod {
-    constructor(element?: HTMLElement, opts?: { fictionTime?: number, zoomDelta?: number })
+    constructor(
+      element?: HTMLElement,
+      opts?: { fictionTime?: number; zoomDelta?: number }
+    )
     destroy(): void
   }
-  export interface ScrollZoomControlMethodInterface extends ScrollZoomControlMethod {}
+  export interface ScrollZoomControlMethodInterface
+    extends ScrollZoomControlMethod {}
 
   /**
    * SingleAssetSource
    */
-  export class SingleAssetSource  {
+  export class SingleAssetSource {
     constructor(asset: Asset)
     loadAsset(stage: Stage, tile: Tile, done?: Function): void
   }
   export interface SingleAssetSourceInterface extends SingleAssetSource {}
-
-
 
   /**
    * StaticAsset
@@ -462,7 +526,9 @@ declare module 'marzipano' {
   }
   export interface TextureStoreInterface extends TextureStore {}
 
-  export interface TextureStoreOptions { previouslyVisibleCacheSize?: number }
+  export interface TextureStoreOptions {
+    previouslyVisibleCacheSize?: number
+  }
 
   /**
    * TextureStore
@@ -477,10 +543,8 @@ declare module 'marzipano' {
    */
   export class TileSearcher {
     search(view: View, tile: Tile, result: Tile[]): number
-}
+  }
   export interface TileSearcherInterface extends TileSearcher {}
-
-
 
   /**
    * Timer
@@ -494,7 +558,6 @@ declare module 'marzipano' {
   }
   export interface TimerInterface extends Timer {}
 
-
   /**
    * VelocityControlMethod
    */
@@ -504,8 +567,8 @@ declare module 'marzipano' {
     setFriction(friction: number): void
     setVelocity(velocity: number): void
   }
-  export interface VelocityControlMethodInterface extends VelocityControlMethod {}
-
+  export interface VelocityControlMethodInterface
+    extends VelocityControlMethod {}
 
   /**
    * VelocityControlMethod
@@ -529,11 +592,16 @@ declare module 'marzipano' {
     setIdleMovement(timeout: number, movement?: Function): void
     startMovement(fn: Function, done?: Function): void
     stopMovement(): void
-    switchScene(newScene: Scene, opts?: { transitionDuration?: number, transitionUpdate?: number }, done?: Function): void
+    switchScene(
+      newScene: Scene,
+      opts?: { transitionDuration?: number; transitionUpdate?: number },
+      done?: Function
+    ): void
     updateSize(): void
     view(): View
   }
-  export interface VelocityControlMethodInterface extends VelocityControlMethod {}
+  export interface VelocityControlMethodInterface
+    extends VelocityControlMethod {}
 
   export interface ViewerOptions {
     controls?: any
@@ -552,14 +620,11 @@ declare module 'marzipano' {
     layerOpts?: LayerOptions
   }
 
-
   /**
    * WebGlCubeRenderer
    */
-  export class WebGlCubeRenderer implements Renderer {
-  }
+  export class WebGlCubeRenderer implements Renderer {}
   export interface WebGlCubeRendererInterface extends WebGlCubeRenderer {}
-
 
   /**
    * WebGlEquirectRenderer
@@ -569,20 +634,25 @@ declare module 'marzipano' {
     renderTile(tile: Tile, texture: any, layer: Layer, layerZ: number): void
     startLayer(layer: Layer, rect: Rect): void
   }
-  export interface WebGlEquirectRendererInterface extends WebGlEquirectRenderer {}
+  export interface WebGlEquirectRendererInterface
+    extends WebGlEquirectRenderer {}
 
   /**
    * WebGlFlatRenderer
    */
-  export class WebGlFlatRenderer implements Renderer {
-  }
+  export class WebGlFlatRenderer implements Renderer {}
   export interface WebGlFlatRendererInterface extends WebGlFlatRenderer {}
 
   /**
    * WebGlStage
    */
   export class WebGlStage implements Stage {
-    constructor(opts: { antialias?: boolean, preserveDrawingBuffer?: boolean, generateMipmaps?: boolean, wrapContext?: boolean })
+    constructor(opts: {
+      antialias?: boolean
+      preserveDrawingBuffer?: boolean
+      generateMipmaps?: boolean
+      wrapContext?: boolean
+    })
     addLayer(layer: Layer, i?: number): void
     createTexture(tile: Tile, asset: Asset, done?: Function): void
     destroy(): void
@@ -632,22 +702,23 @@ declare module 'marzipano' {
    * Geometry
    */
   export abstract class Geometry {
-    type: "cube" | "equirect" | "flat"
+    type: 'cube' | 'equirect' | 'flat'
     visibleTiles(view: View, level: Level): Tile[]
   }
   export interface GeometryInterface extends Geometry {}
 
-
   /**
    * Perspective
    */
-  export interface Perspective { radius?: number, extraTransforms: string }
+  export interface Perspective {
+    radius?: number
+    extraTransforms: string
+  }
 
   /**
    * Rect
    */
-  export interface Rect extends Coords, Size{
-  }
+  export interface Rect extends Coords, Size {}
 
   /**
    * Source
@@ -655,7 +726,6 @@ declare module 'marzipano' {
   export interface Source {
     loadAsset(stage: Stage, tile: Tile, done: Function): Function
   }
-
 
   /**
    * Effects
@@ -721,7 +791,7 @@ declare module 'marzipano' {
    * View
    */
   export interface View {
-    type: "rectilinear" | "flat"
+    type: 'rectilinear' | 'flat'
     destroy(): void
     height(): number
     intersects(rectangle: [number, number][]): boolean
@@ -782,6 +852,4 @@ declare module 'marzipano' {
     timestamp(): number
     width(): number
   }
-
-
 }
