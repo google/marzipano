@@ -41,17 +41,17 @@ var defaultOptions = {
  *
  * @param {Controls} controls Where to register the instances.
  * @param {Element} element Element to listen for events.
- * @param {Object} opts
- * @param {'drag'|'qtvr'} mouseViewMode
+ * @param {'drag'|'qtvr'} opts.mouseViewMode
+ * @param {boolean} opts.scrollZoom
+ * @param {'pinch'|'pan'} opts.dragMode
  */
 function registerDefaultControls(controls, element, opts) {
   opts = defaults(opts || {}, defaultOptions);
 
+
   var controlMethods = {
     mouseViewDrag: new DragControlMethod(element, 'mouse'),
     mouseViewQtvr: new QtvrControlMethod(element, 'mouse'),
-    touchView: new DragControlMethod(element, 'touch'),
-    pinch: new PinchZoomControlMethod(element, 'touch'),
 
     leftArrowKey: new KeyControlMethod(37, 'x', -0.7, 3),
     rightArrowKey: new KeyControlMethod(39, 'x', 0.7, 3),
@@ -68,6 +68,8 @@ function registerDefaultControls(controls, element, opts) {
     eKey: new KeyControlMethod(69, 'roll', -0.7, 3)
   };
 
+  var enabledControls = ['scrollZoom', 'touchView', 'pinch' ];
+
   if(opts.scrollZoom !== false) {
     controlMethods.scrollZoom = new ScrollZoomControlMethod(element); //{ frictionTime: 0 }
   }
@@ -80,7 +82,17 @@ function registerDefaultControls(controls, element, opts) {
   };
 
 
-  var enabledControls = [ 'scrollZoom', 'touchView', 'pinch' ];
+  switch (opts.dragMode) {
+    case 'pinch':
+       controlMethods.pinch = new DragControlMethod(element, 'touch', { hammerEvent: 'pinch'});
+      break;
+    default:
+    case 'pan':
+      controlMethods.touchView = new DragControlMethod(element, 'touch');
+      controlMethods.pinch = new PinchZoomControlMethod(element, 'touch');
+      break;
+  }
+
   switch (opts.mouseViewMode) {
     case 'drag':
       enabledControls.push('mouseViewDrag');
