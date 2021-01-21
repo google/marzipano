@@ -52,7 +52,7 @@ HammerGestures.prototype.get = function(element, type) {
 
 
 HammerGestures.prototype._createManager = function(element, type) {
-  var manager = new Hammer.Manager(element, { dragMaxTouches: 2 });
+  var manager = new Hammer.Manager(element);
 
   // Managers are created with different parameters for different pointer
   // types.
