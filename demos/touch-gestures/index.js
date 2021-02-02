@@ -135,9 +135,11 @@
   // Prevent pan and zoom events from being handled after swipe ends.
   function disableControlsTemporarily() {
     viewer.controls().disableMethod('touchView');
+    viewer.controls().disableMethod('penView');
     viewer.controls().disableMethod('pinch');
     setTimeout(function() {
       viewer.controls().enableMethod('touchView');
+      viewer.controls().enableMethod('penView');
       viewer.controls().enableMethod('pinch');
     }, 200);
   }

@@ -33,6 +33,7 @@ var defaultOptions = {
  *   - mouseViewDrag
  *   - mouseViewQtvr
  *   - touchView
+ *   - penView
  *   - pinch
  *   - arrowKeys
  *   - plusMinusKeys
@@ -51,6 +52,7 @@ function registerDefaultControls(controls, element, opts) {
     mouseViewDrag: new DragControlMethod(element, 'mouse'),
     mouseViewQtvr: new QtvrControlMethod(element, 'mouse'),
     touchView: new DragControlMethod(element, 'touch'),
+    penView: new DragControlMethod(element, 'pen'), 
     pinch: new PinchZoomControlMethod(element, 'touch'),
 
     leftArrowKey: new KeyControlMethod(37, 'x', -0.7, 3),
@@ -80,7 +82,7 @@ function registerDefaultControls(controls, element, opts) {
   };
 
 
-  var enabledControls = [ 'scrollZoom', 'touchView', 'pinch' ];
+  var enabledControls = [ 'scrollZoom', 'touchView', 'penView', 'pinch' ];
   switch (opts.mouseViewMode) {
     case 'drag':
       enabledControls.push('mouseViewDrag');
