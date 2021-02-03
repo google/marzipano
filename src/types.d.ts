@@ -1193,7 +1193,8 @@ declare module 'marzipano' {
 
   export function autorotate(options: autorotateOptions): Function
 
-  export const dependencies = {
-    eventEmitter(method: Function): void
+  export type Dependencies = {
+    eventEmitter: (method: Function) => {}
   }
+  export const dependencies: Dependencies
 }
