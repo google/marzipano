@@ -1128,20 +1128,14 @@ declare module 'marzipano' {
    * Events
    */
   type Event =
-    | 'change'
     | 'active'
-    | 'inactive'
     | 'inactive'
     | 'parameterDynamics'
     | 'hotspotsChange'
-    | 'renderComplete'
     | 'afterRender'
     | 'beforeRender'
     | 'layerChange'
-    | 'viewChange'
     | 'networkError'
-    | 'renderComplete'
-    | 'renderInvalid'
     | 'textureCancel'
     | 'textureError'
     | 'textureInvalid'
