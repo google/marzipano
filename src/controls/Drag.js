@@ -64,7 +64,7 @@ function DragControlMethod(element, pointerType, opts) {
 
   this._hammer.on("hammer.input", this._handleHammerEvent.bind(this));
 
-  if (!['pan', 'pinch'].includes(this._opts.hammerEvent)) {
+  if (this._opts.hammerEvent != 'pan' && this._opts.hammerEvent != 'pinch') {
     throw new Error(this._opts.hammerEvent + ' is not a hammerEvent managed in DragControlMethod');
   }
 

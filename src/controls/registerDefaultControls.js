@@ -84,13 +84,14 @@ function registerDefaultControls(controls, element, opts) {
 
   switch (opts.dragMode) {
     case 'pinch':
-       controlMethods.pinch = new DragControlMethod(element, 'touch', { hammerEvent: 'pinch'});
+       controlMethods.pinch = new DragControlMethod(element, 'touch', { hammerEvent: 'pinch' });
       break;
-    default:
     case 'pan':
       controlMethods.touchView = new DragControlMethod(element, 'touch');
       controlMethods.pinch = new PinchZoomControlMethod(element, 'touch');
       break;
+    default:
+      throw new Error("Unknown drag mode: " + opts.dragMode);
   }
 
   switch (opts.mouseViewMode) {
