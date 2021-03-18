@@ -117,7 +117,7 @@ ControlComposer.prototype._updateDynamics = function(storedDynamics, parameter, 
   parameterDynamics.dynamics.update(dynamics, (newTime - parameterDynamics.time)/1000);
   parameterDynamics.time = newTime;
 
-  this.emit('change');
+  this.emit('change', parameter, parameterDynamics, dynamics);
 };
 
 
