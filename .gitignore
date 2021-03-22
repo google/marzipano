@@ -10,4 +10,5 @@ package-lock.json
 /dist/*
 /docs/*
 /test/test_suite.js*
-.idea
+.idea/
+
