@@ -23,7 +23,8 @@ var PinchZoomControlMethod = require('./PinchZoom');
 var KeyControlMethod = require('./Key');
 
 var defaultOptions = {
-  mouseViewMode: 'drag'
+  mouseViewMode: 'drag',
+  dragMode: 'pan'
 };
 
 /**
@@ -41,8 +42,9 @@ var defaultOptions = {
  *
  * @param {Controls} controls Where to register the instances.
  * @param {Element} element Element to listen for events.
- * @param {Object} opts
- * @param {'drag'|'qtvr'} mouseViewMode
+ * @param {'drag'|'qtvr'} opts.mouseViewMode
+ * @param {'pan'|'pinch'} opts.dragMode
+ * @param {boolean} opts.scrollZoom
  */
 function registerDefaultControls(controls, element, opts) {
   opts = defaults(opts || {}, defaultOptions);
@@ -50,8 +52,6 @@ function registerDefaultControls(controls, element, opts) {
   var controlMethods = {
     mouseViewDrag: new DragControlMethod(element, 'mouse'),
     mouseViewQtvr: new QtvrControlMethod(element, 'mouse'),
-    touchView: new DragControlMethod(element, 'touch'),
-    pinch: new PinchZoomControlMethod(element, 'touch'),
 
     leftArrowKey: new KeyControlMethod(37, 'x', -0.7, 3),
     rightArrowKey: new KeyControlMethod(39, 'x', 0.7, 3),
@@ -68,7 +68,9 @@ function registerDefaultControls(controls, element, opts) {
     eKey: new KeyControlMethod(69, 'roll', -0.7, 3)
   };
 
-  if(opts.scrollZoom !== false) {
+  var enabledControls = ['scrollZoom', 'touchView', 'pinch' ];
+
+  if (opts.scrollZoom !== false) {
     controlMethods.scrollZoom = new ScrollZoomControlMethod(element); //{ frictionTime: 0 }
   }
 
@@ -80,7 +82,18 @@ function registerDefaultControls(controls, element, opts) {
   };
 
 
-  var enabledControls = [ 'scrollZoom', 'touchView', 'pinch' ];
+  switch (opts.dragMode) {
+    case 'pinch':
+       controlMethods.pinch = new DragControlMethod(element, 'touch', { hammerEvent: 'pinch' });
+      break;
+    case 'pan':
+      controlMethods.touchView = new DragControlMethod(element, 'touch');
+      controlMethods.pinch = new PinchZoomControlMethod(element, 'touch');
+      break;
+    default:
+      throw new Error("Unknown drag mode: " + opts.dragMode);
+  }
+
   switch (opts.mouseViewMode) {
     case 'drag':
       enabledControls.push('mouseViewDrag');

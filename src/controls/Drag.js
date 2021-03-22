@@ -24,7 +24,8 @@ var clearOwnProperties = require('../util/clearOwnProperties');
 
 var defaultOptions = {
   friction: 6,
-  maxFrictionTime: 0.3
+  maxFrictionTime: 0.3,
+  hammerEvent: 'pan'
 };
 
 var debug = typeof MARZIPANODEBUG !== 'undefined' && MARZIPANODEBUG.controls;
@@ -42,6 +43,7 @@ var debug = typeof MARZIPANODEBUG !== 'undefined' && MARZIPANODEBUG.controls;
  * @param {Object} opts
  * @param {number} opts.friction
  * @param {number} opts.maxFrictionTime
+ * @param {'pan'|'pinch'} opts.hammerEvent
  */
 function DragControlMethod(element, pointerType, opts) {
   this._element = element;
@@ -62,11 +64,14 @@ function DragControlMethod(element, pointerType, opts) {
 
   this._hammer.on("hammer.input", this._handleHammerEvent.bind(this));
 
-  this._hammer.on('panstart', this._handleStart.bind(this));
-  this._hammer.on('panmove', this._handleMove.bind(this));
-  this._hammer.on('panend', this._handleEnd.bind(this));
-  this._hammer.on('pancancel', this._handleEnd.bind(this));
+  if (this._opts.hammerEvent != 'pan' && this._opts.hammerEvent != 'pinch') {
+    throw new Error(this._opts.hammerEvent + ' is not a hammerEvent managed in DragControlMethod');
+  }
 
+  this._hammer.on(this._opts.hammerEvent + 'start', this._handleStart.bind(this));
+  this._hammer.on(this._opts.hammerEvent + 'move', this._handleMove.bind(this));
+  this._hammer.on(this._opts.hammerEvent + 'end', this._handleEnd.bind(this));
+  this._hammer.on(this._opts.hammerEvent + 'cancel', this._handleEnd.bind(this));
 }
 
 eventEmitter(DragControlMethod);

@@ -55,7 +55,7 @@ eventEmitter(ScrollZoomControlMethod);
  * Destructor.
  */
 ScrollZoomControlMethod.prototype.destroy = function() {
-  this._element.removeEventListener(this._wheelListener);
+  this._element.removeEventListener('wheel', this._wheelListener);
   clearOwnProperties(this);
 };
 
