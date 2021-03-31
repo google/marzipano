@@ -1,0 +1,16 @@
+{
+  "opts": {
+    "recurse": true,
+    "destination": "docs"
+  },
+  "source": {
+    "include": ["jsdoc.md", "src"],
+    "includePattern": ".+\\.js$"
+  },
+  "plugins": ["plugins/markdown"],
+  "templates": {
+    "default": {
+      "outputSourceFiles": false
+    }
+  }
+}

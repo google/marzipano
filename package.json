@@ -1,0 +1,76 @@
+{
+  "_args": [
+    [
+      "marzipano@0.10.1",
+      "C:\\Users\\kmingulov\\Documents\\WorkingProjects\\Marzipanotestbed"
+    ]
+  ],
+  "_from": "marzipano@0.10.1",
+  "_id": "marzipano@0.10.1",
+  "_inBundle": false,
+  "_integrity": "sha512-RUdDAKJZskZWisg3wNU8xDwHJvTyLjMop0tezuMLc/qm6WTky9gTWr7uaPd7sdWrLKL2UNAfqQ5alc+b9VFBrQ==",
+  "_location": "/marzipano",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "marzipano@0.10.1",
+    "name": "marzipano",
+    "escapedName": "marzipano",
+    "rawSpec": "0.10.1",
+    "saveSpec": null,
+    "fetchSpec": "0.10.1"
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/marzipano/-/marzipano-0.10.1.tgz",
+  "_spec": "0.10.1",
+  "_where": "C:\\Users\\kmingulov\\Documents\\WorkingProjects\\Marzipanotestbed",
+  "author": {
+    "name": "Google Inc."
+  },
+  "bugs": {
+    "url": "https://github.com/google/marzipano/issues"
+  },
+  "contributors": [
+    {
+      "name": "Google Inc."
+    }
+  ],
+  "dependencies": {
+    "bowser": "2.11.0",
+    "gl-matrix": "3.3.0",
+    "hammerjs": "2.0.4",
+    "minimal-event-emitter": "1.0.0"
+  },
+  "description": "A 360° media viewer for the modern web",
+  "devDependencies": {
+    "browserify": "^17.0.0",
+    "chai": "^4.2.0",
+    "jsdoc": "^3.6.6",
+    "lr-http-server": "^0.1.5",
+    "mocha": "^8.2.1",
+    "sinon": "^9.2.2",
+    "testem": "^3.2.0",
+    "uglify-js": "^3.12.3",
+    "watchify": "^3.11.1"
+  },
+  "homepage": "http://www.marzipano.net",
+  "license": "Apache-2.0",
+  "main": "src/index.js",
+  "name": "marzipano",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/google/marzipano.git"
+  },
+  "scripts": {
+    "deploy": "scripts/deploy",
+    "dev": "scripts/dev",
+    "livetest": "testem",
+    "prepublishOnly": "scripts/prepublish",
+    "release": "scripts/release",
+    "test": "testem ci"
+  },
+  "version": "0.10.1"
+}

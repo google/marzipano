@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>WebVR | Marzipano</title>
+<meta name="description" content="Displays a side-by-side stereoscopic panorama that can be moved around through the WebVR API." />
+<meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui" />
+<style>@-ms-viewport { width: device-width; }</style>
+<link rel="stylesheet" href="//www.marzipano.net/demos/common/reset.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="pano"></div>
+
+<div id="no-vr" class="vr-button" style="display: none">No VR device detected</div>
+<div id="enter-vr" class="vr-button" style="display: none">Enter VR mode</div>
+
+<script src="//www.marzipano.net/demos/common/webvr-polyfill.js"></script>
+<script src="../../build/marzipano.js" ></script>
+
+<script src="WebVrView.js"></script>
+<script src="index.js"></script>
+
+<script src="//www.marzipano.net/demos/common/attribution.js"></script>
+<script>attribution('Panorama by', 'Thomas Sharpless', 'http://tksharpless.net');</script>
+
+</body>
+</html>

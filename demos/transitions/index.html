@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Transitions | Marzipano</title>
+<meta name="description" content="Showcases some of the transitions that can be achieved by using a custom `transitionUpdate()` function and the [easing.js](https://github.com/danro/easing-js) library." />
+<meta charset="utf-8">
+<meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui" />
+<style>@-ms-viewport { width: device-width; }</style>
+<link rel="stylesheet" href="//www.marzipano.net/demos/common/reset.css">
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+<div id="pano"></div>
+
+<div id="transitionList">
+  <h1 class="title">Transitions</h1>
+  <ul class="transitions">
+    <li data-fun="opacity" data-time="1000" data-easing="linear">Opacity, Linear (default)</li>
+    <li data-fun="fromRight" data-time="1000" data-easing="linear">From Right, Linear</li>
+    <li data-fun="fromRight" data-time="1000" data-easing="easeOutQuad">From Right, easeOutQuad</li>
+    <li data-fun="fromRight" data-time="500" data-easing="swingTo">From Right, swingTo</li>
+    <li data-fun="fromCenter" data-time="400" data-easing="easeOutBack">From Center, easeOutBack</li>
+    <li data-fun="fromTopAndOpacity" data-time="300" data-easing="easeOutQuad">From Top and Opacity</li>
+    <li data-fun="fromTop" data-time="1000" data-easing="bounce">From Top, bounce</li>
+    <li data-fun="width" data-time="500" data-easing="swingTo">Width, swingTo</li>
+    <li data-fun="fromBottom" data-time="1000" data-easing="bouncePast">From Bottom, bouncePast</li>
+    <li data-fun="throughBlack" data-time="1000" data-easing="easeInOutQuad">Black, easeInOutQuad</li>
+    <li data-fun="fromWhite" data-time="2000" data-easing="easeInQuart">Flash White, easeInQuart</li>
+    <li id="custom">
+      <h3>Custom transition</h3>
+      <form id="customForm">
+        <select id="fun"></select>
+        <select id="easing"></select>
+        <label>Time: <input id="time" type="number" min="0" step="100" value="1000"></label>
+        <button class="submit" type="submit">Go</button>
+      </form>
+    </li>
+  </ul>
+</div>
+
+<script src="//www.marzipano.net/demos/common/easing.js" ></script>
+<script src="../../build/marzipano.js" ></script>
+
+<script src="transitionFunctions.js" ></script>
+<script src="index.js"></script>
+
+</body>
+</html>

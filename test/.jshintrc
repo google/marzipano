@@ -1,0 +1,15 @@
+{
+  "browser": true,
+  "browserify": true,
+  "globalstrict": true,
+  "undef": true,
+  "unused": true,
+  "eqnull": true,
+  "sub": true,
+  "globals": {
+    "suite": false,
+    "test": false,
+    "setup": false,
+    "teardown": false
+  }
+}

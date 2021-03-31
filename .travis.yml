@@ -1,0 +1,19 @@
+language: node_js
+
+node_js:
+  - "node"
+
+git:
+  depth: false
+
+addons:
+  chrome: stable
+  apt:
+    packages:
+      - xvfb
+
+sudo: required
+
+script:
+  - npm run release
+  - xvfb-run npm test -- -l chrome

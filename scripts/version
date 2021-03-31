@@ -1,0 +1,87 @@
+#!/usr/bin/env node
+
+/*
+ * Copyright 2016 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+'use strict';
+
+var execSync = require('child_process').execSync;
+var fs = require('fs');
+
+// Regex for the string returned by getNpmVersion().
+// The subexpression match is the npm version.
+var npmRegex = /^(\d+(?:\.\d+)+)$/;
+
+// Regex for the string returned by getGitVersion().
+// The 1st subexpression match is the most recent tagged version.
+// The 2nd subexpression match exists if either commits were made since the most
+// recent tagged version, or there are uncommitted or untracked changes.
+var gitRegex = /^v(\d+(?:\.\d+)+)((?:-\d+-g([\da-f]+))?(?:-dirty)?)?$/;
+
+// Return npm package version declared by package.json.
+function getNpmVersion() {
+  return JSON.parse(fs.readFileSync('package.json', 'utf-8')).version;
+}
+
+// Return the output of `git describe --tags --dirty`, modified by the result
+// of `git status --porcelain`. The latter is necessary because `git describe`
+// ignores untracked files, but we want their presence to be considered dirty.
+function getGitVersion() {
+  var versionStr =
+      execSync("git describe --tags --dirty", { encoding: 'utf-8' }).trim();
+  if (!/-dirty$/.test(versionStr) &&
+      execSync("git status --porcelain", { encoding: 'utf-8' })) {
+    versionStr += '-dirty';
+  }
+  return versionStr;
+}
+
+function getVersion() {
+
+  // Check that the npm version has the expected format.
+  var npmVersion = getNpmVersion();
+  var npmMatch = npmRegex.exec(npmVersion);
+  if (!npmMatch) {
+    throw new Error("Invalid npm version: " + npmVersion);
+  }
+
+  // Check that the git version has the expected format.
+  var gitVersion = getGitVersion();
+  var gitMatch = gitRegex.exec(gitVersion);
+  if (!gitMatch) {
+    throw new Error("Invalid git version: " + gitVersion);
+  }
+
+  // Check that npm and git agree on the version.
+  if (npmMatch[1] !== gitMatch[1]) {
+    throw new Error("Version mismatch: npm says " + npmMatch[1] + " but git says " + gitMatch[1]);
+  }
+
+  if (gitMatch[2]) {
+    // Development version.
+    return npmMatch[1] + '-dev';
+  } else {
+    // Release version.
+    return npmMatch[1];
+  }
+}
+
+try {
+  console.log(getVersion());
+  process.exit(0);
+} catch (err) {
+  console.error(err);
+  process.exit(1);
+}

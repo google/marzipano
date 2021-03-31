@@ -1,0 +1,52 @@
+#!/bin/bash
+#
+# Copyright 2016 Google Inc. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+set -e -v
+cd "`dirname $0`/.."
+
+PATH=scripts:node_modules/.bin:$PATH
+
+VERSION=$(scripts/version)
+MANIFEST="{ \"version\": \"$VERSION\", \"file\": \"marzipano-$VERSION.zip\" }"
+
+rm -rf dist
+mkdir -p dist
+
+sed s/VERSION_STRING/$VERSION/ src/preamble.js > dist/preamble.js
+
+browserify \
+  --noparse=node_modules/**/*.js \
+  -s Marzipano \
+  -o dist/browserified.js \
+  src/index.js
+
+uglifyjs \
+  --compress --mangle \
+  -o dist/uglified.js \
+  dist/browserified.js
+
+cat dist/preamble.js dist/uglified.js > dist/marzipano.js
+
+rm dist/preamble.js dist/browserified.js dist/uglified.js
+
+jsdoc -c jsdoc-conf.json
+
+cp LICENSE dist/LICENSE.txt
+
+echo "$MANIFEST" > dist/latest.json
+
+zip -j dist/marzipano-$VERSION.zip \
+  dist/marzipano.js dist/LICENSE.txt

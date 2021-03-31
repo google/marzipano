@@ -1,0 +1,109 @@
+CHANGELOG
+
+This file lists notable changes included in each Marzipano release. Please note
+that only library changes are considered; changes to tests, documentation, demos
+or the Marzipano Tool are not tracked.
+
+Each change is prefixed by one of:
+
+- `New`: a newly introduced feature.
+- `Fix`: a fix to an existing bug.
+- `Breaking`: a breaking change to the API.
+
+Related GitHub issue or pull request numbers are indicated in brackets.
+
+# Upcoming release
+
+# v0.10.1 [2020-12-23]
+
+* Fix: broken release script (#362).
+
+# v0.10.0 [2020-12-23]
+
+* New: add a `wrapContext` debug option to WebGlStage.
+* Fix: pass tile instead of asset to `networkError` callback (#342).
+* Breaking: delete Flash and CSS renderers (#350).
+
+# v0.9.1 [2019-11-24]
+
+* New: provide a way to override the easing function in Scene#lookTo (#242).
+* New: allow controls to interrupt an ongoing tween.
+* Fix: crash in ImageUrlSource on retry (#264).
+
+# v0.9.0 [2019-04-15]
+
+* New: `Layer#renderComplete` event (#200).
+* New: allow setting additional CSS transforms on non-embedded hotspot.
+* New: add Stage option for progressive loading (#99).
+* Fix: make it possible for multiple layers to share a TextureStore (#232).
+* Fix: increase the TextureStore default LRU size from 32 to 512.
+* Breaking: StaticAsset and DynamicAsset replace existing Asset classes.
+* Breaking: TextureStore no longer receives a Geometry argument.
+* Breaking: the `TileClass` property of classes is now called `Tile`.
+
+# v0.8.0 [2018-10-29]
+
+* New: `Stage#renderComplete` event (#40, #109, #181, #188).
+* New: `TextureStore#textureStartLoad` event (#189).
+* Fix: make WebGL rendering resilient to device pixel ratio changes (#196).
+* Breaking: listeners are no longer called with event name as first argument.
+* Breaking: remove `Layer#stage` and the `stage` Layer constructor argument.
+* Breaking: remove underscore from Stage methods meant to be overridden.
+* Breaking: remove ImageUrlSource utility methods for querying template string.
+
+# v0.7.2 [2018-07-15]
+
+* New: emit event for network error on ImageUrl (#166).
+* New: allow default mouse cursors to be overridden (#158).
+* Fix: export shaders as source to be compatible with module loaders (#177).
+* Fix: use more conservative value for fov epsilon (#136).
+* Fix: hotspot clicks not working on iOS (#173, #157).
+* Fix: WebGL errors when switching renderers (#171).
+
+# v0.7.1 [2018-02-23]
+
+* Fix: handling of WebGlStage options.
+
+# v0.7.0 [2018-02-23]
+
+* New: support multiple layers per scene.
+* New: allow layers to be inserted into custom position.
+* Fix: disable WebGL antialiasing by default (#147).
+* Fix: `Geometry#visibleTiles` no longer crashes on a null viewport.
+* Fix: `Viewer#lookTo` (#126).
+* Fix: layer addition/removal during scene transition.
+* Breaking: remove Layer#setView.
+
+# v0.6.0 [2017-11-04]
+
+* Fix: generate mipmaps only for power-of-two textures.
+* Fix: blending of semitransparent textures (#112).
+* Fix: controls updating view shared by multiple layers (#111).
+* Breaking: remove the WebGlStage `blendFunc` option.
+
+# v0.5.5 [2017-08-30]
+
+* Fix: hotspot clicks not working on Android (#87).
+
+# v0.5.4 [2017-03-27]
+
+* Fix: crash in browsers without typed array support.
+
+# v0.5.3 [2016-12-05]
+
+* Fix: broken equirectangular rendering.
+
+# v0.5.2 [2016-12-01]
+
+* New: ability to take a snapshot of the stage (#30).
+* Fix: actually remove event listeners in control destructors.
+* Fix: prevent bounce scroll on iOS.
+* Fix: cross-domain image loading on Flash.
+
+# v0.5.1 [2016-05-20]
+
+* Breaking: remove the mistakenly exported `supported` API.
+
+# v0.5.0 [2016-03-01]
+
+* First open source release!

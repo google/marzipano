@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Side-by-side | Marzipano</title>
+<meta name="description" content="Display a stereoscopic panorama side-by-side." />
+<meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui" />
+<style>@-ms-viewport { width: device-width; }</style>
+<link rel="stylesheet" href="//www.marzipano.net/demos/common/reset.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="pano"></div>
+
+<div class="info">
+  <div class="label">Projection Center</div>
+  <div><label>x: <input id="projection-center-x" type="range" min="-0.5" max="0.5" step="0.01"></label></div>
+  <div><label>y: <input id="projection-center-y" type="range" min="-0.5" max="0.5" step="0.01"></label></div>
+</div>
+
+<script src="../../build/marzipano.js" ></script>
+
+<script src="index.js"></script>
+
+<script src="//www.marzipano.net/demos/common/attribution.js"></script>
+<script>attribution('Panorama by', 'Thomas Sharpless', 'http://tksharpless.net');</script>
+
+</body>
+</html>

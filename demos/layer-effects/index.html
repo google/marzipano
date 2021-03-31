@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Layers | Marzipano</title>
+<meta name="description" content="Demonstrates the Layer mechanism in Marzipano and showcases the different effects that can be applied." />
+<meta charset="utf-8">
+<meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui" />
+<style>@-ms-viewport { width: device-width; }</style>
+<link rel="stylesheet" href="//www.marzipano.net/demos/common/reset.css">
+<link rel="stylesheet" href="//www.marzipano.net/demos/common/hint.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="wrapper">
+  <div id="pano"></div>
+  <div id="sidebar">
+    <div class="instructions">
+      <p>
+        Add 2:1 equirectangular images in JPEG format.
+      </p>
+      <p>
+        The maximum size supported on your browser is
+        <span data-bind="text: maxSize"></span> by
+        <span data-bind="text: maxSize"></span> pixels.
+      </p>
+    </div>
+    <input id="selectFilesInput" type="file" multiple style="display: none">
+    <button id="selectFilesButton">Add layer</button>
+    <ul data-bind="foreach: layers">
+      <li class="layerControls" data-bind="template: { name: 'layerControls' }"></li>
+    </ul>
+  </div>
+</div>
+
+<script type="text/plain" id="layerControls">
+  <div class="title">
+    <div class="name" data-bind="text: name"></div>
+    <div class="remove" data-bind="click: $root.discardLayer"></div>
+  </div>
+  <div class="thumbnail" data-bind="element: canvas"></div>
+  <div class="label"><label>
+    <p>Opacity:</p>
+    <input type="number" min="0" max="1" step='0.01' data-bind="textInput: effects.opacity">
+    <input type="range" min="0" max="1" step='0.01' data-bind="value: effects.opacity, valueUpdate: 'input'">
+  </label><div>
+  <details>
+    <summary>Rect</summary>
+    <div class="label"><label>
+      <p>Width:</p>
+      <input type="number" min="0" max="1" step='0.01' data-bind="textInput: effects.rect.width">
+      <input type="range" min="0" max="2" step='0.01' data-bind="value: effects.rect.width, valueUpdate: 'input'">
+    </label></div>
+    <div class="label"><label>
+      <p>Height:</p>
+      <input type="number" min="0" max="1" step='0.01' data-bind="textInput: effects.rect.height">
+      <input type="range" min="0" max="2" step='0.01' data-bind="value: effects.rect.height, valueUpdate: 'input'">
+    </label></div>
+    <div class="label"><label>
+      <p>X:</p>
+      <input type="number" min="0" max="1" step='0.01' data-bind="textInput: effects.rect.x">
+      <input type="range" min="-1" max="1" step='0.01' data-bind="value: effects.rect.x, valueUpdate: 'input'">
+    </label></div>
+    <div class="label"><label>
+      <p>Y:</p>
+      <input type="number" min="0" max="1" step='0.01' data-bind="textInput: effects.rect.y">
+      <input type="range" min="-1" max="1" step='0.01' data-bind="value: effects.rect.y, valueUpdate: 'input'">
+    </label></div>
+  </details>
+  <details>
+    <summary>Color</summary>
+    <div class="label"><label>
+      <p>Offset:</p>
+      <table>
+        <tr>
+        <td><input type="number" min="-1" max="1" step='0.01' data-bind="textInput: effects.colorOffset[0]"></td>
+        <td><input type="number" min="-1" max="1" step='0.01' data-bind="textInput: effects.colorOffset[1]"></td>
+        <td><input type="number" min="-1" max="1" step='0.01' data-bind="textInput: effects.colorOffset[2]"></td>
+        <td><input type="number" min="-1" max="1" step='0.01' data-bind="textInput: effects.colorOffset[3]"></td>
+        </tr>
+      </table>
+    </label></div>
+    <div class="label"><label>
+      <p>Matrix:</p>
+      <table>
+        <tr>
+          <td><input type="number" min="-1" max="1" step='0.01' data-bind="textInput: effects.colorMatrix[0]"></td>
+          <td><input type="number" min="-1" max="1" step='0.01' data-bind="textInput: effects.colorMatrix[4]"></td>
+          <td><input type="number" min="-1" max="1" step='0.01' data-bind="textInput: effects.colorMatrix[8]"></td>
+          <td><input type="number" min="-1" max="1" step='0.01' data-bind="textInput: effects.colorMatrix[12]"></td>
+        </tr>
+        <tr>
+          <td><input type="number" min="-1" max="1" step='0.01' data-bind="textInput: effects.colorMatrix[1]"></td>
+          <td><input type="number" min="-1" max="1" step='0.01' data-bind="textInput: effects.colorMatrix[5]"></td>
+          <td><input type="number" min="-1" max="1" step='0.01' data-bind="textInput: effects.colorMatrix[9]"></td>
+          <td><input type="number" min="-1" max="1" step='0.01' data-bind="textInput: effects.colorMatrix[13]"></td>
+        </tr>
+        <tr>
+          <td><input type="number" min="-1" max="1" step='0.01' data-bind="textInput: effects.colorMatrix[2]"></td>
+          <td><input type="number" min="-1" max="1" step='0.01' data-bind="textInput: effects.colorMatrix[6]"></td>
+          <td><input type="number" min="-1" max="1" step='0.01' data-bind="textInput: effects.colorMatrix[10]"></td>
+          <td><input type="number" min="-1" max="1" step='0.01' data-bind="textInput: effects.colorMatrix[14]"></td>
+        </tr>
+        <tr>
+          <td><input type="number" min="-1" max="1" step='0.01' data-bind="textInput: effects.colorMatrix[3]"></td>
+          <td><input type="number" min="-1" max="1" step='0.01' data-bind="textInput: effects.colorMatrix[7]"></td>
+          <td><input type="number" min="-1" max="1" step='0.01' data-bind="textInput: effects.colorMatrix[11]"></td>
+          <td><input type="number" min="-1" max="1" step='0.01' data-bind="textInput: effects.colorMatrix[15]"></td>
+        </tr>
+      </table>
+
+      <select data-bind="options: effects.presets, value: effects.selectedPreset"></select>
+
+      <div data-bind="visible: effects.selectedPreset() === 'brightness'">
+        <label>
+          <p>Amount:</p>
+          <input type="number" min="-1" max="1" step='0.01' data-bind="textInput: effects.brightnessAmount">
+          <input type="range" min="-1" max="1" step='0.01' data-bind="value: effects.brightnessAmount, valueUpdate: 'input'">
+        </label>
+      </div>
+
+      <div class="label" data-bind="visible: effects.selectedPreset() === 'sepia'">
+        <label>
+        <p>Amount:</p>
+          <input type="number" min="0" max="1" step='0.01' data-bind="textInput: effects.sepiaAmount">
+          <input type="range" min="0" max="1" step='0.01' data-bind="value: effects.sepiaAmount, valueUpdate: 'input'">
+        </label>
+      </div>
+
+      <div data-bind="visible: effects.selectedPreset() === 'saturation'">
+        <label>
+          <p>Amount:</p>
+          <input type="number" min="0" max="2" step='0.01' data-bind="textInput: effects.saturationAmount">
+          <input type="range" min="0" max="2" step='0.01' data-bind="value: effects.saturationAmount, valueUpdate: 'input'">
+        </label>
+      </div>
+
+      <div data-bind="visible: effects.selectedPreset() === 'contrast'">
+        <label>
+          <p>Amount:</p>
+          <input type="number" min="0" max="2" step='0.01' data-bind="textInput: effects.contrastAmount">
+          <input type="range" min="0" max="2" step='0.01' data-bind="value: effects.contrastAmount, valueUpdate: 'input'">
+        </label>
+      </div>
+
+
+  </details>
+</script>
+
+<script src="//www.marzipano.net/demos/common/knockout.js" ></script>
+<script src="../../build/marzipano.js" ></script>
+<script src="colorEffects.js"></script>
+<script src="index.js"></script>
+
+</body>
+</html>

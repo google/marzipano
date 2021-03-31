@@ -1,0 +1,194 @@
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+  -ms-content-zooming: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  background-color: #000;
+  color: #fff;
+}
+
+a, a:hover, a:active, a:visited {
+  text-decoration: none;
+  color: inherit;
+}
+
+#wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#pano {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 300px;
+}
+
+#sidebar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: auto;
+  right: 0;
+  width: 300px;
+  overflow-y: auto;
+  padding: 10px;
+  background-color: rgb(58,68,84);
+}
+
+.instructions p {
+  padding: 10px 0;
+}
+
+.thumbnail {
+  width: 100%;
+}
+
+.thumbnail canvas {
+  width: 100%;
+}
+
+.layerControls {
+  padding: 10px 0;
+  border-top: 1px solid rgb(103,115,131);
+}
+
+.layerControls .title {
+  position: relative;
+  background-color: rgb(103,115,131);
+  height: 32px;
+}
+
+.layerControls .name {
+  width: 100%;
+  padding-left: 8px;
+  padding-right: 32px;
+  line-height: 32px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.layerControls .remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.layerControls .remove:before, .layerControls .remove:after {
+  position: absolute;
+  left: 8px;
+  content: ' ';
+  height: 16px;
+  width: 2px;
+  background-color: #fff;
+}
+
+.layerControls .remove:before {
+  transform: rotate(45deg);
+}
+
+.layerControls .remove:after {
+  transform: rotate(-45deg);
+}
+
+
+input[type="number"] {
+  width: 54px;
+  height: 25px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  color: #FFF;
+  font-size: .8em;
+  padding: 5px;
+  background-color: rgb(103,115,131);
+  border: none;
+}
+
+input[type="range"] {
+  width: 100px;
+}
+
+table {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.label {
+  margin: 5px 0;
+}
+
+summary {
+  cursor: pointer;
+}
+
+details {
+  margin: 5px 0;
+  border: 2px solid rgb(103,115,131);
+}
+
+details:focus,
+details summary:focus {
+  outline: none;
+  border: none;
+}
+
+.label p {
+  display: inline-block;
+  width: 60px;
+  margin-left: 5px;
+}
+
+summary {
+  background-color: rgb(103,115,131);
+  padding: 5px;
+}
+
+button {
+  width: 100%;
+  font-size: .8em;
+  padding: .5em 7em;
+  background-color: #25aae1;
+  border: 2px solid #25aae1;
+  color: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #51BBE7;
+  border: 2px solid #51BBE7;
+}
+
+select {
+  width: 120px;
+  height: 25px;
+  margin: 10px 0;
+  margin-left: 5px;
+  color: #fff;
+  font-size: .8em;
+  background-color: rgb(103,115,131);
+  border: none;
+}

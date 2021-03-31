@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Generated Multiresolution Cube | Marzipano</title>
+<meta name="description" content="Marzipano allows media to be generated procedurally. This demo displays a multi-resolution cube which is generated in such a way. After level 16 (which corresponds to a ~280 terapixels per face cubemap!) rendering starts to break down due to the precision limits of numeric types." />
+<meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui" />
+<style>@-ms-viewport { width: device-width; }</style>
+<link rel="stylesheet" href="//www.marzipano.net/demos/common/reset.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="pano"></div>
+
+<div class="info">
+  <div>Fov: <span id="fov"></span></div>
+  <div>Face tiles: <span id="faceTiles"></span></div>
+  <div>Face size: <span id="facePixels"></span></div>
+  <div>Total tiles: <span id="totalTiles"></span></div>
+  <div>Total size: <span id="totalPixels"></span></div>
+</div>
+
+<script src="../../build/marzipano.js" ></script>
+
+<script src="SolidColorSource.js"></script>
+<script src="index.js"></script>
+
+</body>
+</html>

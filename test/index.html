@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+<head>
+<title>Marzipano Test Suite</title>
+<link rel="stylesheet" href="../node_modules/mocha/mocha.css">
+<script src="../node_modules/mocha/mocha.js"></script>
+<script src="/testem.js"></script>
+</head>
+<body>
+<div id="mocha"></div>
+<script>
+  // Prevent global leak detection on environments lacking RAF, e.g. PhantomJS.
+  mocha.globals(['requestAnimationFrame', 'cancelAnimationFrame'])
+  mocha.checkLeaks();
+  mocha.setup('tdd');
+</script>
+<script src="test_suite.js"></script>
+<script>
+  mocha.run();
+</script>
+</script>
+</body>
+</html>

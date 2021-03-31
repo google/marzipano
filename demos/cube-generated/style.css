@@ -1,0 +1,56 @@
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+  -ms-content-zooming: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  background-color: #000;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 16px;
+}
+
+#pano {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.info {
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  background-color: rgb(103,115,131);
+  background-color: rgba(103,115,131,0.9);
+  color: #fff;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.info > div {
+  margin: 0.5em 0;
+  padding: 0.2em 0.5em;
+  background-color: 
+}
+
+.info * {
+  -moz-user-select: text;
+  -webkit-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}

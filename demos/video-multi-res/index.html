@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Video | Marzipano</title>
+<meta name="description" content="Play a 360º videos in equirectangular format. It is possible to switch between different video resolutions." />
+<meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui" />
+<style>@-ms-viewport { width: device-width; }</style>
+<link rel="stylesheet" href="//www.marzipano.net/demos/common/reset.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="pano"></div>
+
+<div class="video-controls" id="video-controls">
+  <div class="control-btn play" id="play-pause">
+    <img class="play-icon" src="img/play.png">
+    <img class="pause-icon" src="img/pause.png">
+  </div>
+  <div class="control-btn sound" id="mute">
+    <img class="sound-on" src="img/sound-on.png">
+    <img class="sound-off" src="img/sound-off.png">
+  </div>
+  <div class="time">
+    <h5 class="initial-time" id="current-time-indicator"></h5>
+    <div class="progress-wrapper" id="progress-background">
+      <div class="progress-bar">
+        <span class="progress-fill" id="progress-fill"></span>
+      </div>
+    </div>
+    <h5 class="end-time" id="duration-indicator"></h5>
+  </div>
+  <div class="control-btn resolution selected" id="toggle-resolution-select">
+    <h4 id="resolution-indicator"></h4>
+    <img class="resolution-icon" src="img/resolution.png">
+    <div class="resolution-changing-indicator">Changing...</div>
+  </div>
+  <div class="control-btn options" id="toggle-options">
+    <img class="options icon" src="img/options.png">
+  </div>
+</div>
+
+<div class="resolution-modal">
+  <ul id="resolution-select"></ul>
+  <div class="resolution-modal-changing-indicator">
+    <div class="spinner">Changing...</div>
+  </div>
+</div>
+
+<div class="options-modal">
+  <label>Effect:
+  <select id="effect">
+    <option value="none">None</option>
+    <option value="desaturate">Desaturate</option>
+    <option value="saturate">Saturate</option>
+    <option value="lighten">Lighten</option>
+    <option value="darken">Darken</option>
+    <option value="sepia">Sepia</option>
+  </select>
+  </label>
+</div>
+
+<script src="../../build/marzipano.js" ></script>
+
+<script src="VideoAsset.js"></script>
+<script src="EventEmitter.js"></script>
+<script src="EventEmitterProxy.js"></script>
+<script src="NullVideoElementWrapper.js"></script>
+<script src="CanvasHackVideoElementWrapper.js"></script>
+<script src="loadVideoInSync.js"></script>
+<script src="multiResVideo.js"></script>
+<script src="colorEffects.js"></script>
+<script src="interface.js"></script>
+<script src="init.js"></script>
+
+<script src="//www.marzipano.net/demos/common/attribution.js"></script>
+<script>attribution('Video by', 'Visualise', 'http://www.visualise.com', 'topleft');</script>
+
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Editable Source | Marzipano</title>
+<meta name="description" content="Use a custom source to interactively edit an image." />
+<meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui" />
+<style>@-ms-viewport { width: device-width; }</style>
+<link rel="stylesheet" href="//www.marzipano.net/demos/common/reset.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="pano"></div>
+
+<div id="sidebar">
+  <p>This demo has two layers:
+  <ul>
+    <li>one layer with an equirectangular image.</li>
+    <li>above it, another layer with the same equirectangular image, but desaturated.</li>
+  </ul>
+  </p>
+
+  <p>Initially only the top layer (desaturated) is visible. Editing its alpha channel makes the colored layer underneath visible.</p>
+
+  <ul>
+    <li>Shift+click: hide desaturated layer (alpha=0)</li>
+    <li>Ctrl+click: show desaturated layer (alpha=1)</li>
+  </ul>
+
+  <div class="export-container"><button id="export">Export Result</button></div>
+  <div id="bw-canvas-container" class="canvas-container"></div>
+  <div id="color-canvas-container" class="canvas-container"></div>
+</div>
+
+<script src="//www.marzipano.net/demos/common/FileSaver.js" ></script>
+<script src="../../build/marzipano.js" ></script>
+
+<script src="editMode.js"></script>
+<script src="colorEffects.js"></script>
+<script src="createEditableLayer.js"></script>
+<script src="brush.js"></script>
+<script src="index.js"></script>
+
+</body>
+</html>

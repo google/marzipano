@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    #rendered, #expected {
+      position: relative;
+      width: 400px;
+      height: 400px;
+    }
+  </style>
+</head>
+<body>
+
+<p>
+  This demo serves as a visual test for:
+    <ol>
+      <li>Tile blending in the presence of transparency.</li>
+      <li>Falling back to child and parent tiles when the desired tile is unavailable.</li>
+    </ol>
+</p>
+<p>The rendered image should appear after a while and match the expected image.</p>
+
+<table>
+  <tr>
+    <th>Rendered</th>
+    <th>Expected</th>
+  </tr>
+  <tr>
+    <td><div id="rendered"></div></td>
+    <td><div id="expected"><img src="img/expected.png"></div></td>
+  </tr>
+</table>
+
+<script src="../../build/marzipano.js" ></script>
+
+<script src="index.js"></script>
+
+</body>
+</html>

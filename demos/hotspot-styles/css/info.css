@@ -1,0 +1,199 @@
+#info {
+  width: 66px;
+  height: 66px;
+  margin-left: -30px;
+  margin-top: -30px;
+}
+
+#info .icon_wrapper {
+  width: 100%;
+  height: 100%;
+  padding: 4px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0);
+  opacity: .8;
+  cursor: pointer;
+  transition: all .2s ease-in-out;
+}
+
+#info .icon {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  transition: all .2s ease-in-out;
+}
+
+#info .icon_wrapper:hover {
+ border: 6px solid rgba(255,255,255,1)
+}
+
+#info .icon_wrapper:hover .icon {
+  border: 4px solid rgba(255,255,255,.5);
+}
+
+#info .inner_icon {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  transition: all .2s ease-in-out;
+}
+
+#info .closeIcon {
+  -webkit-transform: rotate(45deg);
+  transform: rotate(45deg)
+}
+
+#info .icon1 {
+  width: 4px;
+  height: 26px;
+  position: absolute;
+  top: 20px;
+  left: 31px;
+  border-radius: 10px;
+  background-color: #fff;
+}
+
+#info .icon2 {
+  width: 26px;
+  height: 4px;
+  position: absolute;
+  top: 31px;
+  left: 20px;
+  border-radius: 10px;
+  background-color: #fff;
+}
+
+#info .tip, #info .content {
+  position: absolute;
+  left: 100px;
+  top: 10px;
+  width: 280px;
+
+  background-color: white;
+  color: black;
+  padding: 1em;
+  border-radius: 5px;
+}
+
+#info .content {
+  padding: 0;
+}
+
+#info .content .content-form {
+  padding: 0 .5em;
+  margin-top: .5em;
+}
+
+#info .tip {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  -webkit-transition: opacity 0.2s;
+  -webkit-font-smoothing: antialiased;
+  -webkit-transition: opacity 0.3s, -webkit-transform 0.3s;
+  transition: opacity 0.3s, transform 0.3s;
+  -webkit-transform-origin: -2em 50%;
+  transform-origin: -2em 50%;
+  -webkit-transform: translate3d(0,0,0) rotate3d(1,1,1,30deg);
+  transform: translate3d(0,0,0) rotate3d(1,1,1,30deg);
+}
+
+#info .tip::before,
+#info .tip::after {
+  content: '';
+  position: absolute;
+  right: 99%; /* fix visible gap on Firefox */
+}
+
+#info .tip::before {
+  height: 100%;
+  width: 3em;
+}
+
+#info .tip::after {
+  width: 1.8em;
+  height: 1.8em;
+  top: 50%;
+  margin: -.9em 0 0;
+  background: url(../img/tooltip.svg) no-repeat center center;
+  background-size: 100%;
+}
+
+#info:hover .tip {
+  opacity: 1;
+  -webkit-transform: translate3d(0,0,0) rotate3d(0,0,0,0);
+  transform: translate3d(0,0,0) rotate3d(0,0,0,0);
+  pointer-events: auto;
+}
+
+#info.expanded {
+  z-index: 2;
+}
+
+#info .tip, #info .content, #info.expanded:hover .tip {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#info:hover .tip, #info.expanded .content {
+  opacity: 1;
+  pointer-events: all;
+}
+
+#info .content {
+  transform: scaleY(0);
+  -webkit-transform: scaleY(0);
+  transition: transform 0.2s, opacity 0.2s;
+  -webkit-transition: -webkit-transform 0.2s, opacity 0.2s;
+  transform-origin: top center;
+  -webkit-transform-origin: top center;
+}
+
+#info.expanded .content {
+  transform: scaleY(1);
+  -webkit-transform: scaleY(1);
+}
+
+#info .content .content-form > * {
+  margin-bottom: 1em;
+}
+
+#info .content .image-wrapper {
+  padding: 2px
+}
+
+#info .content img {
+  width: 100%;
+}
+
+#info .content > *:last-child {
+  margin-bottom: 0;
+}
+
+#info .close {
+  cursor: pointer;
+}
+
+#info input {
+  width: 100%;
+  height: 30px;
+  padding: 8px;
+  background-color: #f5f5f5;
+  border: 1px solid #e5e5e5;
+}
+
+#info .button_wrapper {
+  width: 100%;
+  background-color: #f5f5f5;
+}
+
+#info button {
+  font-size: .8em;
+  padding: 1em;
+  background-color: #25aae1;
+  border: 2px solid #25aae1;
+  color: #fff;
+}

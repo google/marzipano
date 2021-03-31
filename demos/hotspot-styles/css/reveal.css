@@ -1,0 +1,74 @@
+#reveal {
+  width: 80px;
+  height: 80px;
+  background-color: #25aae1;
+  border-radius: 50%;
+  margin-left: 0;
+  text-align: center;
+  cursor: pointer;
+  transition: height .3s ease-in-out,
+              width .3s ease-in-out,
+              border-radius .3s ease-in-out,
+              margin .3s ease-in-out;
+}
+
+#reveal > img {
+  width: 50px;
+  margin: 15px 0;
+}
+
+.reveal-content {
+  width: 180px;
+  height: 160px;
+  padding: 10px;
+  background-color: #fff;
+  opacity: 0;
+  text-align: center;
+  pointer-events: none;
+  transition: opacity .01s ease-in-out;
+}
+
+.reveal-content img {
+  width: 120px;
+  opacity: 0;
+  transition: width .01s ease-in-out,
+              opacity .01s ease-in-out;
+}
+
+.reveal-content p {
+  margin: 10px 0;
+  color: #2d2d2d;
+  margin-top: -20px;
+  opacity: 0;
+  transition: margin .01s ease-in-out,
+              opacity .01s ease-in-out;
+}
+
+#reveal:hover {
+  width: 180px;
+  height: 240px;
+  border-radius: 5px;
+  margin-left: -50px;
+}
+
+#reveal:hover .reveal-content {
+  opacity: 1;
+  pointer-events: all;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  transition: opacity .3s ease-in-out .3s;
+}
+
+#reveal:hover .reveal-content img {
+  width: 160px;
+  opacity: 1;
+  transition: width .3s ease-in-out .4s,
+              opacity .3s ease-in-out .4s;
+}
+
+#reveal:hover .reveal-content p {
+  margin-top: 10px;
+  opacity: 1;
+  transition: margin .3s ease-in-out .6s,
+              opacity .3s ease-in-out .6s;
+}

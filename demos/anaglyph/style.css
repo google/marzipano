@@ -1,0 +1,51 @@
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+  -ms-content-zooming: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+#pano {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.info {
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  background-color: rgb(30, 30, 30);
+  background-color: rgba(30, 30, 30, 0.8);
+  color: #fff;
+
+  padding: 1em 1em;
+}
+
+select {
+  min-width: 200px;
+  height: 25px;
+  color: #FFF;
+  font-size: .8em;
+  background-color: rgb(103,115,131);
+  background-color: rgba(103,115,131,.8);
+  border: none;
+}

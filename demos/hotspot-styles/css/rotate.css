@@ -1,0 +1,68 @@
+.rotate-hotspot {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.rotate-hotspot:hover {
+  z-index: 3;
+}
+
+.rotate-img,
+.rotate-content {
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-position: center center;
+  transition: all 0.4s ease-in-out;
+  -webkit-transform-origin: 50% 0%;
+  transform-origin: 50% 0%;
+}
+
+.rotate-img {
+  background: url('../img/logo.png') no-repeat center center;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+.rotate-content {
+  -webkit-transform: translate3d(0,0,-150px) rotate3d(1,0,0,90deg);
+  transform: translate3d(0,0,-150px) rotate3d(1,0,0,90deg);
+  background: #fff;
+  color: #000;
+  text-align: center;
+  padding: 20px;
+  opacity: 0;
+}
+
+
+.rotate-content h1 {
+  font-weight: bolder;
+  font-size: 20px;
+  padding: 10px 0;
+  border-bottom: 1px solid #000;
+}
+
+.rotate-content p {
+  font-size: 14px;
+  line-height: 20px;
+  padding: 10px 0;
+  font-weight: lighter;
+}
+
+.rotate-hotspot:hover .rotate-img {
+  -webkit-transform: translate3d(0,150px,0) rotate3d(1,0,0,-90deg);
+  transform: translate3d(0,130px,0) rotate3d(1,0,0,-90deg);
+  opacity: 0;
+}
+
+.rotate-hotspot:hover .rotate-content {
+  -webkit-transform: rotate3d(1,0,0,0deg);
+  transform: rotate3d(1,0,0,0deg);
+  opacity: 1;
+}
