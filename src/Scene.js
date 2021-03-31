@@ -268,6 +268,8 @@ Scene.prototype.switchTo = function(opts, done) {
  *    interrupted.
  */
 Scene.prototype.lookTo = function(params, opts, done) {
+  var self = this;
+
   opts = opts || {};
   done = done || noop;
 
@@ -335,7 +337,7 @@ Scene.prototype.lookTo = function(params, opts, done) {
 
   this.startMovement(movement, function() {
     if (reenableControls) {
-      this._viewer.controls().enable();
+      self._viewer.controls().enable();
     }
     done();
   });
@@ -379,23 +381,26 @@ Scene.prototype.startMovement = function(fn, done) {
  */
 Scene.prototype.stopMovement = function() {
 
+  var done = this._movementCallback;
   var renderLoop = this._viewer.renderLoop();
 
   if (!this._movement) {
     return;
   }
 
-  if (this._movementCallback) {
-    this._movementCallback();
-  }
-
-  renderLoop.removeEventListener('beforeRender', this._updateMovementHandler);
-
+  // Clear state before calling done, to prevent an infinite loop when the
+  // callback starts a new movement.
   this._movement = null;
   this._movementStep = null;
   this._movementStartTime = null;
   this._movementParams = null;
   this._movementCallback = null;
+
+  renderLoop.removeEventListener('beforeRender', this._updateMovementHandler);
+
+  if (done) {
+    done();
+  }
 };
 
 

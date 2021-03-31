@@ -15,7 +15,6 @@
  */
 'use strict';
 
-var browser = require('bowser');
 var eventEmitter = require('minimal-event-emitter');
 
 var RenderLoop = require('./RenderLoop');
@@ -34,7 +33,6 @@ var registerDefaultRenderers = require('./renderers/registerDefaultRenderers');
 var setOverflowHidden = require('./util/dom').setOverflowHidden;
 var setAbsolute = require('./util/dom').setAbsolute;
 var setFullSize = require('./util/dom').setFullSize;
-var setBlocking = require('./util/dom').setBlocking;
 
 var tween = require('./util/tween');
 var noop = require('./util/noop');
@@ -97,25 +95,6 @@ function Viewer(domElement, opts) {
   this._controlContainer = document.createElement('div');
   setAbsolute(this._controlContainer);
   setFullSize(this._controlContainer);
-
-  // Prevent bounce scroll effect on iOS.
-  // Applied only for iOS, as Android's events must have the default action to allow interaction with hotspots.
-  if (browser.ios) {
-    this._controlContainer.addEventListener('touchmove', function(event) {
-      event.preventDefault();
-    });
-  }
-
-
-  // Old IE does not detect mouse events on elements without background
-  // Add a child element to the controls with full width, a background color
-  // and opacity 0
-  var controlCapture = document.createElement('div');
-  setAbsolute(controlCapture);
-  setFullSize(controlCapture);
-  setBlocking(controlCapture);
-
-  this._controlContainer.appendChild(controlCapture);
   domElement.appendChild(this._controlContainer);
 
   // Respond to window size changes.

@@ -17,16 +17,20 @@
 
 var StaticAsset = require('../assets/Static');
 var NetworkError = require('../NetworkError');
+var browser = require('bowser');
 var global = require('../util/global');
 var once = require('../util/once');
 
 // TODO: Move the load queue into the loader.
 
+// Whether to use createImageBitmap instead of a canvas for cropping.
+// See https://caniuse.com/?search=createimagebitmap
+var useCreateImageBitmap = !!global.createImageBitmap && !browser.firefox;
+
 // Options for createImageBitmap.
 var createImageBitmapOpts = {
   imageOrientation: 'flipY',
-  premultiplyAlpha: 'premultiply',
-  resizeQuality: 'high'
+  premultiplyAlpha: 'premultiply'
 };
 
 /**
@@ -105,7 +109,7 @@ HtmlImageLoader.prototype._handleLoad = function(img, x, y, width, height, done)
   width *= img.naturalWidth;
   height *= img.naturalHeight;
 
-  if (global.createImageBitmap) {
+  if (useCreateImageBitmap) {
     // Prefer to crop using createImageBitmap, which can potentially offload
     // work to another thread and avoid blocking the user interface.
     // Assume that the promise is never rejected.

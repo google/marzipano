@@ -109,13 +109,6 @@ function setNoPointerEvents(element) {
 }
 
 
-function setBlocking(element) {
-  element.style.backgroundColor = '#000';
-  element.style.opacity = '0';
-  element.style.filter = 'alpha(opacity=0)';
-}
-
-
 module.exports = {
   prefixProperty: prefixProperty,
   getWithVendorPrefix: getWithVendorPrefix,
@@ -131,6 +124,5 @@ module.exports = {
   setFullSize: setFullSize,
   setOverflowHidden: setOverflowHidden,
   setOverflowVisible: setOverflowVisible,
-  setNoPointerEvents: setNoPointerEvents,
-  setBlocking: setBlocking
+  setNoPointerEvents: setNoPointerEvents
 };
