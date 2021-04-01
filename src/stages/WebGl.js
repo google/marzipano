@@ -42,7 +42,8 @@ function initWebGlContext(canvas, opts) {
     alpha: true,
     premultipliedAlpha: true,
     antialias: !!(opts && opts.antialias),
-    preserveDrawingBuffer: !!(opts && opts.preserveDrawingBuffer)
+    preserveDrawingBuffer: !!(opts && opts.preserveDrawingBuffer),
+	xrCompatible: !!(opts && opts.xrCompatible)
   };
 
   var gl = (canvas.getContext) && (canvas.getContext('webgl', options) || canvas.getContext('experimental-webgl', options));
