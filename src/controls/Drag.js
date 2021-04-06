@@ -60,11 +60,11 @@ function DragControlMethod(element, pointerType, opts) {
     y: new Dynamics()
   };
 
-  this._hammer = HammerGestures.get(element, pointerType);
+  this._hammer = HammerGestures.get(element, pointerType, this._opts.hammerEvent);
 
   this._hammer.on("hammer.input", this._handleHammerEvent.bind(this));
 
-  if (this._opts.hammerEvent != 'pan' && this._opts.hammerEvent != 'pinch') {
+  if (this._opts.hammerEvent != 'pan' && this._opts.hammerEvent != 'pinch' && this._opts.hammerEvent != 'multipinch') {
     throw new Error(this._opts.hammerEvent + ' is not a hammerEvent managed in DragControlMethod');
   }
 
