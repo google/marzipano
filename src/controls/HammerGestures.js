@@ -40,10 +40,10 @@ function HammerGestures() {
 }
 
 
-HammerGestures.prototype.get = function(element, type, hammerEvent) {
+HammerGestures.prototype.get = function(element, type, hammerEvent) { 
   var key = getKeyForElementAndType(element, type);
   if (!this._managers[key]) {
-    this._managers[key] = this._createManager(element, type, hammerEvent);
+    this._managers[key] = this._createManager(element, type, hammerEvent); 
     this._refCount[key] = 0;
   }
   this._refCount[key]++;
@@ -51,7 +51,7 @@ HammerGestures.prototype.get = function(element, type, hammerEvent) {
 };
 
 
-HammerGestures.prototype._createManager = function(element, type, hammerEvent) {
+HammerGestures.prototype._createManager = function(element, type, hammerEvent) { 
   var manager = new Hammer.Manager(element);
 
   // Managers are created with different parameters for different pointer
@@ -67,7 +67,7 @@ HammerGestures.prototype._createManager = function(element, type, hammerEvent) {
       manager.add(new Hammer.Pinch({event: 'multipinch', pointers: 0, threshold: 0}));      
     } else {      
       manager.add(new Hammer.Pinch());
-    }
+    } 
   }
 
   return manager;
