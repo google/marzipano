@@ -61,7 +61,7 @@ declare module 'marzipano' {
 
     enableMethod(id: string): void
 
-    enableMethodGroup(groupId): void
+    enableMethodGroup(groupId: string): void
 
     method(id: string): ControlMethod
 
