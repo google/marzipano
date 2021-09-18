@@ -606,7 +606,7 @@ declare module 'marzipano' {
 
     destroyLayer(layer: Layer): void
 
-    hotspotContainer(): HotpsotContainer
+    hotspotContainer(): HotspotContainer
 
     layer(): Layer
 
