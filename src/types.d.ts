@@ -539,7 +539,7 @@ declare module 'marzipano' {
     traditional(
       maxResolution: number,
       maxVFov: number,
-      maxHFox
+      maxHFov?: number
     ): RectilinearViewLimiter
 
     vfov(min: number, max: number): RectilinearViewLimiter
