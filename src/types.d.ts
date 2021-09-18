@@ -484,7 +484,11 @@ declare module 'marzipano' {
 
     type: 'rectilinear'
 
-    coordinatesToPerspectiveTransform(coords, radius, extraTransforms): string
+    coordinatesToPerspectiveTransform(
+      coords: RectilinearViewCoords,
+      radius: number,
+      extraTransforms: string
+    ): string
 
     coordinatesToScreen(coords: Coords, result?: Coords): Coords
 
