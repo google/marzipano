@@ -293,7 +293,7 @@ declare module 'marzipano' {
   /**
    * HotspotContainer
    */
-  export class HotpsotContainer {
+  export class HotspotContainer {
     constructor(
       parentDomElement: HTMLElement,
       stage: Stage,
