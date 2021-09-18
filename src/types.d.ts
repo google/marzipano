@@ -149,9 +149,9 @@ declare module 'marzipano' {
    * EquirectTile
    */
   export class EquirectTile implements Tile {
-    cmp(that): number
+    cmp(that: Tile): number
 
-    equals(that): boolean
+    equals(that: Tile): boolean
 
     hash(): number
   }
