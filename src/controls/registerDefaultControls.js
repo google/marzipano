@@ -68,7 +68,7 @@ function registerDefaultControls(controls, element, opts) {
     eKey: new KeyControlMethod(69, 'roll', -0.7, 3)
   };
 
-  var enabledControls = ['scrollZoom', 'touchView', 'pinch' ];
+  var enabledControls = ['scrollZoom', 'touchView', 'pinch', 'rotate' ]; 
 
   if (opts.scrollZoom !== false) {
     controlMethods.scrollZoom = new ScrollZoomControlMethod(element); //{ frictionTime: 0 }
@@ -82,9 +82,13 @@ function registerDefaultControls(controls, element, opts) {
   };
 
 
-  switch (opts.dragMode) {
+  switch (opts.dragMode) {    
+    case 'multipinch':
+      controlMethods.pinch = new DragControlMethod(element, 'touch', { hammerEvent: 'multipinch' });
+      controlMethods.touchView = new DragControlMethod(element, 'touch');
+      break;
     case 'pinch':
-       controlMethods.pinch = new DragControlMethod(element, 'touch', { hammerEvent: 'pinch' });
+      controlMethods.pinch = new DragControlMethod(element, 'touch', { hammerEvent: 'pinch' });
       break;
     case 'pan':
       controlMethods.touchView = new DragControlMethod(element, 'touch');

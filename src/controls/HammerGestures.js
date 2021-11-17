@@ -40,10 +40,10 @@ function HammerGestures() {
 }
 
 
-HammerGestures.prototype.get = function(element, type) {
+HammerGestures.prototype.get = function(element, type, hammerEvent) { 
   var key = getKeyForElementAndType(element, type);
   if (!this._managers[key]) {
-    this._managers[key] = this._createManager(element, type);
+    this._managers[key] = this._createManager(element, type, hammerEvent); 
     this._refCount[key] = 0;
   }
   this._refCount[key]++;
@@ -51,7 +51,7 @@ HammerGestures.prototype.get = function(element, type) {
 };
 
 
-HammerGestures.prototype._createManager = function(element, type) {
+HammerGestures.prototype._createManager = function(element, type, hammerEvent) { 
   var manager = new Hammer.Manager(element);
 
   // Managers are created with different parameters for different pointer
@@ -63,7 +63,11 @@ HammerGestures.prototype._createManager = function(element, type) {
     // On touch one wants to have both panning and pinching. The panning
     // recognizer needs a threshold to allow the pinch to be recognized.
     manager.add(new Hammer.Pan({ direction: Hammer.DIRECTION_ALL, threshold: 20, pointers: 1 }));
-    manager.add(new Hammer.Pinch());
+    if (hammerEvent ==  'multipinch') {
+      manager.add(new Hammer.Pinch({event: 'multipinch', pointers: 0, threshold: 0}));      
+    } else {      
+      manager.add(new Hammer.Pinch());
+    } 
   }
 
   return manager;
