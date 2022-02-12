@@ -91,7 +91,6 @@ import delay from "./util/delay";
 import dom from "./util/dom";
 import extend from "./util/extend";
 import hash from "./util/hash";
-import inherits from "./util/inherits";
 import mod from "./util/mod";
 import noop from "./util/noop";
 import now from "./util/now";
@@ -189,7 +188,6 @@ export default {
     dom,
     extend,
     hash,
-    inherits,
     mod,
     noop,
     now,

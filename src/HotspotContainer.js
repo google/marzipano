@@ -51,218 +51,197 @@ import clearOwnProperties from "./util/clearOwnProperties";
  * @param {RectSpec} opts.rect Rectangular region covered by the container. See
  *    {@link Effects#rect}.
  */
-function HotspotContainer(parentDomElement, stage, view, renderLoop, opts) {
-  opts = opts || {};
+class HotspotContainer {
+  constructor(parentDomElement, stage, view, renderLoop, opts) {
+    opts = opts || {};
 
-  this._parentDomElement = parentDomElement;
-  this._stage = stage;
-  this._view = view;
-  this._renderLoop = renderLoop;
+    this._parentDomElement = parentDomElement;
+    this._stage = stage;
+    this._view = view;
+    this._renderLoop = renderLoop;
 
-  // Hotspot list.
-  this._hotspots = [];
+    // Hotspot list.
+    this._hotspots = [];
 
-  // Whether the hotspot container should be visible.
-  this._visible = true;
+    // Whether the hotspot container should be visible.
+    this._visible = true;
 
-  // The current rect.
-  this._rect = opts.rect;
+    // The current rect.
+    this._rect = opts.rect;
 
-  // Whether the visibility or the rect have changed since the last DOM update.
-  this._visibilityOrRectChanged = true;
+    // Whether the visibility or the rect have changed since the last DOM update.
+    this._visibilityOrRectChanged = true;
 
-  // The last seen stage dimensions.
-  this._stageWidth = null;
-  this._stageHeight = null;
+    // The last seen stage dimensions.
+    this._stageWidth = null;
+    this._stageHeight = null;
 
-  // Temporary variable to hold the calculated position and size.
-  this._tmpRect = {};
+    // Temporary variable to hold the calculated position and size.
+    this._tmpRect = {};
 
-  // Wrapper element. When the rect effect is set, the wrapper will have nonzero
-  // dimensions and `pointer-events: none` so that hotspots outside the rect are
-  // hidden, but no mouse events are hijacked.
-  this._hotspotContainerWrapper = document.createElement('div');
-  setAbsolute(this._hotspotContainerWrapper);
-  setPointerEvents(this._hotspotContainerWrapper, 'none');
-  this._parentDomElement.appendChild(this._hotspotContainerWrapper);
+    // Wrapper element. When the rect effect is set, the wrapper will have nonzero
+    // dimensions and `pointer-events: none` so that hotspots outside the rect are
+    // hidden, but no mouse events are hijacked.
+    this._hotspotContainerWrapper = document.createElement('div');
+    setAbsolute(this._hotspotContainerWrapper);
+    setPointerEvents(this._hotspotContainerWrapper, 'none');
+    this._parentDomElement.appendChild(this._hotspotContainerWrapper);
 
-  // Hotspot container element. It has zero dimensions and `pointer-events: all`
-  // to override the `pointer-events: none` on the wrapper and allow hotspots to
-  // be interacted with.
-  this._hotspotContainer = document.createElement('div');
-  setAbsolute(this._hotspotContainer);
-  setPointerEvents(this._hotspotContainer, 'all');
-  this._hotspotContainerWrapper.appendChild(this._hotspotContainer);
+    // Hotspot container element. It has zero dimensions and `pointer-events: all`
+    // to override the `pointer-events: none` on the wrapper and allow hotspots to
+    // be interacted with.
+    this._hotspotContainer = document.createElement('div');
+    setAbsolute(this._hotspotContainer);
+    setPointerEvents(this._hotspotContainer, 'all');
+    this._hotspotContainerWrapper.appendChild(this._hotspotContainer);
 
-  // Update when the hotspots change or scene is re-rendered.
-  this._updateHandler = this._update.bind(this);
-  this._renderLoop.addEventListener('afterRender', this._updateHandler);
+    // Update when the hotspots change or scene is re-rendered.
+    this._updateHandler = this._update.bind(this);
+    this._renderLoop.addEventListener('afterRender', this._updateHandler);
+  }
+  /**
+   * Destructor.
+   */
+  destroy() {
+    while (this._hotspots.length) {
+      this.destroyHotspot(this._hotspots[0]);
+    }
+
+    this._parentDomElement.removeChild(this._hotspotContainerWrapper);
+
+    this._renderLoop.removeEventListener('afterRender', this._updateHandler);
+
+    clearOwnProperties(this);
+  }
+  /**
+   * @return {Element}
+   */
+  domElement() {
+    return this._hotspotContainer;
+  }
+  /**
+   * @param {Rect} rect
+   */
+  setRect(rect) {
+    this._rect = rect;
+    this._visibilityOrRectChanged = true;
+  }
+  /**
+   * @return {Rect}
+   */
+  rect() {
+    return this._rect;
+  }
+  /**
+   * Creates a new hotspot in this container.
+   *
+   * @param {Element} domElement DOM element to use for the hotspot
+   * @param {Object} coords The hotspot coordinates.
+   *     Use {@link RectilinearViewCoords}` for a {@link RectilinearView} or
+   *     {@link FlatViewCoords} for a {@link FlatView}.
+   * @param {Object} opts Options in the same format as the `opts` argument to
+   *     the {@link Hotspot} constructor.
+   * @return {Hotspot}
+   */
+  createHotspot(domElement, coords, opts) {
+    coords = coords || {};
+
+    var hotspot = new Hotspot(
+      domElement, this._hotspotContainer, this._view, coords, opts);
+    this._hotspots.push(hotspot);
+    hotspot._update();
+
+    this.emit('hotspotsChange');
+
+    return hotspot;
+  }
+  /**
+   * @param {Hotspot} hotspot
+   * @return {boolean}
+   */
+  hasHotspot(hotspot) {
+    return this._hotspots.indexOf(hotspot) >= 0;
+  }
+  /**
+   * @return {Hotspot[]}
+   */
+  listHotspots() {
+    return [].concat(this._hotspots);
+  }
+  /**
+   * Removes a hotspot from the container.
+   *
+   * @param {Hotspot} hotspot
+   */
+  destroyHotspot(hotspot) {
+    var i = this._hotspots.indexOf(hotspot);
+    if (i < 0) {
+      throw new Error('No such hotspot');
+    }
+    this._hotspots.splice(i, 1);
+
+    hotspot.destroy();
+    this.emit('hotspotsChange');
+  }
+  /**
+   * Hide the container's DOM element, causing every contained {@link Hotspot} to
+   * be hidden.
+   */
+  hide() {
+    if (this._visible) {
+      this._visible = false;
+      this._visibilityOrRectChanged = true;
+      this._update();
+    }
+  }
+  /**
+   * Show the container's DOM element, causing every contained {@link Hotspot} to
+   * be shown.
+   */
+  show() {
+    if (!this._visible) {
+      this._visible = true;
+      this._visibilityOrRectChanged = true;
+      this._update();
+    }
+  }
+  _update() {
+    var wrapper = this._hotspotContainerWrapper;
+    var width = this._stage.width();
+    var height = this._stage.height();
+    var tmpRect = this._tmpRect;
+
+    // Avoid updating the wrapper DOM unless necessary.
+    if (this._visibilityOrRectChanged ||
+      (this._rect && (width !== this._stageWidth || height !== this._stageHeight))) {
+      var visible = this._visible;
+      wrapper.style.display = visible ? 'block' : 'none';
+
+      if (visible) {
+        if (this._rect) {
+          calcRect(width, height, this._rect, tmpRect);
+          positionAbsolutely(wrapper, width * tmpRect.x, height * tmpRect.y);
+          setPixelSize(wrapper, width * tmpRect.width, height * tmpRect.height);
+          setOverflowHidden(wrapper);
+        } else {
+          positionAbsolutely(wrapper, 0, 0);
+          setNullSize(wrapper);
+          setOverflowVisible(wrapper);
+        }
+      }
+
+      this._stageWidth = width;
+      this._stageHeight = height;
+      this._visibilityOrRectChanged = false;
+    }
+
+    // Update hotspots unconditionally, as the view parameters may have changed.
+    for (var i = 0; i < this._hotspots.length; i++) {
+      this._hotspots[i]._update();
+    }
+  }
 }
 
 eventEmitter(HotspotContainer);
-
-
-/**
- * Destructor.
- */
-HotspotContainer.prototype.destroy = function() {
-  while (this._hotspots.length) {
-    this.destroyHotspot(this._hotspots[0]);
-  }
-
-  this._parentDomElement.removeChild(this._hotspotContainerWrapper);
-
-  this._renderLoop.removeEventListener('afterRender', this._updateHandler);
-
-  clearOwnProperties(this);
-};
-
-
-/**
- * @return {Element}
- */
-HotspotContainer.prototype.domElement = function() {
-  return this._hotspotContainer;
-};
-
-
-/**
- * @param {Rect} rect
- */
-HotspotContainer.prototype.setRect = function(rect) {
-  this._rect = rect;
-  this._visibilityOrRectChanged = true;
-};
-
-
-/**
- * @return {Rect}
- */
-HotspotContainer.prototype.rect = function() {
-  return this._rect;
-};
-
-
-/**
- * Creates a new hotspot in this container.
- *
- * @param {Element} domElement DOM element to use for the hotspot
- * @param {Object} coords The hotspot coordinates.
- *     Use {@link RectilinearViewCoords}` for a {@link RectilinearView} or
- *     {@link FlatViewCoords} for a {@link FlatView}.
- * @param {Object} opts Options in the same format as the `opts` argument to
- *     the {@link Hotspot} constructor.
- * @return {Hotspot}
- */
-HotspotContainer.prototype.createHotspot = function(domElement, coords, opts) {
-  coords = coords || {};
-
-  var hotspot = new Hotspot(
-      domElement, this._hotspotContainer, this._view, coords, opts);
-  this._hotspots.push(hotspot);
-  hotspot._update();
-
-  this.emit('hotspotsChange');
-
-  return hotspot;
-};
-
-
-/**
- * @param {Hotspot} hotspot
- * @return {boolean}
- */
-HotspotContainer.prototype.hasHotspot = function(hotspot) {
-  return this._hotspots.indexOf(hotspot) >= 0;
-};
-
-
-/**
- * @return {Hotspot[]}
- */
-HotspotContainer.prototype.listHotspots = function() {
-  return [].concat(this._hotspots);
-};
-
-
-/**
- * Removes a hotspot from the container.
- *
- * @param {Hotspot} hotspot
- */
-HotspotContainer.prototype.destroyHotspot = function(hotspot) {
-  var i = this._hotspots.indexOf(hotspot);
-  if (i < 0) {
-    throw new Error('No such hotspot');
-  }
-  this._hotspots.splice(i, 1);
-
-  hotspot.destroy();
-  this.emit('hotspotsChange');
-};
-
-
-/**
- * Hide the container's DOM element, causing every contained {@link Hotspot} to
- * be hidden.
- */
-HotspotContainer.prototype.hide = function() {
-  if (this._visible) {
-    this._visible = false;
-    this._visibilityOrRectChanged = true;
-    this._update();
-  }
-};
-
-
-/**
- * Show the container's DOM element, causing every contained {@link Hotspot} to
- * be shown.
- */
-HotspotContainer.prototype.show = function() {
-  if (!this._visible) {
-    this._visible = true;
-    this._visibilityOrRectChanged = true;
-    this._update();
-  }
-};
-
-
-HotspotContainer.prototype._update = function() {
-  var wrapper = this._hotspotContainerWrapper;
-  var width = this._stage.width();
-  var height = this._stage.height();
-  var tmpRect = this._tmpRect;
-
-  // Avoid updating the wrapper DOM unless necessary.
-  if (this._visibilityOrRectChanged ||
-      (this._rect && (width !== this._stageWidth || height !== this._stageHeight))) {
-    var visible = this._visible;
-    wrapper.style.display = visible ? 'block' : 'none';
-
-    if (visible) {
-      if (this._rect) {
-        calcRect(width, height, this._rect, tmpRect);
-        positionAbsolutely(wrapper, width * tmpRect.x, height * tmpRect.y);
-        setPixelSize(wrapper, width * tmpRect.width, height * tmpRect.height);
-        setOverflowHidden(wrapper);
-      } else {
-        positionAbsolutely(wrapper, 0, 0);
-        setNullSize(wrapper);
-        setOverflowVisible(wrapper);
-      }
-    }
-
-    this._stageWidth = width;
-    this._stageHeight = height;
-    this._visibilityOrRectChanged = false;
-  }
-
-  // Update hotspots unconditionally, as the view parameters may have changed.
-  for (var i = 0; i < this._hotspots.length; i++) {
-    this._hotspots[i]._update();
-  }
-};
-
 
 export default HotspotContainer;

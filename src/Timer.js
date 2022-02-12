@@ -44,66 +44,76 @@ var defaultOptions = {
  *
  * @param {number} [opts.duration=Infinity] Timeout in milliseconds.
  */
-function Timer(opts) {
+class Timer {
+  constructor(opts) {
 
-  opts = defaults(opts || {}, defaultOptions);
+    opts = defaults(opts || {}, defaultOptions);
 
-  this._duration = opts.duration;
+    this._duration = opts.duration;
 
-  this._startTime = null;
+    this._startTime = null;
 
-  this._handle = null;
+    this._handle = null;
 
-  this._check = this._check.bind(this);
+    this._check = this._check.bind(this);
 
-}
-
-eventEmitter(Timer);
-
-
-/**
- * Starts the timer. If the timer is already started, this has the effect of
- * stopping and starting again (i.e. resetting the timer).
- */
-Timer.prototype.start = function() {
-  this._startTime = now();
-  if (this._handle == null && this._duration < Infinity) {
-    this._setup(this._duration);
   }
-};
-
-
-/**
- * Returns whether the timer is in the started state.
- * @return {boolean}
- */
-Timer.prototype.started = function() {
-  return this._startTime != null;
-};
-
-
-/**
- * Stops the timer.
- */
-Timer.prototype.stop = function() {
-  this._startTime = null;
-  if (this._handle != null) {
+  /**
+   * Starts the timer. If the timer is already started, this has the effect of
+   * stopping and starting again (i.e. resetting the timer).
+   */
+  start() {
+    this._startTime = now();
+    if (this._handle == null && this._duration < Infinity) {
+      this._setup(this._duration);
+    }
+  }
+  /**
+   * Returns whether the timer is in the started state.
+   * @return {boolean}
+   */
+  started() {
+    return this._startTime != null;
+  }
+  /**
+   * Stops the timer.
+   */
+  stop() {
+    this._startTime = null;
+    if (this._handle != null) {
+      clearTimeout(this._handle);
+      this._handle = null;
+    }
+  }
+  _setup(interval) {
+    this._handle = setTimeout(this._check, interval);
+  }
+  _teardown() {
     clearTimeout(this._handle);
     this._handle = null;
   }
-};
+  /**
+   * Returns the currently set duration.
+   */
+  duration() {
+    return this._duration;
+  }
+  /**
+   * Sets the duration. If the timer is already started, the timeout event is
+   * rescheduled to occur once the new duration has elapsed since the last call
+   * to start. In particular, if an amount of time larger than the new duration
+   * has already elapsed, the timeout event fires immediately.
+   * @param {number}
+   */
+  setDuration(duration) {
+    this._duration = duration;
+    if (this._startTime != null) {
+      this._check();
+    }
+  }
+}
 
-
-Timer.prototype._setup = function(interval) {
-  this._handle = setTimeout(this._check, interval);
-};
-
-
-Timer.prototype._teardown = function() {
-  clearTimeout(this._handle);
-  this._handle = null;
-};
-
+eventEmitter(Timer);
 
 Timer.prototype._check = function() {
   var currentTime = now();
@@ -117,29 +127,6 @@ Timer.prototype._check = function() {
     this._startTime = null;
   } else if (remaining < Infinity) {
     this._setup(remaining);
-  }
-};
-
-
-/**
- * Returns the currently set duration.
- */
-Timer.prototype.duration = function() {
-  return this._duration;
-};
-
-
-/**
- * Sets the duration. If the timer is already started, the timeout event is
- * rescheduled to occur once the new duration has elapsed since the last call
- * to start. In particular, if an amount of time larger than the new duration
- * has already elapsed, the timeout event fires immediately.
- * @param {number}
- */
-Timer.prototype.setDuration = function(duration) {
-  this._duration = duration;
-  if (this._startTime != null) {
-    this._check();
   }
 };
 

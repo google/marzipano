@@ -32,29 +32,35 @@ var nextId = 0;
 // The assetFailures and textureFailures parameters determine how many times
 // in a row loading the respective asset or creating the respective texture
 // will fail.
-function MockTile(opts) {
-  this.id = nextId++;
-  this.dynamicAsset = opts && opts.dynamicAsset;
-  this.assetFailures = opts && opts.assetFailures || 0;
-  this.textureFailures = opts && opts.textureFailures || 0;
-  this.hash = function() { return 0; };
-  this.equals = function(that) { return this === that; };
+class MockTile {
+  constructor(opts) {
+    this.id = nextId++;
+    this.dynamicAsset = opts && opts.dynamicAsset;
+    this.assetFailures = opts && opts.assetFailures || 0;
+    this.textureFailures = opts && opts.textureFailures || 0;
+    this.hash = function () { return 0; };
+    this.equals = function (that) { return this === that; };
+  }
 }
 
 // Mock asset.
-function MockAsset(tile, dynamic) {
-  this.id = tile.id;
-  this.isDynamic = sinon.stub().returns(dynamic);
-  this.destroy = sinon.spy();
+class MockAsset {
+  constructor(tile, dynamic) {
+    this.id = tile.id;
+    this.isDynamic = sinon.stub().returns(dynamic);
+    this.destroy = sinon.spy();
+  }
 }
 
 eventEmitter(MockAsset);
 
 // Mock texture.
-function MockTexture(asset) {
-  this.id = asset.id;
-  this.refresh = sinon.spy();
-  this.destroy = sinon.spy();
+class MockTexture {
+  constructor(asset) {
+    this.id = asset.id;
+    this.refresh = sinon.spy();
+    this.destroy = sinon.spy();
+  }
 }
 
 var loadAssetError = new Error('Asset error');

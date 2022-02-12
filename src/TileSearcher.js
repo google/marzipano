@@ -23,79 +23,79 @@ import Set from "./collections/Set";
  *
  * A TileSearcher performs searches for visible tiles.
  */
-function TileSearcher() {
-  // Stack of tiles to be explored.
-  this._stack = [];
+class TileSearcher {
+  constructor() {
+    // Stack of tiles to be explored.
+    this._stack = [];
 
-  // Set of already explored tiles.
-  this._visited = new Set();
+    // Set of already explored tiles.
+    this._visited = new Set();
 
-  // Tile vertices. Allocated by Tile#vertices on first use.
-  this._vertices = null;
-}
-
-/**
- * Performs a search for visible tiles by starting at a given tile and
- * recursively exploring neighbors until no more visible tiles are found.
- *
- * @param {View} view The view used to deem whether a tile is visible.
- * @param {Tile} tile The starting tile.
- * @param {Tile[]} result An array to append the visible tiles to, including the
- *     starting tile when visible. Existing array members are preserved.
- * @return {number} The number of visible tiles found.
- */
-TileSearcher.prototype.search = function(view, startingTile, result) {
-  var stack = this._stack;
-  var visited = this._visited;
-  var vertices = this._vertices;
-
-  var count = 0;
-
-  // Clear internal state.
-  this._clear();
-
-  stack.push(startingTile);
-
-  while (stack.length > 0) {
-    var tile = stack.pop();
-
-    if (visited.has(tile)) {
-      // Skip already visited tile.
-      continue;
-    }
-
-    if (!view.intersects(tile.vertices(vertices))) {
-      // Skip non-visible tile.
-      continue;
-    }
-
-    // Mark tile as visited.
-    visited.add(tile);
-
-    // Add neighbors to the stack of tiles to explore.
-    var neighbors = tile.neighbors();
-    for (var i = 0; i < neighbors.length; i++) {
-      stack.push(neighbors[i]);
-    }
-
-    // Add to result.
-    result.push(tile);
-
-    count++;
+    // Tile vertices. Allocated by Tile#vertices on first use.
+    this._vertices = null;
   }
+  /**
+   * Performs a search for visible tiles by starting at a given tile and
+   * recursively exploring neighbors until no more visible tiles are found.
+   *
+   * @param {View} view The view used to deem whether a tile is visible.
+   * @param {Tile} tile The starting tile.
+   * @param {Tile[]} result An array to append the visible tiles to, including the
+   *     starting tile when visible. Existing array members are preserved.
+   * @return {number} The number of visible tiles found.
+   */
+  search(view, startingTile, result) {
+    var stack = this._stack;
+    var visited = this._visited;
+    var vertices = this._vertices;
 
-  // Reuse the vertices array in future searches.
-  this._vertices = vertices;
+    var count = 0;
 
-  // Clear internal state.
-  this._clear();
+    // Clear internal state.
+    this._clear();
 
-  return count;
-};
+    stack.push(startingTile);
 
-TileSearcher.prototype._clear = function() {
-  this._stack.length = 0;
-  this._visited.clear();
-};
+    while (stack.length > 0) {
+      var tile = stack.pop();
+
+      if (visited.has(tile)) {
+        // Skip already visited tile.
+        continue;
+      }
+
+      if (!view.intersects(tile.vertices(vertices))) {
+        // Skip non-visible tile.
+        continue;
+      }
+
+      // Mark tile as visited.
+      visited.add(tile);
+
+      // Add neighbors to the stack of tiles to explore.
+      var neighbors = tile.neighbors();
+      for (var i = 0; i < neighbors.length; i++) {
+        stack.push(neighbors[i]);
+      }
+
+      // Add to result.
+      result.push(tile);
+
+      count++;
+    }
+
+    // Reuse the vertices array in future searches.
+    this._vertices = vertices;
+
+    // Clear internal state.
+    this._clear();
+
+    return count;
+  }
+  _clear() {
+    this._stack.length = 0;
+    this._visited.clear();
+  }
+}
 
 export default TileSearcher;

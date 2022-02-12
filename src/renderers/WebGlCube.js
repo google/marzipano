@@ -16,7 +16,6 @@
 'use strict';
 
 import WebGlBaseRenderer from "./WebGlBase";
-import inherits from "../util/inherits";
 
 /**
  * @class WebGlCubeRenderer

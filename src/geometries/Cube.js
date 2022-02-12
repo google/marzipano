@@ -15,7 +15,6 @@
  */
 'use strict';
 
-import inherits from "../util/inherits";
 import hash from "../util/hash";
 import TileSearcher from "../TileSearcher";
 import LruMap from "../collections/LruMap";
