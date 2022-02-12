@@ -20,7 +20,6 @@ import sinon from "sinon";
 sinon.assert.expose(assert, {prefix: ''});
 
 import eventEmitter from "minimal-event-emitter";
-import inherits from "../../src/util/inherits";
 
 import Stage from "../../src/stages/Stage";
 
@@ -31,54 +30,64 @@ var EquirectTile = EquirectGeometry.Tile;
 
 // Stage is an abstract class and cannot be instantiated directly.
 // We must stub methods and properties expected to be implemented by subclasses.
-function TestStage(progressive) {
-  var renderers = [].slice.call(arguments, 1);
-  var nextRendererIndex = 0;
-  this.constructor.super_.call(this, {progressive: progressive});
-  this.validateLayer = sinon.stub();
-  this.setSizeForType = sinon.stub();
-  this.startFrame = sinon.stub();
-  this.endFrame = sinon.stub();
-  this.createRenderer = function() { return renderers[nextRendererIndex++]; };
-  this.destroyRenderer = sinon.stub();
-  this.registerRenderer('fake', 'fake', function() {});
+class TestStage extends Stage {
+  constructor(progressive) {
+    super({ progressive: progressive })
+    var renderers = [].slice.call(arguments, 1);
+    var nextRendererIndex = 0;
+    this.validateLayer = sinon.stub();
+    this.setSizeForType = sinon.stub();
+    this.startFrame = sinon.stub();
+    this.endFrame = sinon.stub();
+    this.createRenderer = function () { return renderers[nextRendererIndex++]; };
+    this.destroyRenderer = sinon.stub();
+    this.registerRenderer('fake', 'fake', function () { });
+  }
 }
 
-inherits(TestStage, Stage);
-
-function MockLayer(mockTextureStore) {
-  this.geometry = sinon.stub().returns(new MockGeometry());
-  this.view = sinon.stub().returns(new MockView());
-  this.effects = sinon.stub().returns({});
-  this.isProgressive = sinon.stub();
-  this.visibleTiles = sinon.stub();
-  this.textureStore = function() {
-    return mockTextureStore;
-  };
+class MockLayer {
+  constructor(mockTextureStore) {
+    this.geometry = sinon.stub().returns(new MockGeometry());
+    this.view = sinon.stub().returns(new MockView());
+    this.effects = sinon.stub().returns({});
+    this.isProgressive = sinon.stub();
+    this.visibleTiles = sinon.stub();
+    this.textureStore = function () {
+      return mockTextureStore;
+    };
+  }
 }
 
 eventEmitter(MockLayer);
 
-function MockView() {
-  this.type = 'fake';
-  this.setSize = sinon.stub();
+class MockView {
+  constructor() {
+    this.type = 'fake';
+    this.setSize = sinon.stub();
+  }
 }
 
-function MockGeometry() {
-  this.type = 'fake';
+class MockGeometry {
+  constructor() {
+    this.type = 'fake';
+  }
 }
 
-function MockRenderer() {
-  this.startLayer = sinon.stub();
-  this.renderTile = sinon.stub();
-  this.endLayer = sinon.stub();
+class MockRenderer {
+  constructor() {
+    this.startLayer = sinon.stub();
+    this.renderTile = sinon.stub();
+    this.endLayer = sinon.stub();
+  }
 }
 
-function MockTextureStore() {
-  this.texture = sinon.stub();
-  this.startFrame = sinon.stub();
-  this.markTile = sinon.stub();
-  this.endFrame = sinon.stub();
+class MockTextureStore {
+  constructor() {
+    this.texture = sinon.stub();
+    this.startFrame = sinon.stub();
+    this.markTile = sinon.stub();
+    this.endFrame = sinon.stub();
+  }
 }
 
 suite('Stage', function() {
