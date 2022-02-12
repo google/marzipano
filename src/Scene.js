@@ -220,8 +220,8 @@ class Scene {
    *
    * This is equivalent to calling {@link Viewer#switchScene} on this scene.
    *
-   * @param {Object} opts Options to pass into {@link Viewer#switchScene}.
-   * @param {function} done Function to call when the switch is complete.
+   * @param {Object} [opts] Options to pass into {@link Viewer#switchScene}.
+   * @param {function} [done] Function to call when the switch is complete.
    */
   switchTo(opts, done) {
     return this._viewer.switchScene(this, opts, done);

@@ -31,9 +31,9 @@
     "release": "scripts/release",
     "deploy": "scripts/deploy",
     "prepublishOnly": "scripts/prepublish",
-    "vite:dev": "vite",
+    "vite:dev": "vite --port=3001",
     "vite:build": "tsc && vite build",
-    "vite:preview": "vite preview",
+    "vite:preview": "vite --port=3001 preview",
     "vite:test": "vitest"
   },
   "dependencies": {
@@ -43,6 +43,7 @@
     "minimal-event-emitter": "1.0.0"
   },
   "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.37",
     "happy-dom": "^2.31.1",
     "jsdoc": "^3.6.6",
     "lr-http-server": "^0.1.5",

@@ -141,7 +141,7 @@ ImageUrlSource.prototype.loadAsset = function(stage, tile, done) {
  *    - `{z}` : tile level index (0 is the smallest level)
  *    - `{x}` : tile horizontal index
  *    - `{y}` : tile vertical index
- * @param {Object} opts In addition to the options already supported by the
+ * @param {Object?} [opts] In addition to the options already supported by the
  *     {@link ImageUrlSource} constructor.
  * @param {String} opts.cubeMapPreviewUrl URL to use as the preview level.
  *     This must be a single image containing six cube faces laid out
