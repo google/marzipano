@@ -15,20 +15,19 @@
  */
 'use strict';
 
-function Level(levelProperties) {
-  this._fallbackOnly = !!levelProperties.fallbackOnly;
+class Level {
+  constructor(levelProperties) {
+    this._fallbackOnly = !!levelProperties.fallbackOnly;
+  }
+  numHorizontalTiles() {
+    return Math.ceil(this.width() / this.tileWidth());
+  }
+  numVerticalTiles() {
+    return Math.ceil(this.height() / this.tileHeight());
+  }
+  fallbackOnly() {
+    return this._fallbackOnly;
+  }
 }
-
-Level.prototype.numHorizontalTiles = function() {
-  return Math.ceil(this.width() / this.tileWidth());
-};
-
-Level.prototype.numVerticalTiles = function() {
-  return Math.ceil(this.height() / this.tileHeight());
-};
-
-Level.prototype.fallbackOnly = function() {
-  return this._fallbackOnly;
-};
 
 export default Level;
