@@ -16,7 +16,6 @@
 'use strict';
 
 import StaticAsset from "./Static";
-import inherits from "../util/inherits";
 import eventEmitter from "minimal-event-emitter";
 import clearOwnProperties from "../util/clearOwnProperties";
 
@@ -32,7 +31,7 @@ import clearOwnProperties from "../util/clearOwnProperties";
  *     underlying pixel source.
  * @throws If the pixel source is unsupported.
  */
-class DynamicAsset {
+class DynamicAsset extends StaticAsset {
   constructor(element) {
     this.constructor.super_.call(this, element);
     this._timestamp = 0;
@@ -61,7 +60,6 @@ class DynamicAsset {
   }
 }
 
-inherits(DynamicAsset, StaticAsset);
 eventEmitter(DynamicAsset);
 
 export default DynamicAsset;
