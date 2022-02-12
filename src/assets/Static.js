@@ -36,50 +36,46 @@ var propertyMap = {
  *     underlying pixel source.
  * @throws If the pixel source is unsupported.
  */
-function StaticAsset(element) {
-  var supported = false;
-  for (var type in propertyMap) {
-    if (global[type] && element instanceof global[type]) {
-      supported = true;
-      this._widthProp = propertyMap[type][0];
-      this._heightProp = propertyMap[type][1];
-      break;
+class StaticAsset {
+  constructor(element) {
+    var supported = false;
+    for (var type in propertyMap) {
+      if (global[type] && element instanceof global[type]) {
+        supported = true;
+        this._widthProp = propertyMap[type][0];
+        this._heightProp = propertyMap[type][1];
+        break;
+      }
     }
-  }
-  if (!supported) {
-    throw new Error('Unsupported pixel source');
-  }
+    if (!supported) {
+      throw new Error('Unsupported pixel source');
+    }
 
-  this._element = element;
+    this._element = element;
+  }
+  /**
+   * Destructor.
+   */
+  destroy() {
+    clearOwnProperties(this);
+  }
+  element() {
+    return this._element;
+  }
+  width() {
+    return this._element[this._widthProp];
+  }
+  height() {
+    return this._element[this._heightProp];
+  }
+  timestamp() {
+    return 0;
+  }
+  isDynamic() {
+    return false;
+  }
 }
 
 eventEmitter(StaticAsset);
-
-/**
- * Destructor.
- */
-StaticAsset.prototype.destroy = function() {
-  clearOwnProperties(this);
-};
-
-StaticAsset.prototype.element = function() {
-  return this._element;
-};
-
-StaticAsset.prototype.width = function() {
-  return this._element[this._widthProp];
-};
-
-StaticAsset.prototype.height = function() {
-  return this._element[this._heightProp];
-};
-
-StaticAsset.prototype.timestamp = function() {
-  return 0;
-};
-
-StaticAsset.prototype.isDynamic = function() {
-  return false;
-};
 
 export default StaticAsset;
