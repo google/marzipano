@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 'use strict';
+import Marzipano from '../../src/index.js';
 
 var clearOwnProperties = Marzipano.util.clearOwnProperties;
 var eventEmitter = Marzipano.dependencies.eventEmitter;
@@ -124,3 +125,5 @@ WebVrView.prototype.intersects = function(rectangle) {
 
 // Pretend to be a RectilinearView so that an appropriate renderer can be found.
 WebVrView.type = WebVrView.prototype.type = 'rectilinear';
+
+export default WebVrView;

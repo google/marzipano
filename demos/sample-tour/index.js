@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 'use strict';
+import Marzipano from '../../src/index.js';
+import { data } from './data.js';
+
 
 (function() {
-  var Marzipano = window.Marzipano;
   var bowser = window.bowser;
   var screenfull = window.screenfull;
-  var data = window.data;
 
   // Grab elements from DOM.
   var panoElement = document.querySelector('#pano');

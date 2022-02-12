@@ -84,3 +84,5 @@ SolidColorSource.prototype.loadAsset = function(stage, tile, done) {
     done.apply(null, arguments);
   };
 };
+
+export default SolidColorSource;

@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 'use strict';
+import Marzipano from '../../src/index.js';
 
 // Create a stage and register the default renderers.
 var stage = new Marzipano.WebGlStage();

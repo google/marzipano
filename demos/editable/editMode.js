@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 'use strict';
+import Marzipano from '../../src/index.js';
 
 (function() {
 

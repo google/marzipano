@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 'use strict';
+import Marzipano from '../../src/index.js';
 
 // Create viewer.
 var viewer = new Marzipano.Viewer(document.getElementById('pano'));

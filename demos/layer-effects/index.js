@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 'use strict';
+import Marzipano from '../../src/index.js';
+import { colorEffects } from './colorEffects.js';
 
 // Create viewer.
 var viewer = new Marzipano.Viewer(document.getElementById('pano'));
@@ -27,6 +29,8 @@ var scene = viewer.createEmptyScene({ view: view });
 
 // Query the stage for the maximum supported texture size.
 var maxSize = viewer.stage().maxTextureSize();
+// hack for knockoutjs demo
+window.maxSize = maxSize;
 var maxDimensions = maxSize + 'x' + maxSize;
 
 // Create a knockout.js observable array to hold the layers.

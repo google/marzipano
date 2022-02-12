@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 'use strict';
+import Marzipano from '../../src/index.js';
+import { data } from './data.js';
 
 (function() {
-  var Marzipano = window.Marzipano;
-  var data = window.data;
   var Hammer = Marzipano.dependencies['hammerjs'];
 
   // Grab elements from DOM.

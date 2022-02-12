@@ -28,6 +28,8 @@
 // function used by Marzipano, glBlend(ONE, ONE_MINUS_SRC_ALPHA), results in
 // additive composition when the left image is rendered on top of the right one.
 
+import Marzipano from '../../src/index.js';
+
 // Luminance values.
 var lumR = 0.3086;
 var lumG = 0.6094;
@@ -233,7 +235,7 @@ function optimized() {
   return { left: leftEffects, right: rightEffects };
 }
 
-var colorTransformEffects = {
+export var colorTransformEffects = {
   gray: gray,
   color: color,
   halfcolor: halfcolor,

@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 'use strict';
+import Marzipano from '../../src/index.js';
+import { colorEffects } from './colorEffects.js';
 
-function createEditableLayers(stage, url, done) {
+export function createEditableLayers(stage, url, done) {
   urlToCanvas(url, function(err, colorCanvas) {
     if (err) {
       done(err);

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 'use strict';
+import Marzipano from '../../src/index.js';
+import DeviceOrientationControlMethod from './DeviceOrientationControlMethod.js';
 
 // Create viewer.
 var viewer = new Marzipano.Viewer(document.getElementById('pano'));

@@ -17,7 +17,7 @@
 
 function linear(val) { return val; }
 
-var transitionFunctions = {
+export var transitionFunctions = {
 
   opacity: function(ease) {
     ease = ease || linear;

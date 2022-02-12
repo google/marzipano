@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 'use strict';
+// TODO: verify with VR headset
+import Marzipano from '../../src/index.js';
+import WebVrView from './WebVrView.js';
 
 var mat4 = Marzipano.dependencies.glMatrix.mat4;
 var quat = Marzipano.dependencies.glMatrix.quat;

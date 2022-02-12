@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 'use strict';
+import Marzipano from '../../src/index.js';
 
 // Custom control method to alter the view according to the device orientation.
 function DeviceOrientationControlMethod() {
@@ -136,3 +137,5 @@ function rotateEuler(euler, result) {
   result.pitch = attitude;
   result.roll = bank;
 }
+
+export default DeviceOrientationControlMethod;

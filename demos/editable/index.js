@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 'use strict';
+import './editMode.js';
+import './brush.js';
+import Marzipano from '../../src/index.js';
+import { createEditableLayers } from './createEditableLayer.js';
 
 (function() {
-  var Marzipano = window.Marzipano;
-  var createEditableLayers = window.createEditableLayers;
   var mod = Marzipano.util.mod;
   var editMode = window.editMode;
   var brush = window.brush;
