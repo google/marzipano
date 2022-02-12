@@ -13,25 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
 
-// Jenkins one-at-a-time hash
-// http://www.burtleburtle.net/bob/hash/doobs.html
-// Input: an array of integers
-// Output: an integer
+import now from "./now";
 
-function hash() {
-  var h = 0;
-  for (var i = 0; i < arguments.length; i++) {
-    var k = arguments[i];
-    h += k;
-    h += k << 10;
-    h ^= k >> 6;
+function tween(duration: number, update: (arg0: number) => void, done: { (): void; apply: (arg0: null, arg1: IArguments) => void; }) {
+  var cancelled = false;
+
+  var startTime = now();
+
+  function runUpdate() {
+    if(cancelled) { return; }
+    var tweenVal = (now() - startTime)/duration;
+    if(tweenVal < 1) {
+      update(tweenVal);
+      requestAnimationFrame(runUpdate);
+    }
+    else {
+      update(1);
+      done();
+    }
   }
-  h += h << 3;
-  h ^= h >> 11;
-  h += h << 15;
-  return h >= 0 ? h : -h;
+
+  update(0);
+  requestAnimationFrame(runUpdate);
+
+  return function cancel() {
+    cancelled = true;
+    done.apply(null, arguments);
+  }
 }
 
-export default hash;
+export default tween;

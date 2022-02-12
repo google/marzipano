@@ -13,20 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
 
-// The global object.
-var globalObject = (function() {
-  if (typeof window !== 'undefined') {
-    return window;
+function defer(fn: { (): void; apply: (arg0: null, arg1: any) => void; }, args: string | any[]) {
+  function deferred() {
+    if (args && args.length > 0) {
+      fn.apply(null, args);
+    } else {
+      fn();
+    }
   }
-  if (typeof self !== 'undefined') {
-    return self;
-  }
-  if (typeof global !== 'undefined') {
-    return global;
-  }
-  return null;
-})();
+  setTimeout(deferred, 0);
+}
 
-export default globalObject;
+export default defer;

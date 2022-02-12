@@ -13,15 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
 
-function defaults(obj, defaultsObj) {
-  for (var key in defaultsObj) {
-    if (!(key in obj)) {
-      obj[key] = defaultsObj[key];
-    }
-  }
-  return obj;
+function real(x: number): boolean {
+  return typeof x === 'number' && isFinite(x);
 }
 
-export default defaults;
+export default real;

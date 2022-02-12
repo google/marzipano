@@ -13,12 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
 
-// Convert a number to a string in decimal notation.
-function decimal(x) {
-  // Double-precision floats have 15 significant decimal digits.
-  return x.toPrecision(15);
+function type(x: null) {
+  var typ = typeof x;
+  if (typ === 'object') {
+    if (x === null) {
+      return 'null';
+    }
+    if (Object.prototype.toString.call(x) === '[object Array]') {
+      return 'array';
+    }
+    if (Object.prototype.toString.call(x) === '[object RegExp]') {
+      return 'regexp';
+    }
+  }
+  return typ;
 }
 
-export default decimal;
+export default type;

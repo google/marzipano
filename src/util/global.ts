@@ -15,9 +15,19 @@
  */
 'use strict';
 
-// Returns whether n is a power of two.
-function ispot(n) {
-  return (n & (n - 1)) == 0;
-}
+// TODO: thinkg about globalThis
+// The global object.
+var globalObject = (function() {
+  if (typeof window !== 'undefined') {
+    return window;
+  }
+  if (typeof self !== 'undefined') {
+    return self;
+  }
+  if (typeof global !== 'undefined') {
+    return global;
+  }
+  return null;
+})();
 
-export default ispot;
+export default globalObject;

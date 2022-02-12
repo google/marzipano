@@ -13,16 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
 
-function cmp(x, y) {
-  if (x < y) {
-    return -1;
-  }
-  if (x > y) {
-    return 1;
-  }
-  return 0;
+/**
+ * @memberof util
+ * @param {number} rad
+ * @return {number}
+ */
+function radToDeg(rad: number) {
+  return rad * 180 / Math.PI;
 }
 
-export default cmp;
+export default radToDeg;

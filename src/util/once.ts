@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
 
-function getNow() {
-  if (typeof performance !== 'undefined' && performance.now) {
-    return function performanceNow() {
-      return performance.now();
-    };
-  }
-  return function dateNow() {
-    return Date.now();
-  };
+function once<T extends (...args: any) => any>(fn: T): T {
+  let called = false;
+  let value: ReturnType<T>;
+  return function onced(...args) {
+    if (!called) {
+      called = true;
+      value = fn(...args);
+    }
+    return value;
+  } as T;
 }
 
-export default getNow();
+export default once;

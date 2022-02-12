@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
 
-function extend(obj, sourceObj) {
-  for (var key in sourceObj) {
-    obj[key] = sourceObj[key];
+function cmp(x: number, y: number) {
+  if (x < y) {
+    return -1;
   }
-  return obj;
+  if (x > y) {
+    return 1;
+  }
+  return 0;
 }
 
-export default extend;
+export default cmp;

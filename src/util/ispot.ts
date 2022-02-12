@@ -15,20 +15,9 @@
  */
 'use strict';
 
-function type(x) {
-  var typ = typeof x;
-  if (typ === 'object') {
-    if (x === null) {
-      return 'null';
-    }
-    if (Object.prototype.toString.call(x) === '[object Array]') {
-      return 'array';
-    }
-    if (Object.prototype.toString.call(x) === '[object RegExp]') {
-      return 'regexp';
-    }
-  }
-  return typ;
+// Returns whether n is a power of two.
+function ispot(n: number): boolean {
+  return (n & (n - 1)) == 0;
 }
 
-export default type;
+export default ispot;

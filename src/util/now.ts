@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
 
-/**
- * @memberof util
- * @param {number} rad
- * @return {number}
- */
-function radToDeg(rad) {
-  return rad * 180 / Math.PI;
+function getNow() {
+  if (typeof performance !== "undefined" && performance.now) {
+    return function performanceNow() {
+      return performance.now();
+    };
+  }
+  return function dateNow() {
+    return Date.now();
+  };
 }
 
-export default radToDeg;
+export default getNow();

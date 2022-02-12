@@ -13,16 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
+"use strict";
 
 import { setTransform as setTransform } from "./dom";
 import decimal from "./decimal";
 
-function positionAbsolutely(element, x, y, extraTransforms) {
-  extraTransforms = extraTransforms || '';
+function positionAbsolutely(
+  element: { style: { [x: string]: any } },
+  x: number,
+  y: number,
+  extraTransforms: string
+) {
+  extraTransforms = extraTransforms || "";
   // A translateZ(0) transform improves performance on Chrome by creating a
   // new layer for the element, which prevents unnecessary repaints.
-  var transform = 'translateX(' + decimal(x) + 'px) translateY(' + decimal(y) + 'px) translateZ(0) ' + extraTransforms;
+  var transform =
+    "translateX(" +
+    decimal(x) +
+    "px) translateY(" +
+    decimal(y) +
+    "px) translateZ(0) " +
+    extraTransforms;
   setTransform(element, transform);
 }
 

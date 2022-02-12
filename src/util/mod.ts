@@ -13,10 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
 
-function real(x) {
-  return typeof x === 'number' && isFinite(x);
+/**
+ * Modulo operation
+ *
+ * @memberof util
+ * @param {Number} dividend
+ * @param {Number} divisor
+ * @returns {Number} Value in range `[0,divisor[`
+ */
+function mod(a: number, b: number) {
+  return ((+a % (b = +b)) + b) % b;
 }
 
-export default real;
+export default mod;

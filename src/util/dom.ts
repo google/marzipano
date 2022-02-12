@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
 
-
-function prefixProperty(property) {
+function prefixProperty(property: string) {
 
   var style = document.documentElement.style;
   var prefixList = ['Moz', 'Webkit', 'Khtml', 'O', 'ms'];
@@ -36,18 +34,18 @@ function prefixProperty(property) {
 }
 
 
-function getWithVendorPrefix(property) {
+function getWithVendorPrefix(property: string) {
   var prefixedProperty = prefixProperty(property);
-  return function getPropertyWithVendorPrefix(element) {
+  return function getPropertyWithVendorPrefix(element: { style: { [x: string]: any; }; }) {
     return element.style[prefixedProperty];
   };
 
 }
 
 
-function setWithVendorPrefix(property) {
+function setWithVendorPrefix(property: string) {
   var prefixedProperty = prefixProperty(property);
-  return function setPropertyWithVendorPrefix(element, val) {
+  return function setPropertyWithVendorPrefix(element: { style: { [x: string]: any; }; }, val: any) {
     return (element.style[prefixedProperty] = val);
   };
 }
@@ -57,54 +55,54 @@ var setTransform = setWithVendorPrefix('transform');
 var setTransformOrigin = setWithVendorPrefix('transformOrigin');
 
 
-function setNullTransform(element) {
+function setNullTransform(element: { style: { [x: string]: any; }; }) {
   setTransform(element, 'translateZ(0)');
 }
 
 
-function setNullTransformOrigin(element) {
+function setNullTransformOrigin(element: { style: { [x: string]: any; }; }) {
   setTransformOrigin(element, '0 0 0');
 }
 
 
-function setAbsolute(element) {
+function setAbsolute(element: { style: { position: string; }; }) {
   element.style.position = 'absolute';
 }
 
 
-function setPixelPosition(element, x, y) {
+function setPixelPosition(element: { style: { left: string; top: string; }; }, x: string, y: string) {
   element.style.left = x + 'px';
   element.style.top = y + 'px';
 }
 
 
-function setPixelSize(element, width, height) {
+function setPixelSize(element: { style: { width: string; height: string; }; }, width: string, height: string) {
   element.style.width = width + 'px';
   element.style.height = height + 'px';
 }
 
 
-function setNullSize(element) {
+function setNullSize(element: { style: { width: number; height: number; }; }) {
   element.style.width = element.style.height = 0;
 }
 
 
-function setFullSize(element) {
+function setFullSize(element: { style: { width: string; height: string; }; }) {
   element.style.width = element.style.height = '100%';
 }
 
 
-function setOverflowHidden(element) {
+function setOverflowHidden(element: { style: { overflow: string; }; }) {
   element.style.overflow = 'hidden';
 }
 
 
-function setOverflowVisible(element) {
+function setOverflowVisible(element: { style: { overflow: string; }; }) {
   element.style.overflow = 'visible';
 }
 
 
-function setNoPointerEvents(element) {
+function setNoPointerEvents(element: { style: { pointerEvents: string; }; }) {
   element.style.pointerEvents = 'none';
 }
 

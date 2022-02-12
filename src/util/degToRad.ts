@@ -13,35 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
 
-import now from "./now";
-
-function tween(duration, update, done) {
-  var cancelled = false;
-
-  var startTime = now();
-
-  function runUpdate() {
-    if(cancelled) { return; }
-    var tweenVal = (now() - startTime)/duration;
-    if(tweenVal < 1) {
-      update(tweenVal);
-      requestAnimationFrame(runUpdate);
-    }
-    else {
-      update(1);
-      done();
-    }
-  }
-
-  update(0);
-  requestAnimationFrame(runUpdate);
-
-  return function cancel() {
-    cancelled = true;
-    done.apply(null, arguments);
-  }
+/**
+ * @memberof util
+ * @param {number} deg
+ * @return {number}
+ */
+function degToRad(deg: number) {
+  return deg * Math.PI / 180;
 }
 
-export default tween;
+export default degToRad;

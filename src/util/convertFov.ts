@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
 
 /**
  * Convert fov
@@ -27,7 +26,7 @@
  * @return {number}
  * @memberof util.convertFov
  */
-function convert(fov, fromDimension, toDimension) {
+function convert(fov: number, fromDimension: number, toDimension: number) {
   return 2 * Math.atan(toDimension * Math.tan(fov / 2) / fromDimension);
 }
 
@@ -38,7 +37,7 @@ function convert(fov, fromDimension, toDimension) {
  * @return {number}
  * @memberof util.convertFov
  */
-function htov(fov, width, height) {
+function htov(fov: number, width: number, height: number) {
   return convert(fov, width, height);
 }
 
@@ -49,7 +48,7 @@ function htov(fov, width, height) {
  * @return {number}
  * @memberof util.convertFov
  */
-function htod(fov, width, height) {
+function htod(fov: number, width: number, height: number) {
   return convert(fov, width, Math.sqrt(width * width + height * height));
 }
 
@@ -60,7 +59,7 @@ function htod(fov, width, height) {
  * @return {number}
  * @memberof util.convertFov
  */
-function vtoh(fov, width, height) {
+function vtoh(fov: number, width: number, height: number) {
   return convert(fov, height, width);
 }
 
@@ -71,7 +70,7 @@ function vtoh(fov, width, height) {
  * @return {number}
  * @memberof util.convertFov
  */
-function vtod(fov, width, height) {
+function vtod(fov: number, width: number, height: number) {
   return convert(fov, height, Math.sqrt(width * width + height * height));
 }
 
@@ -82,7 +81,7 @@ function vtod(fov, width, height) {
  * @return {number}
  * @memberof util.convertFov
  */
-function dtoh(fov, width, height) {
+function dtoh(fov: number, width: number, height: number) {
   return convert(fov, Math.sqrt(width * width + height * height), width);
 }
 
@@ -93,7 +92,7 @@ function dtoh(fov, width, height) {
  * @return {number}
  * @memberof util.convertFov
  */
-function dtov(fov, width, height) {
+function dtov(fov: number, width: number, height: number) {
   return convert(fov, Math.sqrt(width * width + height * height), height);
 }
 

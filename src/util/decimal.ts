@@ -13,18 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
 
-/**
- * Modulo operation
- *
- * @memberof util
- * @param {Number} dividend
- * @param {Number} divisor
- * @returns {Number} Value in range `[0,divisor[`
- */
-function mod(a, b) {
-  return (+a % (b = +b) + b) % b;
+// Convert a number to a string in decimal notation.
+function decimal(x: number) {
+  // Double-precision floats have 15 significant decimal digits.
+  return x.toPrecision(15);
 }
 
-export default mod;
+export default decimal;

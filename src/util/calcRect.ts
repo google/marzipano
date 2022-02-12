@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
 
 /**
  * Converts a {@link RectSpec} into an equivalent {@link Rect}.
@@ -32,7 +31,7 @@
  * @param {Rect} result The output spec. If the argument is present, it is
  *     filled in and returned; otherwise, a fresh object is returned.
  */
-function calcRect(totalWidth, totalHeight, spec, result) {
+function calcRect(totalWidth: number, totalHeight: number, spec: RectSpec, result: Rect) {
 
   result = result || {};
 

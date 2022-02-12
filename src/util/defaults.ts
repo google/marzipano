@@ -13,17 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
 
-function defer(fn, args) {
-  function deferred() {
-    if (args && args.length > 0) {
-      fn.apply(null, args);
-    } else {
-      fn();
+function defaults(obj: { [x: string]: any; }, defaultsObj: { [x: string]: any; }) {
+  for (var key in defaultsObj) {
+    if (!(key in obj)) {
+      obj[key] = defaultsObj[key];
     }
   }
-  setTimeout(deferred, 0);
+  return obj;
 }
 
-export default defer;
+export default defaults;

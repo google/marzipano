@@ -55,6 +55,16 @@
  * @property {number} absoluteWidth The absolute width.
  * @property {number} absoluteHeight The absolute height.
  */
+interface RectSpec {
+    relativeX?: number;
+    relativeY?: number;
+    relativeWidth?: number;
+    relativeHeight?: number;
+    absoluteX?: number;
+    absoluteY?: number;
+    absoluteWidth?: number;
+    absoluteHeight?: number;
+}
 
 /**
  * @interface Rect
@@ -66,6 +76,12 @@
  * @property {number} width The width.
  * @property {number} width The height.
  */
+interface Rect {
+    x?: number;
+    y?: number;
+    width?: number;
+    height?: number;
+}
 
 /**
  * @interface View

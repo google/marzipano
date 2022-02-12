@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
 
-/**
- * @memberof util
- * @param {number} deg
- * @return {number}
- */
-function degToRad(deg) {
-  return deg * Math.PI / 180;
+function extend(obj: { [x: string]: any; }, sourceObj: { [x: string]: any; }) {
+  for (var key in sourceObj) {
+    obj[key] = sourceObj[key];
+  }
+  return obj;
 }
 
-export default degToRad;
+export default extend;
