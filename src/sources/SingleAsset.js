@@ -24,27 +24,27 @@
  *
  * @param {Asset} asset The asset.
 */
-function SingleAssetSource(asset) {
-  this._asset = asset;
-}
-
-SingleAssetSource.prototype.asset = function() {
-  return this._asset;
-};
-
-SingleAssetSource.prototype.loadAsset = function(stage, tile, done) {
-  var self = this;
-
-  var timeout = setTimeout(function() {
-    done(null, tile, self._asset);
-  }, 0);
-
-  function cancel() {
-    clearTimeout(timeout);
-    done.apply(null, arguments);
+class SingleAssetSource {
+  constructor(asset) {
+    this._asset = asset;
   }
+  asset() {
+    return this._asset;
+  }
+  loadAsset(stage, tile, done) {
+    var self = this;
 
-  return cancel;
-};
+    var timeout = setTimeout(function () {
+      done(null, tile, self._asset);
+    }, 0);
+
+    function cancel() {
+      clearTimeout(timeout);
+      done.apply(null, arguments);
+    }
+
+    return cancel;
+  }
+}
 
 export default SingleAssetSource;

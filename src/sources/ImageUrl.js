@@ -41,6 +41,7 @@ var defaultConcurrency = 4;
 var defaultRetryDelay = 10000;
 
 
+// TODO: convert to es class
 /**
  * @class ImageUrlSource
  * @implements Source
