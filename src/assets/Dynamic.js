@@ -33,7 +33,7 @@ import clearOwnProperties from "../util/clearOwnProperties";
  */
 class DynamicAsset extends StaticAsset {
   constructor(element) {
-    this.constructor.super_.call(this, element);
+    super(element);
     this._timestamp = 0;
   }
   /**

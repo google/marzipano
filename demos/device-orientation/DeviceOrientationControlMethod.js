@@ -17,76 +17,70 @@
 import Marzipano from '../../src/index.js';
 
 // Custom control method to alter the view according to the device orientation.
-function DeviceOrientationControlMethod() {
-  this._dynamics = {
-    yaw: new Marzipano.Dynamics(),
-    pitch: new Marzipano.Dynamics()
-  };
+class DeviceOrientationControlMethod {
+  constructor() {
+    this._dynamics = {
+      yaw: new Marzipano.Dynamics(),
+      pitch: new Marzipano.Dynamics()
+    };
 
-  this._deviceOrientationHandler = this._handleData.bind(this);
+    this._deviceOrientationHandler = this._handleData.bind(this);
 
-  if (window.DeviceOrientationEvent) {
-    window.addEventListener('deviceorientation', this._deviceOrientationHandler);
+    if (window.DeviceOrientationEvent) {
+      window.addEventListener('deviceorientation', this._deviceOrientationHandler);
+    }
+
+    this._previous = {};
+    this._current = {};
+    this._tmp = {};
+
+    this._getPitchCallbacks = [];
   }
+  destroy() {
+    this._dynamics = null;
+    if (window.DeviceOrientationEvent) {
+      window.removeEventListener('deviceorientation', this._deviceOrientationHandler);
+    }
+    this._deviceOrientationHandler = null;
+    this._previous = null;
+    this._current = null;
+    this._tmp = null;
+    this._getPitchCallbacks = null;
+  }
+  getPitch(cb) {
+    this._getPitchCallbacks.push(cb);
+  }
+  _handleData(data) {
+    var previous = this._previous, current = this._current, tmp = this._tmp;
 
-  this._previous = {};
-  this._current = {};
-  this._tmp = {};
+    tmp.yaw = Marzipano.util.degToRad(data.alpha);
+    tmp.pitch = Marzipano.util.degToRad(data.beta);
+    tmp.roll = Marzipano.util.degToRad(data.gamma);
 
-  this._getPitchCallbacks = [];
+    rotateEuler(tmp, current);
+
+    // Report current pitch value.
+    this._getPitchCallbacks.forEach(function (callback) {
+      callback(null, current.pitch);
+    });
+    this._getPitchCallbacks.length = 0;
+
+    // Emit control offsets.
+    if (previous.yaw != null && previous.pitch != null && previous.roll != null) {
+      this._dynamics.yaw.offset = -(current.yaw - previous.yaw);
+      this._dynamics.pitch.offset = (current.pitch - previous.pitch);
+
+      this.emit('parameterDynamics', 'yaw', this._dynamics.yaw);
+      this.emit('parameterDynamics', 'pitch', this._dynamics.pitch);
+    }
+
+    previous.yaw = current.yaw;
+    previous.pitch = current.pitch;
+    previous.roll = current.roll;
+  }
 }
 
 Marzipano.dependencies.eventEmitter(DeviceOrientationControlMethod);
-
-
-DeviceOrientationControlMethod.prototype.destroy = function() {
-  this._dynamics = null;
-  if (window.DeviceOrientationEvent) {
-    window.removeEventListener('deviceorientation', this._deviceOrientationHandler);
-  }
-  this._deviceOrientationHandler = null;
-  this._previous = null;
-  this._current = null;
-  this._tmp = null;
-  this._getPitchCallbacks = null;
-};
-
-
-DeviceOrientationControlMethod.prototype.getPitch = function(cb) {
-  this._getPitchCallbacks.push(cb);
-};
-
-
-DeviceOrientationControlMethod.prototype._handleData = function(data) {
-  var previous = this._previous,
-      current = this._current,
-      tmp = this._tmp;
-
-  tmp.yaw = Marzipano.util.degToRad(data.alpha);
-  tmp.pitch = Marzipano.util.degToRad(data.beta);
-  tmp.roll = Marzipano.util.degToRad(data.gamma);
-
-  rotateEuler(tmp, current);
-
-  // Report current pitch value.
-  this._getPitchCallbacks.forEach(function(callback) {
-    callback(null, current.pitch);
-  });
-  this._getPitchCallbacks.length = 0;
-
-  // Emit control offsets.
-  if (previous.yaw != null && previous.pitch != null && previous.roll != null) {
-    this._dynamics.yaw.offset = -(current.yaw - previous.yaw);
-    this._dynamics.pitch.offset = (current.pitch - previous.pitch);
-
-    this.emit('parameterDynamics', 'yaw', this._dynamics.yaw);
-    this.emit('parameterDynamics', 'pitch', this._dynamics.pitch);
-  }
-
-  previous.yaw = current.yaw;
-  previous.pitch = current.pitch;
-  previous.roll = current.roll;
-};
 
 // Taken from krpano's gyro plugin by Aldo Hoeben:
 // https://github.com/fieldOfView/krpano_fovplugins/tree/master/gyro/
