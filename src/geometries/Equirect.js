@@ -15,12 +15,12 @@
  */
 'use strict';
 
-var inherits = require('../util/inherits');
-var hash = require('../util/hash');
-var cmp = require('../util/cmp');
-var common = require('./common');
-var Level = require('./Level');
-var type = require('../util/type');
+import inherits from "../util/inherits";
+import hash from "../util/hash";
+import cmp from "../util/cmp";
+import common from "./common";
+import Level from "./Level";
+import type from "../util/type";
 
 
 /**
@@ -190,4 +190,4 @@ EquirectGeometry.type = EquirectGeometry.prototype.type = 'equirect';
 EquirectTile.type = EquirectTile.prototype.type = 'equirect';
 
 
-module.exports = EquirectGeometry;
+export default EquirectGeometry;

@@ -29,7 +29,13 @@ function changeVectorNorm(x, y, n, result) {
   result[1] = n * Math.sin(theta);
 }
 
-module.exports = {
+// TODO: restructure these imports
+export {
+  maxFriction,
+  changeVectorNorm
+};
+
+export default {
   maxFriction: maxFriction,
   changeVectorNorm: changeVectorNorm
 };

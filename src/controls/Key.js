@@ -15,9 +15,9 @@
  */
 'use strict';
 
-var eventEmitter = require('minimal-event-emitter');
-var Dynamics = require('./Dynamics');
-var clearOwnProperties = require('../util/clearOwnProperties');
+import eventEmitter from "minimal-event-emitter";
+import Dynamics from "./Dynamics";
+import clearOwnProperties from "../util/clearOwnProperties";
 
 /**
  * @class KeyControlMethod
@@ -110,4 +110,4 @@ KeyControlMethod.prototype._handleBlur = function() {
   this._pressing = false;
 };
 
-module.exports = KeyControlMethod;
+export default KeyControlMethod;

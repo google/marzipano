@@ -15,12 +15,12 @@
  */
 'use strict';
 
-var defaults = require('../util/defaults');
-var DragControlMethod = require('./Drag');
-var QtvrControlMethod = require('./Qtvr');
-var ScrollZoomControlMethod = require('./ScrollZoom');
-var PinchZoomControlMethod = require('./PinchZoom');
-var KeyControlMethod = require('./Key');
+import defaults from "../util/defaults";
+import DragControlMethod from "./Drag";
+import QtvrControlMethod from "./Qtvr";
+import ScrollZoomControlMethod from "./ScrollZoom";
+import PinchZoomControlMethod from "./PinchZoom";
+import KeyControlMethod from "./Key";
 
 var defaultOptions = {
   mouseViewMode: 'drag',
@@ -121,4 +121,4 @@ function registerDefaultControls(controls, element, opts) {
   return controlMethods;
 }
 
-module.exports = registerDefaultControls;
+export default registerDefaultControls;

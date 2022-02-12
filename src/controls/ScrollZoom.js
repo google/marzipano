@@ -15,10 +15,10 @@
  */
 'use strict';
 
-var eventEmitter = require('minimal-event-emitter');
-var Dynamics = require('./Dynamics');
-var defaults = require('../util/defaults');
-var clearOwnProperties = require('../util/clearOwnProperties');
+import eventEmitter from "minimal-event-emitter";
+import Dynamics from "./Dynamics";
+import defaults from "../util/defaults";
+import clearOwnProperties from "../util/clearOwnProperties";
 
 var defaultOptions = {
   frictionTime: 0.2,
@@ -108,4 +108,4 @@ function wheelEventDelta(e) {
 }
 
 
-module.exports = ScrollZoomControlMethod;
+export default ScrollZoomControlMethod;

@@ -20,4 +20,4 @@ function ispot(n) {
   return (n & (n - 1)) == 0;
 }
 
-module.exports = ispot;
+export default ispot;

@@ -15,7 +15,7 @@
  */
 'use strict';
 
-var cmp = require('../util/cmp');
+import cmp from "../util/cmp";
 
 function makeLevelList(levelPropertiesList, LevelClass) {
   var list = [];
@@ -47,7 +47,13 @@ function makeSelectableLevelList(levelList) {
   return list;
 }
 
-module.exports = {
+// TODO: restructure these imports
+export {
+  makeLevelList,
+  makeSelectableLevelList
+};
+
+export default {
   makeLevelList: makeLevelList,
   makeSelectableLevelList: makeSelectableLevelList
 };

@@ -15,7 +15,7 @@
  */
 'use strict';
 
-var Hammer = require('hammerjs');
+import Hammer from "hammerjs";
 
 var nextId = 1;
 var idProperty = 'MarzipanoHammerElementId';
@@ -124,4 +124,4 @@ HammerGesturesHandle.prototype.manager = function() {
 };
 
 
-module.exports = new HammerGestures();
+export default new HammerGestures();

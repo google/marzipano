@@ -15,10 +15,10 @@
  */
 'use strict';
 
-var mat4 = require('gl-matrix').mat4;
-var clearOwnProperties = require('../util/clearOwnProperties');
+import { mat4 as mat4 } from "gl-matrix";
+import clearOwnProperties from "../util/clearOwnProperties";
 
-var WebGlCommon = require('./WebGlCommon');
+import WebGlCommon from "./WebGlCommon";
 var createConstantBuffers = WebGlCommon.createConstantBuffers;
 var destroyConstantBuffers = WebGlCommon.destroyConstantBuffers;
 var createShaderProgram = WebGlCommon.createShaderProgram;
@@ -31,8 +31,8 @@ var setupPixelEffectUniforms = WebGlCommon.setupPixelEffectUniforms;
 var setDepth = WebGlCommon.setDepth;
 var setTexture = WebGlCommon.setTexture;
 
-var vertexSrc = require('../shaders/vertexEquirect');
-var fragmentSrc = require('../shaders/fragmentEquirect');
+import vertexSrc from "../shaders/vertexEquirect";
+import fragmentSrc from "../shaders/fragmentEquirect";
 
 var vertexIndices = [0, 1, 2, 0, 2, 3];
 var vertexPositions = [-1.0, -1.0, 0.0, 1.0, -1.0, 0.0, 1.0, 1.0, 0.0, -1.0, 1.0, 0.0];
@@ -144,4 +144,4 @@ WebGlEquirectRenderer.prototype.renderTile = function(tile, texture, layer, laye
 };
 
 
-module.exports = WebGlEquirectRenderer;
+export default WebGlEquirectRenderer;

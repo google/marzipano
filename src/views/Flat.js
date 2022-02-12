@@ -15,13 +15,13 @@
  */
 'use strict';
 
-var eventEmitter = require('minimal-event-emitter');
-var mat4 = require('gl-matrix').mat4;
-var vec4 = require('gl-matrix').vec4;
-var pixelRatio = require('../util/pixelRatio');
-var real = require('../util/real');
-var clamp = require('../util/clamp');
-var clearOwnProperties = require('../util/clearOwnProperties');
+import eventEmitter from "minimal-event-emitter";
+import { mat4 as mat4 } from "gl-matrix";
+import { vec4 as vec4 } from "gl-matrix";
+import pixelRatio from "../util/pixelRatio";
+import real from "../util/real";
+import clamp from "../util/clamp";
+import clearOwnProperties from "../util/clearOwnProperties";
 
 // Default viewport dimensions.
 // Start with zero to ensure that those values are handled correctly.
@@ -876,4 +876,4 @@ FlatView.limit = {
 FlatView.type = FlatView.prototype.type = 'flat';
 
 
-module.exports = FlatView;
+export default FlatView;

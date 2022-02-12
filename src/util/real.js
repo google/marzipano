@@ -19,4 +19,4 @@ function real(x) {
   return typeof x === 'number' && isFinite(x);
 }
 
-module.exports = real;
+export default real;

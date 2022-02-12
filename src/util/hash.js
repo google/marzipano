@@ -34,4 +34,4 @@ function hash() {
   return h >= 0 ? h : -h;
 }
 
-module.exports = hash;
+export default hash;

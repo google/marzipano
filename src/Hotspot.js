@@ -15,10 +15,10 @@
  */
 'use strict';
 
-var eventEmitter = require('minimal-event-emitter');
-var positionAbsolutely = require('./util/positionAbsolutely');
-var setTransform = require('./util/dom').setTransform;
-var clearOwnProperties = require('./util/clearOwnProperties');
+import eventEmitter from "minimal-event-emitter";
+import positionAbsolutely from "./util/positionAbsolutely";
+import { setTransform as setTransform } from "./util/dom";
+import clearOwnProperties from "./util/clearOwnProperties";
 
 /**
  * @class Hotspot
@@ -224,4 +224,4 @@ Hotspot.prototype._setPosition = function(x, y) {
 };
 
 
-module.exports = Hotspot;
+export default Hotspot;

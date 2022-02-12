@@ -108,8 +108,26 @@ function setNoPointerEvents(element) {
   element.style.pointerEvents = 'none';
 }
 
+// TODO: rethink these exports
+export {
+  prefixProperty,
+  getWithVendorPrefix,
+  setWithVendorPrefix,
+  setTransform,
+  setTransformOrigin,
+  setNullTransform,
+  setNullTransformOrigin,
+  setAbsolute,
+  setPixelPosition,
+  setPixelSize,
+  setNullSize,
+  setFullSize,
+  setOverflowHidden,
+  setOverflowVisible,
+  setNoPointerEvents
+};
 
-module.exports = {
+export default {
   prefixProperty: prefixProperty,
   getWithVendorPrefix: getWithVendorPrefix,
   setWithVendorPrefix: setWithVendorPrefix,

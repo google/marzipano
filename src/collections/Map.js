@@ -15,7 +15,7 @@
  */
 'use strict';
 
-var mod = require('../util/mod');
+import mod from "../util/mod";
 
 var defaultCapacity = 64;
 
@@ -142,4 +142,4 @@ Map.prototype.forEach = function(fn) {
   return count;
 };
 
-module.exports = Map;
+export default Map;

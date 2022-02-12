@@ -19,11 +19,14 @@
     "dev": "scripts/dev",
     "release": "scripts/release",
     "deploy": "scripts/deploy",
-    "prepublishOnly": "scripts/prepublish"
+    "prepublishOnly": "scripts/prepublish",
+    "vite:dev": "vite",
+    "vite:build": "tsc && vite build",
+    "vite:preview": "vite preview"
   },
   "dependencies": {
     "bowser": "1.9.4",
-    "gl-matrix": "3.3.0",
+    "gl-matrix": "3.4.3",
     "hammerjs": "2.0.4",
     "minimal-event-emitter": "1.0.0"
   },
@@ -36,6 +39,8 @@
     "sinon": "^9.2.2",
     "testem": "^3.2.0",
     "uglify-js": "^3.12.3",
+    "typescript": "^4.5.4",
+    "vite": "^2.8.0",
     "watchify": "^3.11.1"
   }
 }

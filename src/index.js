@@ -13,107 +13,200 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
+// TODO: re-structure imports
+import WebGlStage from "./stages/WebGl";
 
-module.exports = {
+// Renderers.
+import WebGlCubeRenderer from "./renderers/WebGlCube";
+import WebGlFlatRenderer from "./renderers/WebGlFlat";
+import WebGlEquirectRenderer from "./renderers/WebGlEquirect";
+import registerDefaultRenderers from "./renderers/registerDefaultRenderers";
 
+// Geometries.
+import CubeGeometry from "./geometries/Cube";
+import FlatGeometry from "./geometries/Flat";
+import EquirectGeometry from "./geometries/Equirect";
+
+// Views.
+import RectilinearView from "./views/Rectilinear";
+import FlatView from "./views/Flat";
+
+// Sources.
+import ImageUrlSource from "./sources/ImageUrl";
+import SingleAssetSource from "./sources/SingleAsset";
+
+// Assets.
+import StaticAsset from "./assets/Static";
+import DynamicAsset from "./assets/Dynamic";
+
+// Texture store.
+import TextureStore from "./TextureStore";
+
+// Layer.
+import Layer from "./Layer";
+
+// Render loop.
+import RenderLoop from "./RenderLoop";
+
+// Controls.
+import KeyControlMethod from "./controls/Key";
+import DragControlMethod from "./controls/Drag";
+import QtvrControlMethod from "./controls/Qtvr";
+import ScrollZoomControlMethod from "./controls/ScrollZoom";
+import PinchZoomControlMethod from "./controls/PinchZoom";
+import VelocityControlMethod from "./controls/Velocity";
+import ElementPressControlMethod from "./controls/ElementPress";
+import Controls from "./controls/Controls";
+import Dynamics from "./controls/Dynamics";
+
+// High-level API.
+import Viewer from "./Viewer";
+import Scene from "./Scene";
+
+// Hotspots.
+import Hotspot from "./Hotspot";
+import HotspotContainer from "./HotspotContainer";
+
+// Effects.
+import colorEffects from "./colorEffects";
+
+// Miscellaneous functions.
+import registerDefaultControls from "./controls/registerDefaultControls";
+import autorotate from "./autorotate";
+
+// Utility functions.
+import async from "./util/async";
+import cancelize from "./util/cancelize";
+import chain from "./util/chain";
+import clamp from "./util/clamp";
+import clearOwnProperties from "./util/clearOwnProperties";
+import cmp from "./util/cmp";
+import compose from "./util/compose";
+import convertFov from "./util/convertFov";
+import decimal from "./util/decimal";
+import defaults from "./util/defaults";
+import defer from "./util/defer";
+import degToRad from "./util/degToRad";
+import delay from "./util/delay";
+import dom from "./util/dom";
+import extend from "./util/extend";
+import hash from "./util/hash";
+import inherits from "./util/inherits";
+import mod from "./util/mod";
+import noop from "./util/noop";
+import now from "./util/now";
+import once from "./util/once";
+import pixelRatio from "./util/pixelRatio";
+import radToDeg from "./util/radToDeg";
+import real from "./util/real";
+import retry from "./util/retry";
+import tween from "./util/tween";
+import type from "./util/type";
+
+// Expose dependencies for clients to use.
+import bowser from "bowser";
+import * as glMatrix from "gl-matrix";
+import eventEmitter from "minimal-event-emitter";
+import hammerjs from "hammerjs";
+
+export default {
   // Stages.
-  WebGlStage: require('./stages/WebGl'),
+  WebGlStage,
 
   // Renderers.
-  WebGlCubeRenderer: require('./renderers/WebGlCube'),
-  WebGlFlatRenderer: require('./renderers/WebGlFlat'),
-  WebGlEquirectRenderer: require('./renderers/WebGlEquirect'),
-  registerDefaultRenderers: require('./renderers/registerDefaultRenderers'),
+  WebGlCubeRenderer,
+  WebGlFlatRenderer,
+  WebGlEquirectRenderer,
+  registerDefaultRenderers,
 
   // Geometries.
-  CubeGeometry: require('./geometries/Cube'),
-  FlatGeometry: require('./geometries/Flat'),
-  EquirectGeometry: require('./geometries/Equirect'),
+  CubeGeometry,
+  FlatGeometry,
+  EquirectGeometry,
 
   // Views.
-  RectilinearView: require('./views/Rectilinear'),
-  FlatView: require('./views/Flat'),
+  RectilinearView,
+  FlatView,
 
   // Sources.
-  ImageUrlSource: require('./sources/ImageUrl'),
-  SingleAssetSource: require('./sources/SingleAsset'),
+  ImageUrlSource,
+  SingleAssetSource,
 
   // Assets.
-  StaticAsset: require('./assets/Static'),
-  DynamicAsset: require('./assets/Dynamic'),
+  StaticAsset,
+  DynamicAsset,
 
   // Texture store.
-  TextureStore: require('./TextureStore'),
+  TextureStore,
 
   // Layer.
-  Layer: require('./Layer'),
+  Layer,
 
   // Render loop.
-  RenderLoop: require('./RenderLoop'),
+  RenderLoop,
 
   // Controls.
-  KeyControlMethod: require('./controls/Key'),
-  DragControlMethod: require('./controls/Drag'),
-  QtvrControlMethod: require('./controls/Qtvr'),
-  ScrollZoomControlMethod: require('./controls/ScrollZoom'),
-  PinchZoomControlMethod: require('./controls/PinchZoom'),
-  VelocityControlMethod: require('./controls/Velocity'),
-  ElementPressControlMethod: require('./controls/ElementPress'),
-  Controls: require('./controls/Controls'),
-  Dynamics: require('./controls/Dynamics'),
+  KeyControlMethod,
+  DragControlMethod,
+  QtvrControlMethod,
+  ScrollZoomControlMethod,
+  PinchZoomControlMethod,
+  VelocityControlMethod,
+  ElementPressControlMethod,
+  Controls,
+  Dynamics,
 
   // High-level API.
-  Viewer: require('./Viewer'),
-  Scene: require('./Scene'),
+  Viewer,
+  Scene,
 
   // Hotspots.
-  Hotspot: require('./Hotspot'),
-  HotspotContainer: require('./HotspotContainer'),
+  Hotspot,
+  HotspotContainer,
 
   // Effects.
-  colorEffects: require('./colorEffects'),
+  colorEffects,
 
   // Miscellaneous functions.
-  registerDefaultControls: require('./controls/registerDefaultControls'),
-  autorotate: require('./autorotate'),
+  registerDefaultControls,
+  autorotate,
 
   // Utility functions.
   util: {
-    async: require('./util/async'),
-    cancelize: require('./util/cancelize'),
-    chain: require('./util/chain'),
-    clamp: require('./util/clamp'),
-    clearOwnProperties: require('./util/clearOwnProperties'),
-    cmp: require('./util/cmp'),
-    compose: require('./util/compose'),
-    convertFov: require('./util/convertFov'),
-    decimal: require('./util/decimal'),
-    defaults: require('./util/defaults'),
-    defer: require('./util/defer'),
-    degToRad: require('./util/degToRad'),
-    delay: require('./util/delay'),
-    dom: require('./util/dom'),
-    extend: require('./util/extend'),
-    hash: require('./util/hash'),
-    inherits: require('./util/inherits'),
-    mod: require('./util/mod'),
-    noop: require('./util/noop'),
-    now: require('./util/now'),
-    once: require('./util/once'),
-    pixelRatio: require('./util/pixelRatio'),
-    radToDeg: require('./util/radToDeg'),
-    real: require('./util/real'),
-    retry: require('./util/retry'),
-    tween: require('./util/tween'),
-    type: require('./util/type')
+    async,
+    cancelize,
+    chain,
+    clamp,
+    clearOwnProperties,
+    cmp,
+    compose,
+    convertFov,
+    decimal,
+    defaults,
+    defer,
+    degToRad,
+    delay,
+    dom,
+    extend,
+    hash,
+    inherits,
+    mod,
+    noop,
+    now,
+    once,
+    pixelRatio,
+    radToDeg,
+    real,
+    retry,
+    tween,
+    type,
   },
 
   // Expose dependencies for clients to use.
   dependencies: {
-    bowser: require('bowser'),
-    glMatrix: require('gl-matrix'),
-    eventEmitter: require('minimal-event-emitter'),
-    hammerjs: require('hammerjs')
-  }
+    bowser,
+    glMatrix,
+    eventEmitter,
+    hammerjs,
+  },
 };

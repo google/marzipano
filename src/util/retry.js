@@ -15,7 +15,7 @@
  */
 'use strict';
 
-var noop = require('./noop');
+import noop from "./noop";
 
 // Return a cancelable function that executes fn in a loop until it returns
 // successfully.
@@ -50,4 +50,4 @@ function retry(fn) {
 
 }
 
-module.exports = retry;
+export default retry;

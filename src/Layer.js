@@ -16,9 +16,9 @@
 'use strict';
 
 
-var eventEmitter = require('minimal-event-emitter');
-var extend = require('./util/extend');
-var clearOwnProperties = require('./util/clearOwnProperties');
+import eventEmitter from "minimal-event-emitter";
+import extend from "./util/extend";
+import clearOwnProperties from "./util/clearOwnProperties";
 
 /**
  * Signals that the layer has been rendered.
@@ -249,4 +249,4 @@ Layer.prototype.unpinFirstLevel = function() {
 };
 
 
-module.exports = Layer;
+export default Layer;

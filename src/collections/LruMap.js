@@ -15,7 +15,7 @@
  */
 'use strict';
 
-var mod = require('../util/mod');
+import mod from "../util/mod";
 
 // An LruMap holds up to a maximum number of key-value pairs, ordered by their
 // time of insertion. When the addition of a key-value pair would cause the
@@ -129,4 +129,4 @@ LruMap.prototype.forEach = function(fn) {
   return count;
 };
 
-module.exports = LruMap;
+export default LruMap;

@@ -21,4 +21,4 @@ function decimal(x) {
   return x.toPrecision(15);
 }
 
-module.exports = decimal;
+export default decimal;

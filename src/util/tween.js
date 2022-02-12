@@ -15,7 +15,7 @@
  */
 'use strict';
 
-var now = require('./now');
+import now from "./now";
 
 function tween(duration, update, done) {
   var cancelled = false;
@@ -44,4 +44,4 @@ function tween(duration, update, done) {
   }
 }
 
-module.exports = tween;
+export default tween;

@@ -34,4 +34,4 @@ function pixelRatio() {
   return defaultPixelRatio;
 }
 
-module.exports = pixelRatio;
+export default pixelRatio;

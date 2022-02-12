@@ -36,4 +36,4 @@ function compose() {
   };
 }
 
-module.exports = compose;
+export default compose;

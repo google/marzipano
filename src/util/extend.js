@@ -22,4 +22,4 @@ function extend(obj, sourceObj) {
   return obj;
 }
 
-module.exports = extend;
+export default extend;

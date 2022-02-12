@@ -15,18 +15,18 @@
  */
 'use strict';
 
-var inherits = require('../util/inherits');
-var hash = require('../util/hash');
-var TileSearcher = require('../TileSearcher');
-var LruMap = require('../collections/LruMap');
-var Level = require('./Level');
-var makeLevelList = require('./common').makeLevelList;
-var makeSelectableLevelList = require('./common').makeSelectableLevelList;
-var clamp = require('../util/clamp');
-var cmp = require('../util/cmp');
-var type = require('../util/type');
-var vec3 = require('gl-matrix').vec3;
-var vec4 = require('gl-matrix').vec4;
+import inherits from "../util/inherits";
+import hash from "../util/hash";
+import TileSearcher from "../TileSearcher";
+import LruMap from "../collections/LruMap";
+import Level from "./Level";
+import { makeLevelList as makeLevelList } from "./common";
+import { makeSelectableLevelList as makeSelectableLevelList } from "./common";
+import clamp from "../util/clamp";
+import cmp from "../util/cmp";
+import type from "../util/type";
+import { vec3 as vec3 } from "gl-matrix";
+import { vec4 as vec4 } from "gl-matrix";
 
 var neighborsCacheSize = 64;
 
@@ -561,4 +561,4 @@ CubeGeometry.type = CubeGeometry.prototype.type = 'cube';
 CubeTile.type = CubeTile.prototype.type = 'cube';
 
 
-module.exports = CubeGeometry;
+export default CubeGeometry;

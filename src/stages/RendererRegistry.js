@@ -57,4 +57,4 @@ RendererRegistry.prototype.get = function(geometryType, viewType) {
   return Renderer || null;
 };
 
-module.exports = RendererRegistry;
+export default RendererRegistry;

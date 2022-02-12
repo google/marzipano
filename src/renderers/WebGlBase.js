@@ -15,11 +15,11 @@
  */
 'use strict';
 
-var mat4 = require('gl-matrix').mat4;
-var vec3 = require('gl-matrix').vec3;
-var clearOwnProperties = require('../util/clearOwnProperties');
+import { mat4 as mat4 } from "gl-matrix";
+import { vec3 as vec3 } from "gl-matrix";
+import clearOwnProperties from "../util/clearOwnProperties";
 
-var WebGlCommon = require('./WebGlCommon');
+import WebGlCommon from "./WebGlCommon";
 var createConstantBuffers = WebGlCommon.createConstantBuffers;
 var destroyConstantBuffers = WebGlCommon.destroyConstantBuffers;
 var createShaderProgram = WebGlCommon.createShaderProgram;
@@ -32,8 +32,8 @@ var setupPixelEffectUniforms = WebGlCommon.setupPixelEffectUniforms;
 var setDepth = WebGlCommon.setDepth;
 var setTexture = WebGlCommon.setTexture;
 
-var vertexSrc = require('../shaders/vertexNormal');
-var fragmentSrc = require('../shaders/fragmentNormal');
+import vertexSrc from "../shaders/vertexNormal";
+import fragmentSrc from "../shaders/fragmentNormal";
 
 var vertexIndices = [0, 1, 2, 0, 2, 3];
 var vertexPositions = [-0.5, -0.5, 0.0, 0.5, -0.5, 0.0, 0.5, 0.5, 0.0, -0.5, 0.5, 0.0];
@@ -139,4 +139,4 @@ WebGlBaseRenderer.prototype.renderTile = function(tile, texture, layer, layerZ) 
 };
 
 
-module.exports = WebGlBaseRenderer;
+export default WebGlBaseRenderer;

@@ -15,17 +15,19 @@
  */
 'use strict';
 
-var eventEmitter = require('minimal-event-emitter');
-var Hotspot = require('./Hotspot');
-var calcRect = require('./util/calcRect');
-var positionAbsolutely = require('./util/positionAbsolutely');
-var setAbsolute = require('./util/dom').setAbsolute;
-var setOverflowHidden = require('./util/dom').setOverflowHidden;
-var setOverflowVisible = require('./util/dom').setOverflowVisible;
-var setNullSize = require('./util/dom').setNullSize;
-var setPixelSize = require('./util/dom').setPixelSize;
-var setPointerEvents = require('./util/dom').setWithVendorPrefix('pointer-events');
-var clearOwnProperties = require('./util/clearOwnProperties');
+import eventEmitter from "minimal-event-emitter";
+import Hotspot from "./Hotspot";
+import calcRect from "./util/calcRect";
+import positionAbsolutely from "./util/positionAbsolutely";
+import { setAbsolute as setAbsolute } from "./util/dom";
+import { setOverflowHidden as setOverflowHidden } from "./util/dom";
+import { setOverflowVisible as setOverflowVisible } from "./util/dom";
+import { setNullSize as setNullSize } from "./util/dom";
+import { setPixelSize as setPixelSize } from "./util/dom";
+import dom from "./util/dom";
+const  setPointerEvents = dom.setWithVendorPrefix('pointer-events');
+import clearOwnProperties from "./util/clearOwnProperties";
+
 
 /**
  * Signals that a hotspot has been created or destroyed on the container.
@@ -263,4 +265,4 @@ HotspotContainer.prototype._update = function() {
 };
 
 
-module.exports = HotspotContainer;
+export default HotspotContainer;

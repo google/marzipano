@@ -26,4 +26,4 @@ function clearOwnProperties(obj) {
   }
 }
 
-module.exports = clearOwnProperties;
+export default clearOwnProperties;

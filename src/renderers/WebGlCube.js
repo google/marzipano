@@ -15,8 +15,8 @@
  */
 'use strict';
 
-var WebGlBaseRenderer = require('./WebGlBase');
-var inherits = require('../util/inherits');
+import WebGlBaseRenderer from "./WebGlBase";
+import inherits from "../util/inherits";
 
 /**
  * @class WebGlCubeRenderer
@@ -35,4 +35,4 @@ function WebGlCubeRenderer() {
 
 inherits(WebGlCubeRenderer, WebGlBaseRenderer);
 
-module.exports = WebGlCubeRenderer;
+export default WebGlCubeRenderer;

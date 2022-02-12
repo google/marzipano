@@ -25,4 +25,4 @@ function cmp(x, y) {
   return 0;
 }
 
-module.exports = cmp;
+export default cmp;

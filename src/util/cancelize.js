@@ -15,7 +15,7 @@
  */
 'use strict';
 
-var once = require('./once');
+import once from './once';
 
 // A cancelable function is an asynchronous function (i.e., one whose last
 // argument is a callback receiving an error plus zero or more return values)
@@ -50,4 +50,4 @@ function cancelize(fn) {
   };
 }
 
-module.exports = cancelize;
+export default cancelize;

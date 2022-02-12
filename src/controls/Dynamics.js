@@ -105,4 +105,4 @@ function decreaseAbs(num, dec) {
   return 0;
 }
 
-module.exports = Dynamics;
+export default Dynamics;

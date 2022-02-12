@@ -15,7 +15,7 @@
  */
 'use strict';
 
-module.exports = [
+export default [
 'attribute vec3 aVertexPosition;',
 'attribute vec2 aTextureCoord;',
 

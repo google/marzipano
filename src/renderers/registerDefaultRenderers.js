@@ -15,9 +15,9 @@
  */
 'use strict';
 
-var WebGlCube = require('./WebGlCube');
-var WebGlFlat = require('./WebGlFlat');
-var WebGlEquirect = require('./WebGlEquirect');
+import WebGlCube from "./WebGlCube";
+import WebGlFlat from "./WebGlFlat";
+import WebGlEquirect from "./WebGlEquirect";
 
 /**
  * Registers all known renderers for the given stage type into that stage.
@@ -39,4 +39,4 @@ function registerDefaultRenderers(stage) {
   }
 }
 
-module.exports = registerDefaultRenderers;
+export default registerDefaultRenderers;

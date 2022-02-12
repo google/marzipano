@@ -15,11 +15,11 @@
  */
 'use strict';
 
-var StaticAsset = require('../assets/Static');
-var NetworkError = require('../NetworkError');
-var browser = require('bowser');
-var global = require('../util/global');
-var once = require('../util/once');
+import StaticAsset from "../assets/Static";
+import NetworkError from "../NetworkError";
+import browser from "bowser";
+import global from "../util/global";
+import once from "../util/once";
 
 // TODO: Move the load queue into the loader.
 
@@ -136,4 +136,4 @@ HtmlImageLoader.prototype._handleError = function(url, done) {
   done(new NetworkError('Network error: ' + url));
 };
 
-module.exports = HtmlImageLoader;
+export default HtmlImageLoader;

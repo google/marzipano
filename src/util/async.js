@@ -33,4 +33,4 @@ function async(fn) {
   };
 }
 
-module.exports = async;
+export default async;

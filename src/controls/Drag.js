@@ -15,12 +15,12 @@
  */
 'use strict';
 
-var eventEmitter = require('minimal-event-emitter');
-var Dynamics = require('./Dynamics');
-var HammerGestures = require('./HammerGestures');
-var defaults = require('../util/defaults');
-var maxFriction = require('./util').maxFriction;
-var clearOwnProperties = require('../util/clearOwnProperties');
+import eventEmitter from "minimal-event-emitter";
+import Dynamics from "./Dynamics";
+import HammerGestures from "./HammerGestures";
+import defaults from "../util/defaults";
+import { maxFriction as maxFriction } from "./util";
+import clearOwnProperties from "../util/clearOwnProperties";
 
 var defaultOptions = {
   friction: 6,
@@ -188,4 +188,4 @@ DragControlMethod.prototype._updateDynamicsRelease = function(e) {
 };
 
 
-module.exports = DragControlMethod;
+export default DragControlMethod;

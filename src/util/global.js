@@ -29,4 +29,4 @@ var globalObject = (function() {
   return null;
 })();
 
-module.exports = globalObject;
+export default globalObject;

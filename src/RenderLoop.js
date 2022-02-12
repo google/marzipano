@@ -15,8 +15,8 @@
  */
 'use strict';
 
-var eventEmitter = require('minimal-event-emitter');
-var clearOwnProperties = require('./util/clearOwnProperties');
+import eventEmitter from "minimal-event-emitter";
+import clearOwnProperties from "./util/clearOwnProperties";
 
 /**
  * Signals that {@link Stage#render} is about to be called.
@@ -141,4 +141,4 @@ RenderLoop.prototype._loop = function() {
 };
 
 
-module.exports = RenderLoop;
+export default RenderLoop;

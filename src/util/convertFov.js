@@ -97,10 +97,11 @@ function dtov(fov, width, height) {
   return convert(fov, Math.sqrt(width * width + height * height), height);
 }
 
+// TODO: rethink these exports
 /**
  * @namespace util.convertFov
  */
-module.exports = {
+export default {
   convert: convert,
   htov: htov,
   htod: htod,

@@ -15,15 +15,15 @@
  */
 'use strict';
 
-var Layer = require('./Layer');
-var TextureStore = require('./TextureStore');
-var HotspotContainer = require('./HotspotContainer');
-var eventEmitter = require('minimal-event-emitter');
-var now = require('./util/now');
-var noop = require('./util/noop');
-var type = require('./util/type');
-var defaults = require('./util/defaults');
-var clearOwnProperties = require('./util/clearOwnProperties');
+import Layer from "./Layer";
+import TextureStore from "./TextureStore";
+import HotspotContainer from "./HotspotContainer";
+import eventEmitter from "minimal-event-emitter";
+import now from "./util/now";
+import noop from "./util/noop";
+import type from "./util/type";
+import defaults from "./util/defaults";
+import clearOwnProperties from "./util/clearOwnProperties";
 
 /**
  * Signals that the scene's view has changed. See {@link View#event:change}.
@@ -447,4 +447,4 @@ Scene.prototype._updateHotspotContainer = function() {
 };
 
 
-module.exports = Scene;
+export default Scene;

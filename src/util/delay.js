@@ -44,4 +44,4 @@ function delay(ms, done) {
 
 }
 
-module.exports = delay;
+export default delay;

@@ -31,4 +31,4 @@ Level.prototype.fallbackOnly = function() {
   return this._fallbackOnly;
 };
 
-module.exports = Level;
+export default Level;

@@ -15,10 +15,10 @@
  */
 'use strict';
 
-var StaticAsset = require('./Static');
-var inherits = require('../util/inherits');
-var eventEmitter = require('minimal-event-emitter');
-var clearOwnProperties = require('../util/clearOwnProperties');
+import StaticAsset from "./Static";
+import inherits from "../util/inherits";
+import eventEmitter from "minimal-event-emitter";
+import clearOwnProperties from "../util/clearOwnProperties";
 
 /**
  * @class DynamicAsset
@@ -66,4 +66,4 @@ DynamicAsset.prototype.markDirty = function() {
   this.emit('change');
 };
 
-module.exports = DynamicAsset;
+export default DynamicAsset;

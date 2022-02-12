@@ -15,7 +15,7 @@
  */
 'use strict';
 
-var inherits = require('./util/inherits');
+import inherits from "./util/inherits";
 
 /**
  * @class NetworkError
@@ -33,4 +33,4 @@ function NetworkError(message) {
 
 inherits(NetworkError, Error);
 
-module.exports = NetworkError;
+export default NetworkError;

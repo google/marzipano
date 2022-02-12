@@ -15,15 +15,15 @@
  */
 'use strict';
 
-var Stage = require('./Stage');
-var HtmlImageLoader = require('../loaders/HtmlImage');
-var browser = require('bowser');
-var inherits = require('../util/inherits');
-var pixelRatio = require('../util/pixelRatio');
-var ispot = require('../util/ispot');
-var setAbsolute = require('../util/dom').setAbsolute;
-var setFullSize = require('../util/dom').setFullSize;
-var clearOwnProperties = require('../util/clearOwnProperties');
+import Stage from './Stage';
+import HtmlImageLoader from "../loaders/HtmlImage";
+import browser from "bowser";
+import inherits from "../util/inherits";
+import pixelRatio from "../util/pixelRatio";
+import ispot from "../util/ispot";
+import { setAbsolute as setAbsolute } from "../util/dom";
+import { setFullSize as setFullSize } from "../util/dom";
+import clearOwnProperties from "../util/clearOwnProperties";
 
 // TODO(tjgq): Unify Stage and WebGlStage.
 
@@ -392,4 +392,4 @@ WebGlTexture.prototype.destroy = function() {
 WebGlStage.TextureClass = WebGlStage.prototype.TextureClass = WebGlTexture;
 
 
-module.exports = WebGlStage;
+export default WebGlStage;

@@ -80,4 +80,4 @@ function calcRect(totalWidth, totalHeight, spec, result) {
   return result;
 }
 
-module.exports = calcRect;
+export default calcRect;

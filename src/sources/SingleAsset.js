@@ -47,4 +47,4 @@ SingleAssetSource.prototype.loadAsset = function(stage, tile, done) {
   return cancel;
 };
 
-module.exports = SingleAssetSource;
+export default SingleAssetSource;

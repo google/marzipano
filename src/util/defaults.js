@@ -24,4 +24,4 @@ function defaults(obj, defaultsObj) {
   return obj;
 }
 
-module.exports = defaults;
+export default defaults;

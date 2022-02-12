@@ -19,10 +19,10 @@
 var MAX_LAYERS = 256; // Max number of layers per stage.
 var MAX_LEVELS = 256; // Max number of levels per layer.
 
-var clamp = require('../util/clamp');
-var vec4 = require('gl-matrix').vec4;
-var vec3 = require('gl-matrix').vec3;
-var mat4 = require('gl-matrix').mat4;
+import clamp from "../util/clamp";
+import { vec4 as vec4 } from "gl-matrix";
+import { vec3 as vec3 } from "gl-matrix";
+import { mat4 as mat4 } from "gl-matrix";
 
 
 function createShader(gl, type, src) {
@@ -218,7 +218,7 @@ function setViewport(gl, layer, rect, viewportMatrix) {
               gl.drawingBufferHeight * clampedHeight);
 }
 
-module.exports = {
+export default {
   createShaderProgram: createShaderProgram,
   destroyShaderProgram: destroyShaderProgram,
   createConstantBuffers: createConstantBuffers,

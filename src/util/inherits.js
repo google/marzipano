@@ -25,4 +25,4 @@ function inherits(ctor, superCtor) {
   ctor.prototype.constructor = ctor;
 }
 
-module.exports = inherits;
+export default inherits;

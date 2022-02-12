@@ -26,4 +26,4 @@ function getNow() {
   };
 }
 
-module.exports = getNow();
+export default getNow();

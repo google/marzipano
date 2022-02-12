@@ -15,8 +15,8 @@
  */
 'use strict';
 
-var vec4 = require('gl-matrix').vec4;
-var mat4 = require('gl-matrix').mat4;
+import { vec4 as vec4 } from "gl-matrix";
+import { mat4 as mat4 } from "gl-matrix";
 
 /**
  * Helper functions for color transformation {@link Effects}.
@@ -102,7 +102,8 @@ function applyToImageData(imageData, effect) {
   }
 }
 
-module.exports = {
+// TODO: refactor to named exports
+export default {
   identity: identity,
   applyToPixel: applyToPixel,
   applyToImageData: applyToImageData

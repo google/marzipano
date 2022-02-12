@@ -15,10 +15,11 @@
  */
 'use strict';
 
-var mod = require('../util/mod');
+import mod from "../util/mod";
 
 var defaultCapacity = 64;
 
+// TODO: is this needed? Could we just use js Set
 // A set data structure for elements implementing hash() and equals().
 // The capacity, if given, is just a hint; the set is allowed to exceed it, but
 // performance may suffer.
@@ -114,4 +115,4 @@ Set.prototype.forEach = function(fn) {
   return count;
 };
 
-module.exports = Set;
+export default Set;

@@ -15,7 +15,7 @@
  */
 'use strict';
 
-module.exports = [
+export default [
 'attribute vec3 aVertexPosition;',
 
 'uniform float uDepth;',

@@ -31,4 +31,4 @@ function type(x) {
   return typ;
 }
 
-module.exports = type;
+export default type;

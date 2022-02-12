@@ -15,28 +15,28 @@
  */
 'use strict';
 
-var eventEmitter = require('minimal-event-emitter');
+import eventEmitter from "minimal-event-emitter";
 
-var RenderLoop = require('./RenderLoop');
-var Controls = require('./controls/Controls');
-var Scene = require('./Scene');
-var Timer = require('./Timer');
+import RenderLoop from "./RenderLoop";
+import Controls from "./controls/Controls";
+import Scene from "./Scene";
+import Timer from "./Timer";
 
-var WebGlStage = require('./stages/WebGl');
+import WebGlStage from "./stages/WebGl";
 
-var ControlCursor = require('./controls/ControlCursor');
-var HammerGestures = require('./controls/HammerGestures');
+import ControlCursor from "./controls/ControlCursor";
+import HammerGestures from "./controls/HammerGestures";
 
-var registerDefaultControls = require('./controls/registerDefaultControls');
-var registerDefaultRenderers = require('./renderers/registerDefaultRenderers');
+import registerDefaultControls from "./controls/registerDefaultControls";
+import registerDefaultRenderers from "./renderers/registerDefaultRenderers";
 
-var setOverflowHidden = require('./util/dom').setOverflowHidden;
-var setAbsolute = require('./util/dom').setAbsolute;
-var setFullSize = require('./util/dom').setFullSize;
+import { setOverflowHidden as setOverflowHidden } from "./util/dom";
+import { setAbsolute as setAbsolute } from "./util/dom";
+import { setFullSize as setFullSize } from "./util/dom";
 
-var tween = require('./util/tween');
-var noop = require('./util/noop');
-var clearOwnProperties = require('./util/clearOwnProperties');
+import tween from "./util/tween";
+import noop from "./util/noop";
+import clearOwnProperties from "./util/clearOwnProperties";
 
 /**
  * Signals that the current scene has changed.
@@ -734,4 +734,4 @@ Viewer.prototype.switchScene = function(newScene, opts, done) {
 };
 
 
-module.exports = Viewer;
+export default Viewer;

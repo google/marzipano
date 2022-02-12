@@ -15,9 +15,9 @@
  */
 'use strict';
 
-var global = require('../util/global');
-var eventEmitter = require('minimal-event-emitter');
-var clearOwnProperties = require('../util/clearOwnProperties');
+import global from "../util/global";
+import eventEmitter from "minimal-event-emitter";
+import clearOwnProperties from "../util/clearOwnProperties";
 
 var propertyMap = {
   HTMLImageElement: ['naturalWidth', 'naturalHeight'],
@@ -82,4 +82,4 @@ StaticAsset.prototype.isDynamic = function() {
   return false;
 };
 
-module.exports = StaticAsset;
+export default StaticAsset;

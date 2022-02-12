@@ -15,7 +15,7 @@
  */
 'use strict';
 
-var Set = require('./collections/Set');
+import Set from "./collections/Set";
 
 /**
  * @class TileSearcher
@@ -98,4 +98,4 @@ TileSearcher.prototype._clear = function() {
   this._visited.clear();
 };
 
-module.exports = TileSearcher;
+export default TileSearcher;

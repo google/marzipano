@@ -15,12 +15,12 @@
  */
 'use strict';
 
-var eventEmitter = require('minimal-event-emitter');
-var NetworkError = require('../NetworkError');
-var WorkPool = require('../collections/WorkPool');
-var chain = require('../util/chain');
-var delay = require('../util/delay');
-var now = require('../util/now');
+import eventEmitter from "minimal-event-emitter";
+import NetworkError from "../NetworkError";
+import WorkPool from "../collections/WorkPool";
+import chain from "../util/chain";
+import delay from "../util/delay";
+import now from "../util/now";
 
 
 // Map template properties to their corresponding tile properties.
@@ -193,4 +193,4 @@ function propertyRegExp(property) {
   return new RegExp(regExpStr, 'g');
 }
 
-module.exports = ImageUrlSource;
+export default ImageUrlSource;

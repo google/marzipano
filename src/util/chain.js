@@ -15,7 +15,7 @@
  */
 'use strict';
 
-var noop = require('./noop');
+import noop from "./noop";
 
 // Return a function that executes its arguments (which should be cancelables)
 // in sequence, so that each of them passes its return values to the next.
@@ -114,4 +114,4 @@ function chain() {
 
 }
 
-module.exports = chain;
+export default chain;

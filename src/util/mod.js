@@ -27,4 +27,4 @@ function mod(a, b) {
   return (+a % (b = +b) + b) % b;
 }
 
-module.exports = mod;
+export default mod;

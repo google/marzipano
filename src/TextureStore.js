@@ -15,15 +15,15 @@
  */
 'use strict';
 
-var Map = require('./collections/Map');
-var Set = require('./collections/Set');
-var LruSet = require('./collections/LruSet');
-var eventEmitter = require('minimal-event-emitter');
-var defaults = require('./util/defaults');
-var retry = require('./util/retry');
-var chain = require('./util/chain');
-var inherits = require('./util/inherits');
-var clearOwnProperties = require('./util/clearOwnProperties');
+import Map from "./collections/Map";
+import Set from "./collections/Set";
+import LruSet from "./collections/LruSet";
+import eventEmitter from "minimal-event-emitter";
+import defaults from "./util/defaults";
+import retry from "./util/retry";
+import chain from "./util/chain";
+import inherits from "./util/inherits";
+import clearOwnProperties from "./util/clearOwnProperties";
 
 var debug = typeof MARZIPANODEBUG !== 'undefined' && MARZIPANODEBUG.textureStore;
 
@@ -674,4 +674,4 @@ TextureStore.prototype.query = function(tile) {
 };
 
 
-module.exports = TextureStore;
+export default TextureStore;

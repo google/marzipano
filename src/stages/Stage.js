@@ -15,14 +15,14 @@
  */
 'use strict';
 
-var eventEmitter = require('minimal-event-emitter');
-var WorkQueue = require('../collections/WorkQueue');
-var calcRect = require('../util/calcRect');
-var async = require('../util/async');
-var cancelize = require('../util/cancelize');
-var clearOwnProperties = require('../util/clearOwnProperties');
+import eventEmitter from 'minimal-event-emitter';
+import WorkQueue from '../collections/WorkQueue';
+import calcRect from '../util/calcRect';
+import async from '../util/async';
+import cancelize from '../util/cancelize';
+import clearOwnProperties from '../util/clearOwnProperties';
 
-var RendererRegistry = require('./RendererRegistry');
+import RendererRegistry from './RendererRegistry';
 
 function forwardTileCmp(t1, t2) {
   return t1.cmp(t2);
@@ -660,4 +660,4 @@ Stage.prototype.createTexture = function(tile, asset, done) {
  * @name Stage#type
  */
 
-module.exports = Stage;
+export default Stage;

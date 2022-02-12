@@ -15,17 +15,17 @@
  */
 'use strict';
 
-var eventEmitter = require('minimal-event-emitter');
-var mat4 = require('gl-matrix').mat4;
-var vec4 = require('gl-matrix').vec4;
-var pixelRatio = require('../util/pixelRatio');
-var convertFov = require('../util/convertFov');
-var mod = require('../util/mod');
-var real = require('../util/real');
-var clamp = require('../util/clamp');
-var decimal = require('../util/decimal');
-var compose = require('../util/compose');
-var clearOwnProperties = require('../util/clearOwnProperties');
+import eventEmitter from "minimal-event-emitter";
+import { mat4 as mat4 } from "gl-matrix";
+import { vec4 as vec4 } from "gl-matrix";
+import pixelRatio from "../util/pixelRatio";
+import convertFov from "../util/convertFov";
+import mod from "../util/mod";
+import real from "../util/real";
+import clamp from "../util/clamp";
+import decimal from "../util/decimal";
+import compose from "../util/compose";
+import clearOwnProperties from "../util/clearOwnProperties";
 
 // Default viewport dimensions.
 // Start with zero to ensure that those values are handled correctly.
@@ -991,4 +991,4 @@ RectilinearView.limit = {
 RectilinearView.type = RectilinearView.prototype.type = 'rectilinear';
 
 
-module.exports = RectilinearView;
+export default RectilinearView;

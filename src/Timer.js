@@ -15,9 +15,9 @@
  */
 'use strict';
 
-var eventEmitter = require('minimal-event-emitter');
-var defaults = require('./util/defaults');
-var now = require('./util/now');
+import eventEmitter from "minimal-event-emitter";
+import defaults from "./util/defaults";
+import now from "./util/now";
 
 var defaultOptions = {
   duration: Infinity
@@ -144,4 +144,4 @@ Timer.prototype.setDuration = function(duration) {
 };
 
 
-module.exports = Timer;
+export default Timer;

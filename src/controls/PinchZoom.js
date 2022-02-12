@@ -15,10 +15,10 @@
  */
 'use strict';
 
-var eventEmitter = require('minimal-event-emitter');
-var Dynamics = require('./Dynamics');
-var HammerGestures = require('./HammerGestures');
-var clearOwnProperties = require('../util/clearOwnProperties');
+import eventEmitter from "minimal-event-emitter";
+import Dynamics from "./Dynamics";
+import HammerGestures from "./HammerGestures";
+import clearOwnProperties from "../util/clearOwnProperties";
 
 /**
  * @class PinchZoomControlMethod
@@ -89,4 +89,4 @@ PinchZoomControlMethod.prototype._handleEvent = function(e) {
 };
 
 
-module.exports = PinchZoomControlMethod;
+export default PinchZoomControlMethod;

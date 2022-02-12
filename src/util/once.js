@@ -27,4 +27,4 @@ function once(fn) {
   };
 }
 
-module.exports = once;
+export default once;

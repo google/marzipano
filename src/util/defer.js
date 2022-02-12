@@ -26,4 +26,4 @@ function defer(fn, args) {
   setTimeout(deferred, 0);
 }
 
-module.exports = defer;
+export default defer;
