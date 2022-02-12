@@ -57,91 +57,85 @@ var uniformList = [
  * Most users do not need to instantiate this class. Renderers are created and
  * destroyed by {@link Stage} as necessary.
  */
-function WebGlEquirectRenderer(gl) {
-  this.gl = gl;
+class WebGlEquirectRenderer {
+  constructor(gl) {
+    this.gl = gl;
 
-  // The inverse projection matrix.
-  this.invProjMatrix = mat4.create();
+    // The inverse projection matrix.
+    this.invProjMatrix = mat4.create();
 
-  // The viewport matrix responsible for viewport clamping.
-  // See setViewport() for an explanation of how it works.
-  this.viewportMatrix = mat4.create();
+    // The viewport matrix responsible for viewport clamping.
+    // See setViewport() for an explanation of how it works.
+    this.viewportMatrix = mat4.create();
 
-  this.constantBuffers = createConstantBuffers(gl, vertexIndices, vertexPositions, textureCoords);
+    this.constantBuffers = createConstantBuffers(gl, vertexIndices, vertexPositions, textureCoords);
 
-  this.shaderProgram = createShaderProgram(gl, vertexSrc, fragmentSrc, attribList, uniformList);
+    this.shaderProgram = createShaderProgram(gl, vertexSrc, fragmentSrc, attribList, uniformList);
+  }
+  destroy() {
+    destroyConstantBuffers(this.gl, this.constantBuffers);
+    destroyShaderProgram(this.gl, this.shaderProgram);
+    clearOwnProperties(this);
+  }
+  startLayer(layer, rect) {
+    var gl = this.gl;
+    var shaderProgram = this.shaderProgram;
+    var constantBuffers = this.constantBuffers;
+    var invProjMatrix = this.invProjMatrix;
+    var viewportMatrix = this.viewportMatrix;
+
+    gl.useProgram(shaderProgram);
+
+    enableAttributes(gl, shaderProgram);
+
+    setViewport(gl, layer, rect, viewportMatrix);
+    gl.uniformMatrix4fv(shaderProgram.uViewportMatrix, false, viewportMatrix);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, constantBuffers.vertexPositions);
+    gl.vertexAttribPointer(shaderProgram.aVertexPosition, 3, gl.FLOAT, gl.FALSE, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, constantBuffers.textureCoords);
+
+    // Compute and set the inverse projection matrix.
+    mat4.copy(invProjMatrix, layer.view().projection());
+    mat4.invert(invProjMatrix, invProjMatrix);
+
+    gl.uniformMatrix4fv(shaderProgram.uInvProjMatrix, false, invProjMatrix);
+
+    // Compute and set the texture scale and crop offsets.
+    var textureCrop = layer.effects().textureCrop || {};
+    var textureX = textureCrop.x != null ? textureCrop.x : 0;
+    var textureY = textureCrop.y != null ? textureCrop.y : 0;
+    var textureWidth = textureCrop.width != null ? textureCrop.width : 1;
+    var textureHeight = textureCrop.height != null ? textureCrop.height : 1;
+
+    gl.uniform1f(shaderProgram.uTextureX, textureX);
+    gl.uniform1f(shaderProgram.uTextureY, textureY);
+    gl.uniform1f(shaderProgram.uTextureWidth, textureWidth);
+    gl.uniform1f(shaderProgram.uTextureHeight, textureHeight);
+
+    setupPixelEffectUniforms(gl, layer.effects(), {
+      opacity: shaderProgram.uOpacity,
+      colorOffset: shaderProgram.uColorOffset,
+      colorMatrix: shaderProgram.uColorMatrix
+    });
+  }
+  endLayer(layer, rect) {
+    var gl = this.gl;
+    var shaderProgram = this.shaderProgram;
+    disableAttributes(gl, shaderProgram);
+  }
+  renderTile(tile, texture, layer, layerZ) {
+    var gl = this.gl;
+    var shaderProgram = this.shaderProgram;
+    var constantBuffers = this.constantBuffers;
+
+    setDepth(gl, shaderProgram, layerZ, tile.z);
+
+    setTexture(gl, shaderProgram, texture);
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, constantBuffers.vertexIndices);
+    gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_SHORT, 0);
+  }
 }
-
-WebGlEquirectRenderer.prototype.destroy = function() {
-  destroyConstantBuffers(this.gl, this.constantBuffers);
-  destroyShaderProgram(this.gl, this.shaderProgram);
-  clearOwnProperties(this);
-};
-
-
-WebGlEquirectRenderer.prototype.startLayer = function(layer, rect) {
-  var gl = this.gl;
-  var shaderProgram = this.shaderProgram;
-  var constantBuffers = this.constantBuffers;
-  var invProjMatrix = this.invProjMatrix;
-  var viewportMatrix = this.viewportMatrix;
-
-  gl.useProgram(shaderProgram);
-
-  enableAttributes(gl, shaderProgram);
-
-  setViewport(gl, layer, rect, viewportMatrix);
-  gl.uniformMatrix4fv(shaderProgram.uViewportMatrix, false, viewportMatrix);
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, constantBuffers.vertexPositions);
-  gl.vertexAttribPointer(shaderProgram.aVertexPosition, 3, gl.FLOAT, gl.FALSE, 0, 0);
-  gl.bindBuffer(gl.ARRAY_BUFFER, constantBuffers.textureCoords);
-
-  // Compute and set the inverse projection matrix.
-  mat4.copy(invProjMatrix, layer.view().projection());
-  mat4.invert(invProjMatrix, invProjMatrix);
-
-  gl.uniformMatrix4fv(shaderProgram.uInvProjMatrix, false, invProjMatrix);
-
-  // Compute and set the texture scale and crop offsets.
-  var textureCrop = layer.effects().textureCrop || {};
-  var textureX = textureCrop.x != null ? textureCrop.x : 0;
-  var textureY = textureCrop.y != null ? textureCrop.y : 0;
-  var textureWidth = textureCrop.width != null ? textureCrop.width : 1;
-  var textureHeight = textureCrop.height != null ? textureCrop.height : 1;
-
-  gl.uniform1f(shaderProgram.uTextureX, textureX);
-  gl.uniform1f(shaderProgram.uTextureY, textureY);
-  gl.uniform1f(shaderProgram.uTextureWidth, textureWidth);
-  gl.uniform1f(shaderProgram.uTextureHeight, textureHeight);
-
-  setupPixelEffectUniforms(gl, layer.effects(), {
-    opacity: shaderProgram.uOpacity,
-    colorOffset: shaderProgram.uColorOffset,
-    colorMatrix: shaderProgram.uColorMatrix
-  });
-};
-
-
-WebGlEquirectRenderer.prototype.endLayer = function(layer, rect) {
-  var gl = this.gl;
-  var shaderProgram = this.shaderProgram;
-  disableAttributes(gl, shaderProgram);
-};
-
-
-WebGlEquirectRenderer.prototype.renderTile = function(tile, texture, layer, layerZ) {
-  var gl = this.gl;
-  var shaderProgram = this.shaderProgram;
-  var constantBuffers = this.constantBuffers;
-
-  setDepth(gl, shaderProgram, layerZ, tile.z);
-
-  setTexture(gl, shaderProgram, texture);
-
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, constantBuffers.vertexIndices);
-  gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_SHORT, 0);
-};
-
 
 export default WebGlEquirectRenderer;

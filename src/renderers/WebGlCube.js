@@ -29,10 +29,10 @@ import inherits from "../util/inherits";
  * Most users do not need to instantiate this class. Renderers are created and
  * destroyed by {@link Stage} as necessary.
  */
-function WebGlCubeRenderer() {
-  this.constructor.super_.apply(this, arguments);
+class WebGlCubeRenderer extends WebGlBaseRenderer {
+  constructor(...args) {
+    super(...args)
+  }
 }
-
-inherits(WebGlCubeRenderer, WebGlBaseRenderer);
 
 export default WebGlCubeRenderer;
