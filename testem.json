@@ -1,6 +1,6 @@
 {
   "test_page": "test/index.html",
   "src_files": [ "src/*.js", "src/**/*.js", "test/suite/*.js", "test/suite/**/*.js" ],
-  "before_tests": "browserify -d test/suite/*.js test/suite/**/*.js -o test/test_suite.js",
+  "before_tests": "vite --config vite-test.config.ts",
   "on_exit": "rm test/test_suite.js"
 }

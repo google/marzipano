@@ -17,12 +17,13 @@
 
 // Common tests for WorkQueue and WorkPool.
 
-var assert = require('chai').assert;
-var sinon = require('sinon');
-var wait = require('../../wait');
+import { suite, test } from 'vitest';
+import { assert as assert } from "chai";
+import sinon from "sinon";
+import wait from "../../wait";
 
-var defer = require('../../../src/util/defer');
-var cancelize = require('../../../src/util/cancelize');
+import defer from "../../../src/util/defer";
+import cancelize from "../../../src/util/cancelize";
 
 function returnSync(returnValue) {
   return cancelize(function(done) {

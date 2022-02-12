@@ -97,6 +97,16 @@ function dtov(fov, width, height) {
   return convert(fov, Math.sqrt(width * width + height * height), height);
 }
 
+export {
+  convert,
+  htov,
+  htod,
+  vtoh,
+  vtod,
+  dtoh,
+  dtov
+};
+
 // TODO: rethink these exports
 /**
  * @namespace util.convertFov

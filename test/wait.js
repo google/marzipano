@@ -47,7 +47,7 @@ function untilSpyCalled() {
   until(cond, done);
 }
 
-module.exports = {
+export default {
   until: until,
   untilSpyCalled: untilSpyCalled
 };
