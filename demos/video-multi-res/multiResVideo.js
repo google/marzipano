@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 'use strict';
+import Marzipano from '../../src/index.js';
+import VideoAsset from './VideoAsset.js';
+import EventEmitter from './EventEmitter.js';
+import EventEmitterProxy from './EventEmitterProxy.js';
+import loadVideoInSync from './loadVideoInSync.js';
+import NullVideoElementWrapper from './NullVideoElementWrapper.js';
+import CanvasHackVideoElementWrapper from './CanvasHackVideoElementWrapper.js';
 
 // Marzipano does not have a high-level API for 360° video with multiple levels yet.
 // This code manages the currently playing video using the low-level API.
@@ -94,7 +101,7 @@ function setResolutionIndex(index, cb) {
   });
 }
 
-var multiResVideo = {
+export var multiResVideo = {
   layer: function() {
     return scene.layer();
   },

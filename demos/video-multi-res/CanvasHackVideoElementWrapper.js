@@ -44,3 +44,5 @@ CanvasHackVideoElementWrapper.prototype.destroy = function() {
   this._videoElement.volume = 0;
   this._videoElement.removeAttribute('src');
 };
+
+export default CanvasHackVideoElementWrapper;

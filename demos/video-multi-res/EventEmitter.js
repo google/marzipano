@@ -45,4 +45,4 @@ EventEmitter.prototype.emit = function(event, arg1, arg2, arg3, arg4, arg5) {
   }
 };
 
-window.EventEmitter = EventEmitter;
+export default EventEmitter;

@@ -14,5 +14,6 @@
  * limitations under the License.
  */
 'use strict';
+import { multiResVideo } from './multiResVideo.js';
 
 multiResVideo.setResolutionIndex(1);

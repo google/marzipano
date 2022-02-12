@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 'use strict';
+import Marzipano from '../../src/index.js';
 
-var identity = window.Marzipano.colorEffects.identity;
+var identity = Marzipano.colorEffects.identity;
 
-var colorEffects = {
+export var colorEffects = {
 
   brightness: function(amount, result) {
     result = identity(result);

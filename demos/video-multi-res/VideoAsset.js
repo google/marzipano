@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 'use strict';
+import Marzipano from '../../src/index.js';
 
 // Dynamic asset containing a video element.
 //
@@ -126,3 +127,5 @@ VideoAsset.prototype.destroy = function() {
     this._emitChangeIfPlayingLoop = null;
   }
 };
+
+export default VideoAsset;

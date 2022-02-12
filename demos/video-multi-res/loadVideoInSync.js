@@ -16,7 +16,7 @@
 'use strict';
 
 // Attempts to load a video element in sync with another video element
-function loadVideoInSync(url, syncElement, cb) {
+export default function loadVideoInSync(url, syncElement, cb) {
   cb = once(cb);
   var element = document.createElement('video');
 

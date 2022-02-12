@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 'use strict';
+import Marzipano from '../../src/index.js';
 
 // Custom tile source for procedurally generated solid color tiles.
 function SolidColorSource(width, height) {

@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 'use strict';
+import EventEmitter from "./EventEmitter.js";
 
 function EventEmitterProxy(object) {
   this._object = object;
@@ -93,3 +94,5 @@ EventEmitterProxy.prototype._removeFromListenerArguments = function(args) {
     }
   }
 };
+
+export default EventEmitterProxy;

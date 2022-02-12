@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 'use strict';
+import { multiResVideo } from './multiResVideo.js';
+import { colorEffects } from './colorEffects.js';
 
 var video = multiResVideo.element;
 
@@ -220,8 +222,6 @@ updateResolutionChanging();
 
 /* Effects */
 
-var Marzipano = window.Marzipano;
-
 var effectElement = document.getElementById('effect');
 
 effectElement.addEventListener('change', function() {
@@ -232,15 +232,15 @@ effectElement.addEventListener('change', function() {
   var effect = effectElement.value;
   var effectsObj = { colorMatrix: null, colorOffset: null };
   if (effect === 'desaturate') {
-    effectsObj = window.colorEffects.saturation(0);
+    effectsObj = colorEffects.saturation(0);
   } else if(effect === 'sepia') {
-    effectsObj = window.colorEffects.sepia(1);
+    effectsObj = colorEffects.sepia(1);
   } else if(effect === 'saturate') {
-    effectsObj = window.colorEffects.saturation(1.25);
+    effectsObj = colorEffects.saturation(1.25);
   } else if(effect === 'lighten') {
-    effectsObj = window.colorEffects.brightness(0.1);
+    effectsObj = colorEffects.brightness(0.1);
   } else if(effect === 'darken') {
-    effectsObj = window.colorEffects.brightness(-0.1);
+    effectsObj = colorEffects.brightness(-0.1);
   }
 
   layer.mergeEffects(effectsObj);
