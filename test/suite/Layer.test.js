@@ -30,20 +30,26 @@ function MockTile() {}
 
 function MockLevel() {}
 
-function MockGeometry(levelList) {
-  this.levelList = levelList;
-  this.visibleTiles = sinon.stub();
-  this.levelTiles = sinon.stub();
+class MockGeometry {
+  constructor(levelList) {
+    this.levelList = levelList;
+    this.visibleTiles = sinon.stub();
+    this.levelTiles = sinon.stub();
+  }
 }
 
-function MockView(selectedLevel) {
-  this.selectLevel = function() { return selectedLevel; }
+class MockView {
+  constructor(selectedLevel) {
+    this.selectLevel = function () { return selectedLevel; };
+  }
 }
 eventEmitter(MockView);
 
-function MockTextureStore() {
-  this.pin = sinon.spy();
-  this.unpin = sinon.spy();
+class MockTextureStore {
+  constructor() {
+    this.pin = sinon.spy();
+    this.unpin = sinon.spy();
+  }
 }
 eventEmitter(MockTextureStore);
 

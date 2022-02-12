@@ -20,13 +20,12 @@ import sinon from "sinon";
 
 import eventEmitter from "minimal-event-emitter";
 
-import defer from "../../src/util/defer";
-import cancelize from "../../src/util/cancelize";
-
 import RenderLoop from "../../src/RenderLoop";
 
-function MockStage() {
-  this.render = sinon.spy();
+class MockStage {
+  constructor() {
+    this.render = sinon.spy();
+  }
 }
 
 eventEmitter(MockStage);

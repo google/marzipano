@@ -19,18 +19,18 @@ import { suite, test, assert } from 'vitest';
 
 import Map from "../../../src/collections/Map";
 
-function Key(key) {
-  this._key = key;
+class Key {
+  constructor(key) {
+    this._key = key;
+  }
+  hash() {
+    // Finite numbers hash to their absolute value; everything else hashes to 0.
+    return isFinite(this._key) ? Math.floor(Math.abs(this._key)) : 0;
+  }
+  equals(that) {
+    return this._key === that._key;
+  }
 }
-
-Key.prototype.hash = function() {
-  // Finite numbers hash to their absolute value; everything else hashes to 0.
-  return isFinite(this._key) ? Math.floor(Math.abs(this._key)) : 0;
-};
-
-Key.prototype.equals = function(that) {
-  return this._key === that._key;
-};
 
 suite('Map', function() {
 

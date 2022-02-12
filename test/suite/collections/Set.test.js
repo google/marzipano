@@ -19,18 +19,18 @@ import { suite, test, assert } from 'vitest';
 
 import Set from "../../../src/collections/Set";
 
-function Item(element) {
-  this._element = element;
+class Item {
+  constructor(element) {
+    this._element = element;
+  }
+  hash() {
+    // Finite numbers hash to their absolute value; everything else hashes to 0.
+    return isFinite(this._element) ? Math.floor(Math.abs(this._element)) : 0;
+  }
+  equals(that) {
+    return this._element === that._element;
+  }
 }
-
-Item.prototype.hash = function() {
-  // Finite numbers hash to their absolute value; everything else hashes to 0.
-  return isFinite(this._element) ? Math.floor(Math.abs(this._element)) : 0;
-};
-
-Item.prototype.equals = function(that) {
-  return this._element === that._element;
-};
 
 suite('Set', function() {
 

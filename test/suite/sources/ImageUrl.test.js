@@ -22,18 +22,19 @@ import wait from "../../wait";
 
 import ImageUrlSource from "../../../src/sources/ImageUrl";
 
-function MockStage() {}
-
-MockStage.prototype.loadImage = function(url, rect, done) {
-  if (url === "url" && rect == null) {
-    done(null, "asset");
-  } else if (url === "url-rect" && rect === "rect") {
-    done(null, "asset-rect");
-  } else if (url === "url-error") {
-    done(new Error("error"));
+class MockStage {
+  constructor() { }
+  loadImage(url, rect, done) {
+    if (url === "url" && rect == null) {
+      done(null, "asset");
+    } else if (url === "url-rect" && rect === "rect") {
+      done(null, "asset-rect");
+    } else if (url === "url-error") {
+      done(new Error("error"));
+    }
+    return function () { };
   }
-  return function() {};
-};
+}
 
 suite('ImageUrlSource', function() {
 
