@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 'use strict';
+// TODO: think of better module structure for this.
+// since there seems to be a weird flash of content on initial load
+import Marzipano from '../../src/index.js';
 
 // Create viewer.
 var viewer = new Marzipano.Viewer(document.getElementById('pano'));
@@ -45,3 +48,5 @@ var scene = viewer.createScene({
 
 // Display scene.
 scene.switchTo({ transitionDuration: 0 });
+
+export { scene }

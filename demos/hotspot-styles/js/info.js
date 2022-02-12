@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 'use strict';
+import { scene } from '../index.js';
 
 scene.hotspotContainer().createHotspot(document.querySelector("#info"), { yaw: -2.93, pitch: -0.15 });
 
