@@ -30,39 +30,38 @@ import clearOwnProperties from "../util/clearOwnProperties";
  *
  * @param {String} parameter The parameter to be controlled (e.g. `x`, `y` or `zoom`)
 */
-function VelocityControlMethod(parameter) {
-  if(!parameter) {
-    throw new Error("VelocityControlMethod: parameter must be defined");
-  }
+class VelocityControlMethod {
+  constructor(parameter) {
+    if (!parameter) {
+      throw new Error("VelocityControlMethod: parameter must be defined");
+    }
 
-  this._parameter = parameter;
-  this._dynamics = new Dynamics();
+    this._parameter = parameter;
+    this._dynamics = new Dynamics();
+  }
+  /**
+   * Destructor.
+   */
+  destroy() {
+    clearOwnProperties(this);
+  }
+  /**
+   * Set the parameter's velocity.
+   * @param {Number} velocity
+   */
+  setVelocity(velocity) {
+    this._dynamics.velocity = velocity;
+    this.emit('parameterDynamics', this._parameter, this._dynamics);
+  }
+  /**
+   * Set the parameter's friction.
+   * @param {Number} friction
+   */
+  setFriction(friction) {
+    this._dynamics.friction = friction;
+    this.emit('parameterDynamics', this._parameter, this._dynamics);
+  }
 }
 eventEmitter(VelocityControlMethod);
-
-/**
- * Destructor.
- */
-VelocityControlMethod.prototype.destroy = function() {
-  clearOwnProperties(this);
-};
-
-/**
- * Set the parameter's velocity.
- * @param {Number} velocity
- */
-VelocityControlMethod.prototype.setVelocity = function(velocity) {
-  this._dynamics.velocity = velocity;
-  this.emit('parameterDynamics', this._parameter, this._dynamics);
-};
-
-/**
- * Set the parameter's friction.
- * @param {Number} friction
- */
-VelocityControlMethod.prototype.setFriction = function(friction) {
-  this._dynamics.friction = friction;
-  this.emit('parameterDynamics', this._parameter, this._dynamics);
-};
 
 export default VelocityControlMethod;
