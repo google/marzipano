@@ -15,8 +15,7 @@
  */
 'use strict';
 
-import { suite, test, beforeEach, afterEach } from 'vitest';
-import { assert as assert } from "chai";
+import { suite, test, beforeEach, afterEach, assert } from 'vitest';
 import sinon from "sinon";
 
 import eventEmitter from "minimal-event-emitter";

@@ -2,7 +2,6 @@ lockfileVersion: 5.3
 
 specifiers:
   bowser: 1.9.4
-  chai: ^4.2.0
   gl-matrix: 3.4.3
   hammerjs: 2.0.4
   happy-dom: ^2.31.1
@@ -23,7 +22,6 @@ dependencies:
   minimal-event-emitter: 1.0.0
 
 devDependencies:
-  chai: 4.3.6
   happy-dom: 2.31.1
   jsdoc: 3.6.10
   lr-http-server: 0.1.5

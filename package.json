@@ -43,7 +43,6 @@
     "minimal-event-emitter": "1.0.0"
   },
   "devDependencies": {
-    "chai": "^4.2.0",
     "happy-dom": "^2.31.1",
     "jsdoc": "^3.6.6",
     "lr-http-server": "^0.1.5",

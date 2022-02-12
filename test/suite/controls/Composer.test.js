@@ -15,8 +15,7 @@
  */
 'use strict';
 
-import { suite, test, beforeEach } from 'vitest';
-import { assert as assert } from "chai";
+import { suite, test, beforeEach, assert } from 'vitest';
 
 import ControlComposer from "../../../src/controls/Composer";
 import eventEmitter from "minimal-event-emitter";

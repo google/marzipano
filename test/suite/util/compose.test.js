@@ -15,8 +15,7 @@
  */
 'use strict';
 
-import { suite, test } from 'vitest';
-import { assert as assert } from "chai";
+import { suite, test, assert } from 'vitest';
 
 import compose from "../../../src/util/compose";
 

@@ -15,8 +15,7 @@
  */
 'use strict';
 
-import { suite, test, beforeEach } from 'vitest';
-import { assert as assert } from "chai";
+import { suite, test, beforeEach, assert } from 'vitest';
 
 import Cube from "../../../src/geometries/Cube";
 var CubeTile = Cube.Tile;
