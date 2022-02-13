@@ -24,6 +24,10 @@
  * @property {number} width The width in pixels.
  * @property {number} height The height in pixels.
  */
+interface Size {
+    width: number;
+    height: number;
+}
 
 
 /**
@@ -202,6 +206,14 @@ interface Rect {
  * @returns {boolean}
  */
 
+interface Asset {
+    element: () => any;
+    width: () => number;
+    height: () => number;
+    timestamp: () => number;
+    isDynamic: () => boolean;
+}
+
 /**
  * @interface Effects
  * @classdesc Effects to be applied on the rendering
@@ -282,6 +294,12 @@ interface Rect {
  * @param {Tile} that The tile to compare against.
  * @returns {number}
  */
+
+interface Tile {
+    hash: () => number;
+    equals: (that: Tile) => boolean;
+    cmp: (that: Tile) => number;
+}
 
 /**
  * @interface Renderer

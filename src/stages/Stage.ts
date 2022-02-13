@@ -1,20 +1,3 @@
-/*
- * Copyright 2016 Google Inc. All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-'use strict';
-
 import eventEmitter from 'minimal-event-emitter';
 import WorkQueue from '../collections/WorkQueue';
 import calcRect from '../util/calcRect';
@@ -23,6 +6,7 @@ import cancelize from '../util/cancelize';
 import clearOwnProperties from '../util/clearOwnProperties';
 
 import RendererRegistry from './RendererRegistry';
+import Layer from '../Layer';
 
 function forwardTileCmp(t1, t2) {
   return t1.cmp(t2);
@@ -71,6 +55,23 @@ function reverseTileCmp(t1, t2) {
  * bandwidth.
  */
 class Stage {
+  _progressive: boolean;
+  _layers: any[];
+  _renderers: any[];
+  _tilesToLoad: never[];
+  _tilesToRender: never[];
+  _tmpVisible: never[];
+  _tmpChildren: never[];
+  _width: number;
+  _height: number;
+  _tmpRect: any;
+  _tmpSize: any;
+  _createTextureWorkQueue: WorkQueue;
+  _emitRenderInvalid: any;
+  _rendererRegistry: RendererRegistry;
+  type: string | undefined;
+  TextureClass: any;
+
   constructor(opts) {
     this._progressive = !!(opts && opts.progressive);
 
@@ -129,7 +130,7 @@ class Stage {
    * @param {string} viewType The view type, as given by {@link View#type}.
    * @param {*} Renderer The renderer class.
    */
-  registerRenderer(geometryType, viewType, Renderer) {
+  registerRenderer(geometryType: string, viewType: string, Renderer: any) {
     return this._rendererRegistry.set(geometryType, viewType, Renderer);
   }
   /**
@@ -139,21 +140,21 @@ class Stage {
    *
    * @return {Element}
    */
-  domElement() {
+  domElement(): Element {
     throw new Error('Stage implementation must override domElement');
   }
   /**
    * Get the stage width.
    * @return {number}
    */
-  width() {
+  width(): number {
     return this._width;
   }
   /**
    * Get the stage height.
    * @return {number}
    */
-  height() {
+  height(): number {
     return this._height;
   }
   /**
@@ -162,8 +163,8 @@ class Stage {
    *
    * @param {Size=} size
    */
-  size(size) {
-    size = size || {};
+  size(size: Size | undefined) {
+    size = size || {} as Size;
     size.width = this._width;
     size.height = this._height;
     return size;
@@ -177,7 +178,7 @@ class Stage {
    *
    * @param {Size} size
    */
-  setSize(size) {
+  setSize(size: Size) {
     this._width = size.width;
     this._height = size.height;
 
@@ -185,6 +186,9 @@ class Stage {
 
     this.emit('resize');
     this._emitRenderInvalid();
+  }
+  emit(_arg0: string, _arg1?: any) {
+    throw new Error('Method not implemented.');
   }
   /**
    * Call {@link Stage#setSize} instead.
@@ -195,18 +199,18 @@ class Stage {
    *
    * @param {Size} size
    */
-  setSizeForType(size) {
+  setSizeForType() {
     throw new Error('Stage implementation must override setSizeForType');
   }
   /**
    * Loads an {@link Asset} from an image.
-   * @param {string} url The image URL.
-   * @param {?Rect} rect A {@link Rect} describing a portion of the image, or null
+   * @param {string} _url The image URL.
+   * @param {?Rect} _rect A {@link Rect} describing a portion of the image, or null
    *     to use the full image.
    * @param {function(?Error, Asset)} done The callback.
    * @return {function()} A function to cancel loading.
    */
-  loadImage() {
+  loadImage(_url: string, _rect: Rect | null, _done: Function): () => any {
     throw new Error('Stage implementation must override loadImage');
   }
   /**
@@ -216,7 +220,7 @@ class Stage {
    * @param {Layer} layer
    * @throws {Error} If the layer is not valid for this stage.
    */
-  validateLayer(layer) {
+  validateLayer(_layer: Layer) {
     throw new Error('Stage implementation must override validateLayer');
   }
   /**
@@ -224,16 +228,16 @@ class Stage {
    * returned list is in display order, background to foreground.
    * @return {Layer[]}
    */
-  listLayers() {
+  listLayers(): Layer[] {
     // Return a copy to prevent unintended mutation by the caller.
-    return [].concat(this._layers);
+    return ([] as any[]).concat(this._layers);
   }
   /**
    * Return whether a {@link Layer layer} belongs to the stage.
    * @param {Layer} layer
    * @return {boolean}
    */
-  hasLayer(layer) {
+  hasLayer(layer: Layer): boolean {
     return this._layers.indexOf(layer) >= 0;
   }
   /**
@@ -245,7 +249,7 @@ class Stage {
    * @throws An error if the layer already belongs to the stage or if the position
    *     is invalid.
    */
-  addLayer(layer, i) {
+  addLayer(layer: Layer, i: number | undefined) {
     if (this._layers.indexOf(layer) >= 0) {
       throw new Error('Layer already in stage');
     }
@@ -272,12 +276,23 @@ class Stage {
     this._renderers.splice(i, 0, renderer);
 
     // Listeners for render invalid.
+    // TODO: sort out emitter types
+    // @ts-ignore
     layer.addEventListener('viewChange', this._emitRenderInvalid);
+    // TODO: sort out emitter types
+    // @ts-ignore
     layer.addEventListener('effectsChange', this._emitRenderInvalid);
+    // TODO: sort out emitter types
+    // @ts-ignore
     layer.addEventListener('fixedLevelChange', this._emitRenderInvalid);
+    // TODO: sort out emitter types
+    // @ts-ignore
     layer.addEventListener('textureStoreChange', this._emitRenderInvalid);
 
     this._emitRenderInvalid();
+  }
+  createRenderer(_renderer: any) {
+    throw new Error('Method not implemented.');
   }
   /**
    * Moves a {@link Layer layer} into a different position in the display stack.
@@ -287,7 +302,7 @@ class Stage {
    * @throws An error if the layer does not belong to the stage or if the position
    *     is invalid.
    */
-  moveLayer(layer, i) {
+  moveLayer(layer: Layer, i: number) {
     var index = this._layers.indexOf(layer);
     if (index < 0) {
       throw new Error('No such layer in stage');
@@ -310,7 +325,7 @@ class Stage {
    * @param {Layer} layer The layer to remove.
    * @throws An error if the layer does not belong to the stage.
    */
-  removeLayer(layer) {
+  removeLayer(layer: Layer) {
     var index = this._layers.indexOf(layer);
     if (index < 0) {
       throw new Error('No such layer in stage');
@@ -327,6 +342,9 @@ class Stage {
     removedLayer.removeEventListener('textureStoreChange', this._emitRenderInvalid);
 
     this._emitRenderInvalid();
+  }
+  destroyRenderer(_renderer: any) {
+    throw new Error('Method not implemented.');
   }
   /**
    * Removes all {@link Layer layers} from the stage.
@@ -581,7 +599,7 @@ class Stage {
    * @param {Asset} asset
    * @param {Function} done
    */
-  createTexture(tile, asset, done) {
+  createTexture(tile: Tile, asset: Asset, done: Function) {
 
     var self = this;
 

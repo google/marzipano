@@ -1,20 +1,3 @@
-/*
- * Copyright 2016 Google Inc. All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-'use strict';
-
 import Stage from './Stage';
 import HtmlImageLoader from "../loaders/HtmlImage";
 import browser from "bowser";
@@ -91,6 +74,15 @@ function initWebGlContext(canvas, opts) {
  * Also see the available {@link Stage} options.
  */
 class WebGlStage extends Stage {
+  _generateMipmaps: any;
+  _loader: HtmlImageLoader;
+  _domElement: HTMLCanvasElement;
+  _gl: any;
+  _handleContextLoss: () => void;
+  _rendererInstances: any[];
+  static type: string;
+  static TextureClass: typeof WebGlTexture;
+
   constructor(opts) {
     opts = opts || {};
 
@@ -126,8 +118,11 @@ class WebGlStage extends Stage {
    */
   destroy() {
     this._domElement.removeEventListener('webglcontextlost', this._handleContextLoss);
+    // TODO: figure out if this is proper way to do it?
+    super.destroy.call(this);
+    // previous impelemntation
     // Delegate clearing own properties to the Stage destructor.
-    this.constructor.super_.prototype.destroy.call(this);
+    // this.constructor.super_.prototype.destroy.call(this);
   }
   /**
    * Returns the underlying DOM element.
@@ -249,6 +244,12 @@ class WebGlStage extends Stage {
 WebGlStage.type = WebGlStage.prototype.type = 'webgl';
 
 class WebGlTexture {
+  _stage: any;
+  _gl: any;
+  _texture: null;
+  _timestamp: null;
+  _width: null;
+  _height: null;
   constructor(stage, tile, asset) {
     this._stage = stage;
     this._gl = stage._gl;
@@ -257,7 +258,7 @@ class WebGlTexture {
     this._width = this._height = null;
     this.refresh(tile, asset);
   }
-  refresh(tile, asset) {
+  refresh(_tile, asset) {
 
     var gl = this._gl;
     var stage = this._stage;
