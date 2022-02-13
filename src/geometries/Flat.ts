@@ -1,20 +1,3 @@
-/*
- * Copyright 2016 Google Inc. All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-'use strict';
-
 import hash from "../util/hash";
 import TileSearcher from "../TileSearcher";
 import LruMap from "../collections/LruMap";
@@ -47,6 +30,13 @@ var neighborOffsets = [
  * A tile in a {@link FlatGeometry}.
  */
 class FlatTile {
+  x: any;
+  y: any;
+  z: any;
+  _geometry: any;
+  _level: any;
+  static type: string;
+
   constructor(x, y, z, geometry) {
     this.x = x;
     this.y = y;
@@ -178,7 +168,7 @@ class FlatTile {
     var numX = level.numHorizontalTiles() - 1;
     var numY = level.numVerticalTiles() - 1;
 
-    var result = [];
+    var result: any[] = [];
 
     for (var i = 0; i < neighborOffsets.length; i++) {
       var xOffset = neighborOffsets[i][0];
@@ -210,10 +200,15 @@ class FlatTile {
     return (cmp(this.z, that.z) || cmp(this.y, that.y) || cmp(this.x, that.x));
   }
   str() {
+    // @ts-ignore
     return 'FlatTile(' + tile.x + ', ' + tile.y + ', ' + tile.z + ')';
   }
 }
 class FlatLevel extends Level {
+  _width: any;
+  _height: any;
+  _tileWidth: any;
+  _tileHeight: any;
   constructor(levelProperties) {
     super(levelProperties)
 
@@ -234,6 +229,7 @@ class FlatLevel extends Level {
   tileHeight() {
     return this._tileHeight;
   }
+  // @ts-ignore
   _validateWithParentLevel(parentLevel) {
 
     var width = this.width();
@@ -293,6 +289,14 @@ class FlatLevel extends Level {
  *                 square tiles
  */
 class FlatGeometry {
+  levelList: any[];
+  selectableLevelList: any[];
+  _tileSearcher: TileSearcher;
+  _neighborsCache: LruMap;
+  _vec: vec4;
+  _viewSize: any;
+  static Tile: typeof FlatTile;
+  static type: string;
   constructor(levelPropertiesList) {
     if (type(levelPropertiesList) !== 'array') {
       throw new Error('Level list must be an array');
@@ -305,6 +309,7 @@ class FlatGeometry {
       this.levelList[i]._validateWithParentLevel(this.levelList[i - 1]);
     }
 
+    // @ts-ignore
     this._tileSearcher = new TileSearcher(this);
 
     this._neighborsCache = new LruMap(neighborsCacheSize);
@@ -388,8 +393,11 @@ class FlatGeometry {
   }
 }
 
+// @ts-ignore
 FlatGeometry.Tile = FlatGeometry.prototype.Tile = FlatTile;
+// @ts-ignore
 FlatGeometry.type = FlatGeometry.prototype.type = 'flat';
+// @ts-ignore
 FlatTile.type = FlatTile.prototype.type = 'flat';
 
 

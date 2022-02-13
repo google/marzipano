@@ -67,7 +67,6 @@ class Stage {
   _tmpRect: any;
   _tmpSize: any;
   _createTextureWorkQueue: WorkQueue;
-  _emitRenderInvalid: any;
   _rendererRegistry: RendererRegistry;
   type: string | undefined;
   TextureClass: any;
@@ -614,13 +613,13 @@ class Stage {
     });
 
   }
+
+  _emitRenderInvalid() {
+    this.emit('renderInvalid');
+  }
 }
 
 eventEmitter(Stage);
-
-Stage.prototype._emitRenderInvalid = function() {
-  this.emit('renderInvalid');
-};
 
 /**
  * The stage type, used to determine the appropriate renderer for a given
