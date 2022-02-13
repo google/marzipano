@@ -1,20 +1,3 @@
-/*
- * Copyright 2016 Google Inc. All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-"use strict";
-
 import eventEmitter from "minimal-event-emitter";
 import Composer from "./Composer";
 import clearOwnProperties from "../util/clearOwnProperties";
@@ -169,8 +152,6 @@ class Controls {
     }
     this._unlisten(id);
     this._updateComposer();
-    // TODO: emitter types
-    // @ts-ignore
     this.emit("methodDisabled", id);
   }
   /**
@@ -233,12 +214,8 @@ class Controls {
     }
     this._enabled = true;
     if (this._activeCount > 0) {
-      // TODO: emitter types
-      // @ts-ignore
       this.emit("active");
     }
-    // TODO: emitter types
-    // @ts-ignore
     this.emit("enabled");
     this._updateComposer();
   }
@@ -256,7 +233,7 @@ class Controls {
     this.emit("disabled");
     this._updateComposer();
   }
-  emit(arg0: string) {
+  emit(_arg0: string, _arg1?: any) {
     throw new Error("Method not implemented.");
   }
   /**
@@ -352,8 +329,6 @@ class Controls {
       this._checkActiveCount();
     }
     if (this._enabled && this._activeCount === 1) {
-      // TODO: emitter types
-      // @ts-ignore
       this.emit("active");
     }
   }
@@ -363,8 +338,6 @@ class Controls {
       this._checkActiveCount();
     }
     if (this._enabled && this._activeCount === 0) {
-      // TODO: emitter types
-      // @ts-ignore
       this.emit("inactive");
     }
   }

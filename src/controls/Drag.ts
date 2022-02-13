@@ -1,23 +1,6 @@
-/*
- * Copyright 2016 Google Inc. All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-'use strict';
-
 import eventEmitter from "minimal-event-emitter";
 import Dynamics from "./Dynamics";
-import HammerGestures from "./HammerGestures";
+import HammerGestures, { HammerGesturesHandle } from "./HammerGestures";
 import defaults from "../util/defaults";
 import { maxFriction as maxFriction } from "./util";
 import clearOwnProperties from "../util/clearOwnProperties";
@@ -25,10 +8,12 @@ import clearOwnProperties from "../util/clearOwnProperties";
 var defaultOptions = {
   friction: 6,
   maxFrictionTime: 0.3,
-  hammerEvent: 'pan'
+  hammerEvent: "pan",
 };
 
-var debug = typeof MARZIPANODEBUG !== 'undefined' && MARZIPANODEBUG.controls;
+// TODO: figure out where this was coming from
+// @ts-ignore
+var debug = typeof MARZIPANODEBUG !== "undefined" && MARZIPANODEBUG.controls;
 
 /**
  * @class DragControlMethod
@@ -46,7 +31,15 @@ var debug = typeof MARZIPANODEBUG !== 'undefined' && MARZIPANODEBUG.controls;
  * @param {'pan'|'pinch'} opts.hammerEvent
  */
 class DragControlMethod {
-  constructor(element, pointerType, opts) {
+  _element: any;
+  _opts: { [x: string]: any };
+  _startEvent: null | boolean | PointerEvent;
+  _lastEvent: null | boolean | PointerEvent;
+  _active: boolean;
+  _dynamics: { x: Dynamics; y: Dynamics };
+  _hammer: HammerGesturesHandle;
+
+  constructor(element: Element, pointerType: string, opts?: { hammerEvent: string; }) {
     this._element = element;
 
     this._opts = defaults(opts || {}, defaultOptions);
@@ -58,21 +51,33 @@ class DragControlMethod {
 
     this._dynamics = {
       x: new Dynamics(),
-      y: new Dynamics()
+      y: new Dynamics(),
     };
 
     this._hammer = HammerGestures.get(element, pointerType);
 
     this._hammer.on("hammer.input", this._handleHammerEvent.bind(this));
 
-    if (this._opts.hammerEvent != 'pan' && this._opts.hammerEvent != 'pinch') {
-      throw new Error(this._opts.hammerEvent + ' is not a hammerEvent managed in DragControlMethod');
+    if (this._opts.hammerEvent != "pan" && this._opts.hammerEvent != "pinch") {
+      throw new Error(
+        this._opts.hammerEvent +
+          " is not a hammerEvent managed in DragControlMethod"
+      );
     }
 
-    this._hammer.on(this._opts.hammerEvent + 'start', this._handleStart.bind(this));
-    this._hammer.on(this._opts.hammerEvent + 'move', this._handleMove.bind(this));
-    this._hammer.on(this._opts.hammerEvent + 'end', this._handleEnd.bind(this));
-    this._hammer.on(this._opts.hammerEvent + 'cancel', this._handleEnd.bind(this));
+    this._hammer.on(
+      this._opts.hammerEvent + "start",
+      this._handleStart.bind(this)
+    );
+    this._hammer.on(
+      this._opts.hammerEvent + "move",
+      this._handleMove.bind(this)
+    );
+    this._hammer.on(this._opts.hammerEvent + "end", this._handleEnd.bind(this));
+    this._hammer.on(
+      this._opts.hammerEvent + "cancel",
+      this._handleEnd.bind(this)
+    );
   }
   /**
    * Destructor.
@@ -84,18 +89,25 @@ class DragControlMethod {
   _handleHammerEvent(e) {
     if (e.isFirst) {
       if (debug && this._active) {
-        throw new Error('DragControlMethod active detected when already active');
+        throw new Error(
+          "DragControlMethod active detected when already active"
+        );
       }
       this._active = true;
-      this.emit('active');
+      this.emit("active");
     }
     if (e.isFinal) {
       if (debug && !this._active) {
-        throw new Error('DragControlMethod inactive detected when already inactive');
+        throw new Error(
+          "DragControlMethod inactive detected when already inactive"
+        );
       }
       this._active = false;
-      this.emit('inactive');
+      this.emit("inactive");
     }
+  }
+  emit(_arg0: string) {
+    throw new Error("Method not implemented.");
   }
   _handleStart(e) {
     // Prevent this event from dragging other DOM elements, causing
@@ -111,8 +123,12 @@ class DragControlMethod {
 
     if (this._startEvent) {
       this._updateDynamicsMove(e);
-      this.emit('parameterDynamics', 'axisScaledX', this._dynamics.x);
-      this.emit('parameterDynamics', 'axisScaledY', this._dynamics.y);
+      // TODO: fix these emitter issues
+      // @ts-ignore
+      this.emit("parameterDynamics", "axisScaledX", this._dynamics.x);
+      // TODO: fix these emitter issues
+      // @ts-ignore
+      this.emit("parameterDynamics", "axisScaledY", this._dynamics.y);
     }
   }
   _handleEnd(e) {
@@ -122,8 +138,12 @@ class DragControlMethod {
 
     if (this._startEvent) {
       this._updateDynamicsRelease(e);
-      this.emit('parameterDynamics', 'axisScaledX', this._dynamics.x);
-      this.emit('parameterDynamics', 'axisScaledY', this._dynamics.y);
+      // TODO: fix these emitter issues
+      // @ts-ignore
+      this.emit("parameterDynamics", "axisScaledX", this._dynamics.x);
+      // TODO: fix these emitter issues
+      // @ts-ignore
+      this.emit("parameterDynamics", "axisScaledY", this._dynamics.y);
     }
 
     this._startEvent = false;
@@ -138,7 +158,11 @@ class DragControlMethod {
     var eventToSubtract = this._lastEvent || this._startEvent;
 
     if (eventToSubtract) {
+      // TODO: better type checks
+      // @ts-ignore
       x -= eventToSubtract.deltaX;
+      // TODO: better type checks
+      // @ts-ignore
       y -= eventToSubtract.deltaY;
     }
 
@@ -161,15 +185,21 @@ class DragControlMethod {
     var width = elementRect.right - elementRect.left;
     var height = elementRect.bottom - elementRect.top;
 
-    var x = 1000 * e.velocityX / width;
-    var y = 1000 * e.velocityY / height;
+    var x = (1000 * e.velocityX) / width;
+    var y = (1000 * e.velocityY) / height;
 
     this._dynamics.x.reset();
     this._dynamics.y.reset();
     this._dynamics.x.velocity = x;
     this._dynamics.y.velocity = y;
 
-    maxFriction(this._opts.friction, this._dynamics.x.velocity, this._dynamics.y.velocity, this._opts.maxFrictionTime, tmpReleaseFriction);
+    maxFriction(
+      this._opts.friction,
+      this._dynamics.x.velocity,
+      this._dynamics.y.velocity,
+      this._opts.maxFrictionTime,
+      tmpReleaseFriction
+    );
     this._dynamics.x.friction = tmpReleaseFriction[0];
     this._dynamics.y.friction = tmpReleaseFriction[1];
   }
@@ -177,6 +207,6 @@ class DragControlMethod {
 
 eventEmitter(DragControlMethod);
 
-var tmpReleaseFriction = [ null, null ];
+var tmpReleaseFriction: [null, null] = [null, null];
 
 export default DragControlMethod;

@@ -1,20 +1,3 @@
-/*
- * Copyright 2016 Google Inc. All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-'use strict';
-
 import eventEmitter from "minimal-event-emitter";
 import Dynamics from "./Dynamics";
 import clearOwnProperties from "../util/clearOwnProperties";
@@ -34,6 +17,14 @@ import clearOwnProperties from "../util/clearOwnProperties";
  * @param {number} friction Friction at which the parameter stops
 */
 class ElementPressControlMethod {
+  _element: any;
+  _pressHandler: () => void;
+  _releaseHandler: () => void;
+  _parameter: any;
+  _velocity: any;
+  _friction: any;
+  _dynamics: Dynamics;
+  _pressing: boolean;
   constructor(element, parameter, velocity, friction) {
     if (!element) {
       throw new Error("ElementPressControlMethod: element must be defined");
@@ -86,6 +77,9 @@ class ElementPressControlMethod {
     this._dynamics.friction = 0;
     this.emit('parameterDynamics', this._parameter, this._dynamics);
     this.emit('active');
+  }
+  emit(_arg0: string, _parameter?: any, _dynamics?: any) {
+    throw new Error("Method not implemented.");
   }
   _handleRelease() {
     if (this._pressing) {

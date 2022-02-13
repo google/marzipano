@@ -1,20 +1,3 @@
-/*
- * Copyright 2016 Google Inc. All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-'use strict';
-
 import eventEmitter from "minimal-event-emitter";
 import Dynamics from "./Dynamics";
 import now from "../util/now";
@@ -30,12 +13,30 @@ import clearOwnProperties from "../util/clearOwnProperties";
  * @listens ControlMethod#parameterDynamics
  */
 class ControlComposer {
-  constructor(opts) {
+  _methods: Array<{
+    instance: any;
+    dynamics: any;
+    parameterDynamicsHandler: (parameter: string, dynamics: Dynamics) => void;
+  }>;
+  _parameters: string[];
+  _now: any;
+  _composedOffsets: {};
+  _composeReturn: { offsets: any; changing: null | boolean };
+  constructor(opts?: { nowForTesting?: any } | undefined) {
     opts = opts || {};
 
     this._methods = [];
 
-    this._parameters = ['x', 'y', 'axisScaledX', 'axisScaledY', 'zoom', 'yaw', 'pitch', 'roll'];
+    this._parameters = [
+      "x",
+      "y",
+      "axisScaledX",
+      "axisScaledY",
+      "zoom",
+      "yaw",
+      "pitch",
+      "roll",
+    ];
 
     this._now = opts.nowForTesting || now;
 
@@ -52,7 +53,7 @@ class ControlComposer {
     this._parameters.forEach(function (parameter) {
       dynamics[parameter] = {
         dynamics: new Dynamics(),
-        time: null
+        time: null,
       };
     });
 
@@ -61,10 +62,10 @@ class ControlComposer {
     var method = {
       instance: instance,
       dynamics: dynamics,
-      parameterDynamicsHandler: parameterDynamicsHandler
+      parameterDynamicsHandler: parameterDynamicsHandler,
     };
 
-    instance.addEventListener('parameterDynamics', parameterDynamicsHandler);
+    instance.addEventListener("parameterDynamics", parameterDynamicsHandler);
 
     this._methods.push(method);
   }
@@ -72,7 +73,10 @@ class ControlComposer {
     var index = this._indexOfInstance(instance);
     if (index >= 0) {
       var method = this._methods.splice(index, 1)[0];
-      method.instance.removeEventListener('parameterDynamics', method.parameterDynamicsHandler);
+      method.instance.removeEventListener(
+        "parameterDynamics",
+        method.parameterDynamicsHandler
+      );
     }
   }
   has(instance) {
@@ -87,7 +91,7 @@ class ControlComposer {
     return -1;
   }
   list() {
-    var instances = [];
+    var instances: unknown[] = [];
     for (var i = 0; i < this._methods.length; i++) {
       instances.push(this._methods[i].instance);
     }
@@ -101,10 +105,16 @@ class ControlComposer {
     }
 
     var newTime = this._now();
-    parameterDynamics.dynamics.update(dynamics, (newTime - parameterDynamics.time) / 1000);
+    parameterDynamics.dynamics.update(
+      dynamics,
+      (newTime - parameterDynamics.time) / 1000
+    );
     parameterDynamics.time = newTime;
 
-    this.emit('change');
+    this.emit("change");
+  }
+  emit(_arg0: string) {
+    throw new Error("Method not implemented.");
   }
   _resetComposedOffsets() {
     for (var i = 0; i < this._parameters.length; i++) {
@@ -126,7 +136,6 @@ class ControlComposer {
         parameter = this._parameters[p];
         var parameterDynamics = methodDynamics[parameter];
         var dynamics = parameterDynamics.dynamics;
-
 
         // Add offset to composed offset
         if (dynamics.offset != null) {

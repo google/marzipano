@@ -34,7 +34,8 @@
     "vite:dev": "vite --port=3001",
     "vite:build": "tsc && vite build",
     "vite:preview": "vite --port=3001 preview",
-    "vite:test": "vitest"
+    "vite:test": "vitest",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "bowser": "1.9.4",

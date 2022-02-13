@@ -1,20 +1,3 @@
-/*
- * Copyright 2016 Google Inc. All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-'use strict';
-
 import eventEmitter from "minimal-event-emitter";
 import Dynamics from "./Dynamics";
 import defaults from "../util/defaults";
@@ -38,7 +21,13 @@ var defaultOptions = {
  * @param {number} [opts.zoomDelta=0.001]
  */
 class ScrollZoomControlMethod {
-  constructor(element, opts) {
+  _element: any;
+  _opts: { [x: string]: any; };
+  _dynamics: Dynamics;
+  _eventList: any[];
+  _wheelListener: (e: any) => void;
+
+  constructor(element: Element, opts?: any) {
     this._element = element;
     this._opts = defaults(opts || {}, defaultOptions);
     this._dynamics = new Dynamics();
@@ -65,6 +54,9 @@ class ScrollZoomControlMethod {
     this.emit('active');
     this.emit('inactive');
   }
+  emit(_arg0: string, _arg1?: string, _dynamics?: any) {
+    throw new Error("Method not implemented.");
+  }
   withSmoothing(e) {
     var currentTime = e.timeStamp;
 
@@ -73,6 +65,8 @@ class ScrollZoomControlMethod {
 
     // Remove events whose smoothing has already expired.
     while (this._eventList[0].timeStamp < currentTime - this._opts.frictionTime * 1000) {
+      // TODO: figure out what's up with 0
+      // @ts-ignore
       this._eventList.shift(0);
     }
 
