@@ -37,10 +37,14 @@ var propertyMap = {
  * @throws If the pixel source is unsupported.
  */
 class StaticAsset {
+  _widthProp: any;
+  _heightProp: any;
+  _element: any;
+
   constructor(element) {
     var supported = false;
     for (var type in propertyMap) {
-      if (global[type] && element instanceof global[type]) {
+      if (global?.[type] && element instanceof global[type]) {
         supported = true;
         this._widthProp = propertyMap[type][0];
         this._heightProp = propertyMap[type][1];
