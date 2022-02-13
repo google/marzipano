@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
+"use strict";
 
 import eventEmitter from "minimal-event-emitter";
 import Composer from "./Composer";
 import clearOwnProperties from "../util/clearOwnProperties";
+import RenderLoop from "../RenderLoop";
 
-var debug = typeof MARZIPANODEBUG !== 'undefined' && MARZIPANODEBUG.controls;
+// TODO: this was probably got from window?
+// @ts-ignore
+var debug = typeof MARZIPANODEBUG !== "undefined" && MARZIPANODEBUG.controls;
 
 /**
  * @class Controls
@@ -41,7 +44,17 @@ var debug = typeof MARZIPANODEBUG !== 'undefined' && MARZIPANODEBUG.controls;
  *
  */
 class Controls {
-  constructor(opts) {
+  _methods: Record<string, any>;
+  _methodGroups: any;
+  _composer: any;
+  _enabled: boolean;
+  _activeCount: number;
+  updatedViews_: any[];
+  _attachedRenderLoop: any;
+  _beforeRenderHandler?: (() => void) | null;
+  _changeHandler?: (() => void) | null;
+
+  constructor(opts: { enabled?: any } | undefined) {
     opts = opts || {};
 
     this._methods = {};
@@ -49,7 +62,7 @@ class Controls {
     this._composer = new Composer();
 
     // Whether the controls are enabled.
-    this._enabled = (opts && opts.enabled) ? !!opts.enabled : true;
+    this._enabled = opts && opts.enabled ? !!opts.enabled : true;
 
     // How many control methods are enabled and in the active state.
     this._activeCount = 0;
@@ -70,7 +83,7 @@ class Controls {
    * @return {ControlMethod[]} List of registered @{link ControlMethod instances}
    */
   methods() {
-    var obj = {};
+    var obj: typeof this._methods = {};
     for (var id in this._methods) {
       obj[id] = this._methods[id];
     }
@@ -80,7 +93,7 @@ class Controls {
    * @param {String} id
    * @return {ControlMethod}
    */
-  method(id) {
+  method(id: string | number) {
     return this._methods[id];
   }
   /**
@@ -88,9 +101,9 @@ class Controls {
    * @param {ControlMethod} instance
    * @param {Boolean} [enable=false]
    */
-  registerMethod(id, instance, enable) {
+  registerMethod(id: string, instance: any, enable?: any) {
     if (this._methods[id]) {
-      throw new Error('Control method already registered with id ' + id);
+      throw new Error("Control method already registered with id " + id);
     }
 
     this._methods[id] = {
@@ -98,20 +111,20 @@ class Controls {
       enabled: false,
       active: false,
       activeHandler: this._handleActive.bind(this, id),
-      inactiveHandler: this._handleInactive.bind(this, id)
+      inactiveHandler: this._handleInactive.bind(this, id),
     };
 
     if (enable) {
-      this.enableMethod(id, instance);
+      this.enableMethod(id);
     }
   }
   /**
    * @param {String} id
    */
-  unregisterMethod(id) {
+  unregisterMethod(id: string) {
     var method = this._methods[id];
     if (!method) {
-      throw new Error('No control method registered with id ' + id);
+      throw new Error("No control method registered with id " + id);
     }
     if (method.enabled) {
       this.disableMethod(id);
@@ -121,10 +134,10 @@ class Controls {
   /**
    * @param {String} id
    */
-  enableMethod(id) {
+  enableMethod(id: string) {
     var method = this._methods[id];
     if (!method) {
-      throw new Error('No control method registered with id ' + id);
+      throw new Error("No control method registered with id " + id);
     }
     if (method.enabled) {
       return;
@@ -135,15 +148,17 @@ class Controls {
     }
     this._listen(id);
     this._updateComposer();
-    this.emit('methodEnabled', id);
+    // TODO: emitter types
+    // @ts-ignore
+    this.emit("methodEnabled", id);
   }
   /**
    * @param {String} id
    */
-  disableMethod(id) {
+  disableMethod(id: string) {
     var method = this._methods[id];
     if (!method) {
-      throw new Error('No control method registered with id ' + id);
+      throw new Error("No control method registered with id " + id);
     }
     if (!method.enabled) {
       return;
@@ -154,7 +169,9 @@ class Controls {
     }
     this._unlisten(id);
     this._updateComposer();
-    this.emit('methodDisabled', id);
+    // TODO: emitter types
+    // @ts-ignore
+    this.emit("methodDisabled", id);
   }
   /**
    * Create a method group, which can be used to more conveniently enable or
@@ -162,20 +179,20 @@ class Controls {
    * @param {String} groupId
    * @param {String[]} methodIds
    */
-  addMethodGroup(groupId, methodIds) {
+  addMethodGroup(groupId: string | number, methodIds: any) {
     this._methodGroups[groupId] = methodIds;
   }
   /**
    * @param {String} groupId
    */
-  removeMethodGroup(id) {
+  removeMethodGroup(id: string | number) {
     delete this._methodGroups[id];
   }
   /**
    * @return {ControlMethodGroup[]} List of control method groups
    */
   methodGroups() {
-    var obj = {};
+    var obj: typeof this._methodGroups = {};
     for (var id in this._methodGroups) {
       obj[id] = this._methodGroups[id];
     }
@@ -185,9 +202,9 @@ class Controls {
    * Enables all the control methods in the group
    * @param {String} groupId
    */
-  enableMethodGroup(id) {
+  enableMethodGroup(id: string | number) {
     var self = this;
-    self._methodGroups[id].forEach(function (methodId) {
+    self._methodGroups[id].forEach(function (methodId: string) {
       self.enableMethod(methodId);
     });
   }
@@ -195,9 +212,9 @@ class Controls {
    * Disables all the control methods in the group
    * @param {String} groupId
    */
-  disableMethodGroup(id) {
+  disableMethodGroup(id: string | number) {
     var self = this;
-    self._methodGroups[id].forEach(function (methodId) {
+    self._methodGroups[id].forEach(function (methodId: string) {
       self.disableMethod(methodId);
     });
   }
@@ -216,9 +233,13 @@ class Controls {
     }
     this._enabled = true;
     if (this._activeCount > 0) {
-      this.emit('active');
+      // TODO: emitter types
+      // @ts-ignore
+      this.emit("active");
     }
-    this.emit('enabled');
+    // TODO: emitter types
+    // @ts-ignore
+    this.emit("enabled");
     this._updateComposer();
   }
   /**
@@ -230,10 +251,13 @@ class Controls {
     }
     this._enabled = false;
     if (this._activeCount > 0) {
-      this.emit('inactive');
+      this.emit("inactive");
     }
-    this.emit('disabled');
+    this.emit("disabled");
     this._updateComposer();
+  }
+  emit(arg0: string) {
+    throw new Error("Method not implemented.");
   }
   /**
    * Attaches the controls to a {@link RenderLoop}. The RenderLoop will be woken
@@ -241,7 +265,7 @@ class Controls {
    *
    * @param {RenderLoop}
    */
-  attach(renderLoop) {
+  attach(renderLoop: RenderLoop) {
     if (this._attachedRenderLoop) {
       this.detach();
     }
@@ -250,8 +274,11 @@ class Controls {
     this._beforeRenderHandler = this._updateViewsWithControls.bind(this);
     this._changeHandler = renderLoop.renderOnNextFrame.bind(renderLoop);
 
-    this._attachedRenderLoop.addEventListener('beforeRender', this._beforeRenderHandler);
-    this._composer.addEventListener('change', this._changeHandler);
+    this._attachedRenderLoop.addEventListener(
+      "beforeRender",
+      this._beforeRenderHandler
+    );
+    this._composer.addEventListener("change", this._changeHandler);
   }
   /**
    * Detaches the controls
@@ -261,8 +288,11 @@ class Controls {
       return;
     }
 
-    this._attachedRenderLoop.removeEventListener('beforeRender', this._beforeRenderHandler);
-    this._composer.removeEventListener('change', this._changeHandler);
+    this._attachedRenderLoop.removeEventListener(
+      "beforeRender",
+      this._beforeRenderHandler
+    );
+    this._composer.removeEventListener("change", this._changeHandler);
 
     this._beforeRenderHandler = null;
     this._changeHandler = null;
@@ -274,42 +304,42 @@ class Controls {
   attached() {
     return this._attachedRenderLoop != null;
   }
-  _listen(id) {
+  _listen(id: string) {
     var method = this._methods[id];
     if (!method) {
-      throw new Error('Bad method id');
+      throw new Error("Bad method id");
     }
-    method.instance.addEventListener('active', method.activeHandler);
-    method.instance.addEventListener('inactive', method.inactiveHandler);
+    method.instance.addEventListener("active", method.activeHandler);
+    method.instance.addEventListener("inactive", method.inactiveHandler);
   }
-  _unlisten(id) {
+  _unlisten(id: string) {
     var method = this._methods[id];
     if (!method) {
-      throw new Error('Bad method id');
+      throw new Error("Bad method id");
     }
-    method.instance.removeEventListener('active', method.activeHandler);
-    method.instance.removeEventListener('inactive', method.inactiveHandler);
+    method.instance.removeEventListener("active", method.activeHandler);
+    method.instance.removeEventListener("inactive", method.inactiveHandler);
   }
-  _handleActive(id) {
+  _handleActive(id: string | number) {
     var method = this._methods[id];
     if (!method) {
-      throw new Error('Bad method id');
+      throw new Error("Bad method id");
     }
     if (!method.enabled) {
-      throw new Error('Should not receive event from disabled control method');
+      throw new Error("Should not receive event from disabled control method");
     }
     if (!method.active) {
       method.active = true;
       this._incrementActiveCount();
     }
   }
-  _handleInactive(id) {
+  _handleInactive(id: string | number) {
     var method = this._methods[id];
     if (!method) {
-      throw new Error('Bad method id');
+      throw new Error("Bad method id");
     }
     if (!method.enabled) {
-      throw new Error('Should not receive event from disabled control method');
+      throw new Error("Should not receive event from disabled control method");
     }
     if (method.active) {
       method.active = false;
@@ -322,7 +352,9 @@ class Controls {
       this._checkActiveCount();
     }
     if (this._enabled && this._activeCount === 1) {
-      this.emit('active');
+      // TODO: emitter types
+      // @ts-ignore
+      this.emit("active");
     }
   }
   _decrementActiveCount() {
@@ -331,7 +363,9 @@ class Controls {
       this._checkActiveCount();
     }
     if (this._enabled && this._activeCount === 0) {
-      this.emit('inactive');
+      // TODO: emitter types
+      // @ts-ignore
+      this.emit("inactive");
     }
   }
   _checkActiveCount() {
@@ -343,7 +377,7 @@ class Controls {
       }
     }
     if (count != this._activeCount) {
-      throw new Error('Bad control state');
+      throw new Error("Bad control state");
     }
   }
   _updateComposer() {

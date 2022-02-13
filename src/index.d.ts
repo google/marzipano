@@ -1,0 +1,1 @@
+declare module 'minimal-event-emitter';

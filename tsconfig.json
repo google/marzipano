@@ -12,7 +12,9 @@
     "noEmit": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitReturns": true
+    "noImplicitReturns": true,
+    "noImplicitAny": false,
+    "allowJs": true
   },
   "include": ["src"]
 }

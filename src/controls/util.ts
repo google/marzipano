@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
 
-function maxFriction(friction, velocityX, velocityY, maxFrictionTime, result) {
+function maxFriction(friction: number, velocityX: number, velocityY: number, maxFrictionTime: number, result: number[]) {
   var velocity = Math.sqrt(Math.pow(velocityX,2) + Math.pow(velocityY,2));
   friction = Math.max(friction, velocity/maxFrictionTime);
   changeVectorNorm(velocityX, velocityY, friction, result);
@@ -23,7 +22,7 @@ function maxFriction(friction, velocityX, velocityY, maxFrictionTime, result) {
   result[1] = Math.abs(result[1]);
 }
 
-function changeVectorNorm(x, y, n, result) {
+function changeVectorNorm(x: number, y: number, n: number, result: null[] | number[]) {
   var theta = Math.atan(y/x);
   result[0] = n * Math.cos(theta);
   result[1] = n * Math.sin(theta);
@@ -33,9 +32,4 @@ function changeVectorNorm(x, y, n, result) {
 export {
   maxFriction,
   changeVectorNorm
-};
-
-export default {
-  maxFriction: maxFriction,
-  changeVectorNorm: changeVectorNorm
 };

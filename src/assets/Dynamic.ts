@@ -32,9 +32,11 @@ import clearOwnProperties from "../util/clearOwnProperties";
  * @throws If the pixel source is unsupported.
  */
 class DynamicAsset extends StaticAsset {
-  constructor(element) {
+  #_timestamp: number;
+
+  constructor(element: ConstructorParameters<typeof StaticAsset>[0]) {
     super(element);
-    this._timestamp = 0;
+    this.#_timestamp = 0;
   }
   /**
    * Destructor.
@@ -43,7 +45,7 @@ class DynamicAsset extends StaticAsset {
     clearOwnProperties(this);
   }
   timestamp() {
-    return this._timestamp;
+    return this.#_timestamp;
   }
   isDynamic() {
     return true;
@@ -55,7 +57,9 @@ class DynamicAsset extends StaticAsset {
    * @throws If the asset is not dynamic.
    */
   markDirty() {
-    this._timestamp++;
+    this.#_timestamp++;
+    // TODO: define the proper event emitter interface
+    // @ts-ignore
     this.emit('change');
   }
 }

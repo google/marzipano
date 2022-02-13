@@ -25,8 +25,6 @@ MANIFEST="{ \"version\": \"$VERSION\", \"file\": \"marzipano-$VERSION.zip\" }"
 rm -rf dist
 mkdir -p dist
 
-sed s/VERSION_STRING/$VERSION/ src/preamble.js > dist/preamble.js
-
 browserify \
   --noparse=node_modules/**/*.js \
   -s Marzipano \
@@ -38,9 +36,7 @@ uglifyjs \
   -o dist/uglified.js \
   dist/browserified.js
 
-cat dist/preamble.js dist/uglified.js > dist/marzipano.js
-
-rm dist/preamble.js dist/browserified.js dist/uglified.js
+rm dist/browserified.js dist/uglified.js
 
 jsdoc -c jsdoc-conf.json
 

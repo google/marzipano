@@ -24,10 +24,11 @@
  * {@link Loader loaders} to distinguish network failures from other errors.
  */
 class NetworkError extends Error {
-  constructor(message) {
-    // See: https://stackoverflow.com/questions/1382107/whats-a-good-way-to-extend-error-in-javascript
-    this.constructor.super_.apply(this, arguments);
-    this.message = message;
+  constructor(...args: ConstructorParameters<typeof Error>) {
+    super(...args)
+    if(typeof args[0] === 'string') {
+      this.message = args[0]
+    }
   }
 }
 
