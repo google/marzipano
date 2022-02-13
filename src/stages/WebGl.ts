@@ -80,13 +80,14 @@ class WebGlStage extends Stage {
   _gl: any;
   _handleContextLoss: () => void;
   _rendererInstances: any[];
-  static type: string;
+  static type: string = 'webgl';
+
   static TextureClass: typeof WebGlTexture;
 
   constructor(opts) {
     opts = opts || {};
-
     super(opts);
+    this.type = 'webgl';
 
     this._generateMipmaps = opts.generateMipmaps != null ?
       opts.generateMipmaps : false;
