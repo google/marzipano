@@ -74,14 +74,13 @@ view.addEventListener('change', function() {
 });
 
 function formatMegaPixels(num) {
-  var suffixes = [ 'Mega' , 'Giga', 'Tera', 'Peta', 'Exa', 'Zetta' ];
+  var suffixes = [ 'Kilo', 'Mega', 'Giga', 'Tera', 'Peta', 'Exa', 'Zetta' ];
   for (var i = 0; i < suffixes.length; i++) {
     var divider = Math.pow(1000, i);
     if (num < divider) {
       break;
     }
   }
-  i -= 1;
   var divided = num / Math.pow(1000, i);
   var formatted = divided.toFixed(2) + ' ' + suffixes[i];
   return formatted;
