@@ -1,10 +1,11 @@
 {
   "name": "marzipano",
-  "version": "0.10.2",
+  "version": "0.10.3",
   "description": "A 360° media viewer for the modern web",
   "author": "Google Inc.",
   "license": "Apache-2.0",
   "main": "src/index.js",
+  "types": "src/types.d.ts",
   "homepage": "http://www.marzipano.net",
   "repository": {
     "type": "git",
